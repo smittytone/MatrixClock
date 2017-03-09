@@ -4,7 +4,7 @@ An [Electric Imp](https://electricimp.com/) imp001-based digital clock using fou
 
 ## Hardware
 
-![Matrix Clock](matrixclock.jpg)
+<p><img src="matrixclock.jpg" width="760" alt="Matrix Clock in use"></p>
 
 ### Ingredients
 
@@ -15,7 +15,9 @@ An [Electric Imp](https://electricimp.com/) imp001-based digital clock using fou
 
 ### Circuit
 
-*Circuit to follow*
+<p><img src="circuit.png" width="760" alt="Matrix Clock circuit"></p>
+
+The circuit shown is idealised. Power comes from the imp breakout board’s USB port (VIN). In practice, you will want to re-position the imp relative to the LED matrices, and I added to barrel jack power ports in parallel and positioned so that you can run a cable into the top of the clock or up to its base, depending on where you plan to site the clock. The jacks were wired directly to the GND and power rails, and from there to the imp board’s P+ and P- panels. The jumper on the board was adjusted accordingly.
 
 ### Setup
 
