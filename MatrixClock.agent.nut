@@ -347,7 +347,7 @@ function appResponse() {
     return rs;
 }
 
-function reset() {
+function resetToDefaults() {
     // Reset clock prefs to the defaults
     prefs.hrmode = true;
     prefs.bst = true;
@@ -431,7 +431,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save mode setting");
             if (debug) server.log("Clock mode turned to " + (prefs.hrmode ? "24 hour" : "12 hour"));
-            device.send("clock.switch.mode", (prefs.hrmode ? 24 : 12));
+            device.send("mclock.set.mode", (prefs.hrmode ? 24 : 12));
         }
 
         // Check for a BST set/unset message
@@ -448,7 +448,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
             if (debug) server.log("Clock bst observance turned " + (prefs.bst ? "on" : "off"));
-            device.send("clock.switch.bst", (prefs.bst ? 1 : 0));
+            device.send("mclock.set.bst", (prefs.bst ? 1 : 0));
         }
 
         // Check for a set brightness message
@@ -456,7 +456,7 @@ api.post("/settings", function(context) {
             prefs.brightness = data.setbright.tointeger();
             if (server.save(prefs) != 0) server.error("Could not save brightness setting");
             if (debug) server.log(format("Brightness set to %i", prefs.brightness));
-            device.send("clock.set.brightness", prefs.brightness);
+            device.send("mclock.set.brightness", prefs.brightness);
         }
 
         // Check for a set flash message
@@ -473,7 +473,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon flash setting");
             if (debug) server.log("Clock colon flash turned " + (prefs.flash ? "on" : "off"));
-            device.send("clock.switch.flash", (prefs.flash ? 1 : 0));
+            device.send("mclock.set.flash", (prefs.flash ? 1 : 0));
         }
 
         // Check for a set colon show message
@@ -490,7 +490,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon visibility setting");
             if (debug) server.log("Clock colon turned " + (prefs.colon ? "on" : "off"));
-            device.send("clock.switch.colon", (prefs.colon ? 1 : 0));
+            device.send("mclock.set.colon", (prefs.colon ? 1 : 0));
         }
 
         // Check for set light message
@@ -507,7 +507,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save display light setting");
             if (debug) server.log("Clock display turned " + (prefs.on ? "on" : "off"));
-            device.send("clock.set.light", (prefs.on ? 1 : 0));
+            device.send("mclock.set.light", (prefs.on ? 1 : 0));
         }
 
         context.send(200, "OK");
@@ -527,7 +527,7 @@ api.post("/action", function(context) {
         if ("action" in data) {
             if (data.action == "reset") {
                 resetToDefaults();
-                device.send("clock.set.prefs", prefs);
+                device.send("mclock.set.prefs", prefs);
                 if (debug) server.log("Clock settings reset");
                 if (server.save(prefs) != 0) server.error("Could not save clock settings after reset");
             }
@@ -539,7 +539,7 @@ api.post("/action", function(context) {
                     debug = false;
                 }
 
-                device.send("clock.set.debug", (debug ? 1 : 0));
+                device.send("mclock.set.debug", (debug ? 1 : 0));
                 server.log("Debug mode " + (debug ? "on" : "off"));
             }
         }

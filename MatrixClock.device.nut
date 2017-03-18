@@ -383,6 +383,7 @@ agent.on("mclock.set.brightness", setBright);
 agent.on("mclock.set.flash", setFlash);
 agent.on("mclock.set.colon", setColon);
 agent.on("mclock.set.light", setLight);
+agent.on("mclock.set.debug", function(d) { debug = d; });
 
 // Get preferences from server
 agent.send("mclock.get.prefs", true);
