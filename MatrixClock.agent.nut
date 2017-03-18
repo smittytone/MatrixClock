@@ -1,11 +1,274 @@
 // Matrix Clock
 // Copyright 2016-17, Tony Smith
-// Version 1.1
+
+#require "Rocky.class.nut:2.0.0"
+
+// CONSTANTS
+const APP_NAME = "Clock";
+const APP_VERSION = "1.2";
+const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
+<html>
+    <head>
+        <title>Matrix Clock</title>
+        <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
+        <link href='//fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
+        <link href='//fonts.googleapis.com/css?family=Monofett' rel='stylesheet'>
+        <link href='//fonts.googleapis.com/css?family=Questrial' rel='stylesheet'>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+        <style>
+            .center { margin-left: auto; margin-right: auto; margin-bottom: auto; margin-top: auto; }
+            body {background-color: #222222;}
+            p {color: white; font-family: Questrial}
+            h2 {color: #33cc00; font-family: Monofett; font-size: 4em}
+            h4 {color: white; font-family: Questrial}
+            td {color: white; font-family: Questrial}
+            hr {border-color: #33cc00}
+            .error-message {color: white}
+        </style>
+    </head>
+    <body>
+        <div class='container' style='padding: 20px;'>
+            <div style='border: 2px solid #33cc00' align='center'>
+                <h2 align='center'>Matrix Clock</h2>
+                <p align='center'>&nbsp;</p>
+                <table width='100%%'>
+                    <tr>
+                        <td width='20%%'>&nbsp;</td>
+                        <td width='60%%'>
+                            <div class='mode-checkbox' style='color:white;font-family:Questrial'>
+                                <input type='checkbox' name='mode' id='mode' value='mode'> 24-Hour Mode (Switch off for AM/PM)
+                            </div>
+                            <div class='mode-checkbox' style='color:white;font-family:Questrial'>
+                                <input type='checkbox' name='bst' id='bst' value='bst'> Apply Daylight Savings Time Automatically
+                            </div>
+                            <div class='slider'>
+                                <h4 class='brightness-status'>&nbsp;<br>Brightness</h4>
+                                <input type='range' name='brightness' id='brightness' value='15' min='1' max='15'>
+                                <p class='brightness-status' align='right'><span></span></p>
+                            </div>
+                            <div class='seconds-checkbox' style='color:white;font-family:Questrial'>
+                                <input type='checkbox' name='seconds' id='seconds' value='seconds'> Show Seconds Indicator
+                            </div>
+                            <div class='flash-checkbox' style='color:white;font-family:Questrial'>
+                                <input type='checkbox' name='flash' id='flash' value='seconds'> Flash Seconds Indicator
+                            </div>
+                            <p>&nbsp;</p>
+                            <div class='onoff-button' style='color:dimGrey;font-family:Rubik;weight:bold' align='center'>
+                                <button type='submit' id='onoff' style='height:32px;width:200px'>Turn off Display</button>
+                            </div>
+                            <hr>
+                            <h4 align='center' class='clock-status'><i><span>This Matrix Clock is online</span></i></h4>
+                            <hr>
+                            <div class='reset-button' style='color:dimGrey;font-family:Rubik;weight:bold' align='center'>
+                                <button type='submit' id='reset' style='height:28px;width:200px'>Reset Matrix Clock</button>
+                            </div>
+                        </td>
+                        <td width='20%%'>&nbsp;</td>
+                    </tr>
+                </table>
+                <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-17 Tony Smith</small><br>&nbsp;<br><img src='https://smittytone.github.io/rassilon.png' width='32' height='32'></p>
+            </div>
+        </div>
+
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+        <script>
+          // Variables
+          var agenturl = '%s';
+          var displayon = true;
+          var stateflag = false;
+
+          // Get initial readings
+          getState(updateReadout);
+
+          // Set UI click actions: Checkboxes
+          $('#mode').click(setmode);
+          $('#bst').click(setbst);
+          $('#seconds').click(setcolon);
+          $('#flash').click(setflash);
+          // $('#debug').click(setdebug);
+
+          // Buttons
+          $('.reset-button button').click(reset);
+          $('.onoff-button button').click(setlight);
+
+          // Slider
+          var slider = document.getElementById('brightness');
+          slider.addEventListener('mouseup', updateSlider);
+          slider.addEventListener('touchend', updateSlider);
+          $('.brightness-status span').text(slider.value);
+
+          $('#brightness').css('background', '#222222');
+
+          // Functions
+          function updateSlider() {
+            $('.brightness-status span').text($('#brightness').val());
+            setbright();
+          }
+
+          function updateReadout(data) {
+            var s = data.split('.');
+            document.getElementById('mode').checked = (s[0] == '1') ? true : false;
+            document.getElementById('bst').checked = (s[1] == '1') ? true : false;
+            document.getElementById('seconds').checked = (s[3] == '1') ? true : false;
+            document.getElementById('flash').checked = (s[2] == '1') ? true : false;
+            $('.onoff-button button').text((s[7] == '1') ? 'Turn off Display' : 'Turn on Display');
+            displayon = (s[7] == '1');
+
+            var b = parseInt(s[4]);
+            $('.brightness-status span').text(b);
+            $('#brightness').val(b);
+
+            updateState(s[8]);
+
+            // Auto-reload data in 120 seconds
+            if (!stateflag) {
+              checkState();
+              stateflag = true;
+            }
+          }
+
+          function updateState(s) {
+             if (s == 'd') {
+               $('.clock-status span').text('This Matrix Clock is offline');
+             } else {
+               $('.clock-status span').text('This Matrix Clock is online');
+             }
+          }
+
+          function getState(callback) {
+             // Request the current data
+             $.ajax({
+               url : agenturl + '/settings',
+               type: 'GET',
+               success : function(response) {
+                 if (callback) {
+                   callback(response);
+                 }
+               },
+               error : function(xhr, textStatus, error) {
+                 if (error) {
+                   $('.clock-status span').text(error);
+                 }
+               }
+             });
+          }
+
+          function checkState() {
+            $.ajax({
+               url : agenturl + '/state',
+               type: 'GET',
+               success : function(response) {
+                 updateState(response)
+                 setTimeout(checkState, 120000);
+               },
+               error : function(xhr, textStatus, error) {
+                 if (error) {
+                   $('.clock-status span').text(error);
+                 }
+               }
+             });
+          }
+
+          function setmode() {
+            var d = { 'setmode' : ((document.getElementById('mode').checked == true) ? '1' : '0') };
+            sendstate(d);
+          }
+
+          function setbst() {
+            var d = { 'setbst' : ((document.getElementById('bst').checked == true) ? '1' : '0') };
+            sendstate(d);
+          }
+
+          function setcolon() {
+            var d = { 'setcolon' : ((document.getElementById('seconds').checked == true) ? '1' : '0') };
+            sendstate(d);
+          }
+
+          function setflash() {
+            var d = { 'setflash' : ((document.getElementById('flash').checked == true) ? '1' : '0') };
+            sendstate(d);
+          }
+
+          function setbright() {
+            var d = { 'setbright' : ($('#brightness').val()) };
+            sendstate(d);
+          }
+
+          function setlight() {
+            displayon = !displayon;
+            $('.onoff-button button').text(displayon ? 'Turn off Display' : 'Turn on Display');
+            var s = (displayon ? '1' : '0');
+            var d = { 'setlight' :  s };
+            sendstate(d);
+          }
+
+          function sendstate(data) {
+            $.ajax({
+              url : agenturl + '/settings',
+              type: 'POST',
+              data: JSON.stringify(data),
+              success: function() {
+                getState(updateReadout);
+              },
+              error : function(xhr, textStatus, error) {
+                if (error) {
+                  $('.clock-status span').text(error);
+                }
+              }
+            });
+          }
+
+          function reset() {
+            // Trigger a settings reset
+            $.ajax({
+              url : agenturl + '/action',
+              type: 'POST',
+              data: JSON.stringify({ 'action' : 'reset' }),
+              success : function(response) {
+                getState(updateReadout);
+              }
+            });
+          }
+
+          function setdebug() {
+            // Tell the device to enter or leave debug mode
+            $.ajax({
+              url : agenturl + '/action',
+              type: 'POST',
+              data: JSON.stringify({ 'action' : 'debug', 'debug' : document.getElementById('debug').checked }),
+              error : function(xhr, textStatus, error) {
+                if (error) {
+                  $('.clock-status span').text(error);
+                }
+              }
+            });
+          }
+
+          function reboot() {
+            // Trigger a device restart
+            $.ajax({
+              url : agenturl + '/action',
+              type: 'POST',
+              data: JSON.stringify({ 'action' : 'reboot' }),
+              success : function(response) {
+                getState(updateReadout);
+              },
+              error : function(xhr, textStatus, error) {
+                if (error) {
+                  $('.clock-status span').text(error);
+                }
+              }
+            });
+          }
+        </script>
+    </body>
+</html>";
 
 // GLOBALS
 
 local prefs = {};
 local saveResponse = null;
+local api = null;
 local debug = true;
 
 // USE 'true' TO ZAP THE STORED DEFAULTS
@@ -46,242 +309,42 @@ function appResponse() {
     if (prefs.hrmode == true) rs = "1.";
 
     // Add BST status as a 1-digit value
-    if (prefs.bst) {
-        rs = rs + "1.";
-    } else {
-        rs = rs + "0.";
-    }
+    rs = rs + ((prefs.bst) ? "1." : "0.");
 
     // Add colon flash status as a 1-digit value
-    if (prefs.flash) {
-        rs = rs + "1.";
-    } else {
-        rs = rs + "0.";
-    }
+    rs = rs + ((prefs.flash) ? "1." : "0.");
 
     // Add colon state as a 1-digit value
-    if (prefs.colon) {
-        rs = rs + "1.";
-    } else {
-        rs = rs + "0.";
-    }
+    rs = rs + ((prefs.colon) ? "1." : "0.");
 
     // Add brightness as a two-digit value
-    rs = rs + format("%02d", prefs.brightness) + ".";
+    if (prefs.brightness < 10) {
+        rs = rs + "0" + prefs.brightness.tostring() + ".";
+    } else {
+        rs = rs + prefs.brightness.tostring() + ".";
+    }
 
     // Add UTC status as a 1-digit value
-    if (prefs.utc) {
-        rs = rs + "1.";
-    } else {
-        rs = rs + "0.";
-    }
+    rs = rs + ((prefs.utc) ? "1." : "0.");
 
     // Add UTC offset
-    rs = rs + format("%02d", prefs.utcoffset) + ".";
-
-    // Add clock state as 1-digit value
-    if (prefs.on) {
-        rs = rs + "1";
+    if (prefs.utcoffset < 10) {
+        rs = rs + "0." + prefs.utcoffset.tostring();
     } else {
-        rs = rs + "0";
+        rs = rs + prefs.utcoffset.tostring() + ".";
     }
 
-    if (!device.isconnected()) rs = rs + ".d";
+	// Add clock state as 1-digit value
+	rs = rs + ((prefs.on) ? "1." : "0.");
 
-    // Return data string to app via cached HTTP response
-    saveResponse.send(200, rs);
-}
-
-function requestHandler(request, response) {
-    try {
-        // Check for app test
-        if ("getappcode" in request.query) {
-            response.send(200, appID);
-            return;
-        }
-
-        // Check for a mode-read message
-        if ("getmode" in request.query) {
-            saveResponse = response;
-            appResponse();
-            return;
-        }
-
-        // Check for a reset message
-        if ("reset" in request.query) {
-            reset();
-            sendPrefsToDevice(true);
-
-            if (server.save(prefs) == 0) {
-                response.send(200, "Settings reset");
-            } else {
-                response.send(200, "Settings not reset");
-            }
-
-            return;
-        }
-
-        // Check for a mode-set message
-        // ?setmode=24 or ?setmode=12 for 24/12-hour clock
-        if ("setmode" in request.query) {
-            if (request.query.setmode == "1" || request.query.setmode == "24") {
-                device.send("mclock.set.mode", 24);
-                prefs.hrmode = true;
-            } else {
-                device.send("mclock.set.mode", 12);
-                prefs.hrmode = false;
-            }
-
-            response.send(200, "Clock mode switched");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("Mode setting saved");
-            } else {
-                if (debug) server.log("Mode setting not saved");
-            }
-
-            return;
-        }
-
-        // Check for a BST set/unset message
-        // ?setbst=1 or ?setbst=0 for BST/GMT
-        if ("setbst" in request.query) {
-            if (request.query.setbst == "1") {
-                device.send("mclock.set.bst", 1);
-                prefs.bst = true;
-            } else {
-                device.send("mclock.set.bst", 0);
-                prefs.bst = false;
-            }
-
-            response.send(200, "BST setting switched");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("BST setting saved");
-            } else {
-                if (debug) server.log("BST setting not saved");
-            }
-
-            return;
-        }
-
-        // Check for a UTC set/unset and offset message
-        // ?setutc=0.xx or ?setutc=1.xx for set/unset world time
-        // xx = two-digit offset (-12 for the actual value)
-        if ("setutc" in request.query) {
-            local us = "";
-
-            // Slice up incoming data string to obtain parameters
-            if (request.query.setutc.slice(0,1) == "1") {
-                // UTC is set
-                prefs.utc = true;
-                us = request.query.setutc;
-                us = us.slice(2);
-                prefs.utcoffset = us.tointeger();
-            } else {
-                // Set the string to be passed to the imp to zero if
-                // world time is being disabled
-                prefs.utc = false;
-                us = "N";
-            }
-
-            device.send("mclock.set.utc", us);
-            response.send(200, "UTC set");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("UTC setting saved");
-            } else {
-                if (debug) server.log("UTC setting not saved");
-            }
-
-            return;
-        }
-
-        // Check for a set brightness message
-        if ("setbright" in request.query) {
-            // Note this only sets prefs, to be applied next time the device
-            // boots up. ?setbright=xx xx = 0-15
-            prefs.brightness = request.query.setbright.tointeger();
-            device.send("mclock.set.brightness", prefs.brightness);
-
-            response.send(200, "Brightness set");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("Brightness setting saved");
-            } else {
-                if (debug) server.log("Brightness setting not saved");
-            }
-
-            return;
-        }
-
-        // Check for a set flash message
-        if ("setflash" in request.query) {
-            if (request.query.setflash == "1") {
-                device.send("mclock.set.flash", 1);
-                prefs.flash = true;
-            } else {
-                device.send("mclock.set.flash", 0);
-                prefs.flash = false;
-            }
-
-            response.send(200, "Colon flash set");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("Colon flash setting saved");
-            } else {
-                if (debug) server.log("Colon flash setting not saved");
-            }
-
-            return;
-        }
-
-        // Check for a set colon show message
-        if ("setcolon" in request.query) {
-            if (request.query.setcolon == "1") {
-                device.send("mclock.set.colon", 1);
-                prefs.colon = true;
-            } else {
-                device.send("mclock.set.colon", 0);
-                prefs.colon = false;
-            }
-
-            response.send(200, "Colon state set");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("Colon state setting saved");
-            } else {
-                if (debug) server.log("Colon state setting not saved");
-            }
-
-            return;
-        }
-
-        if ("setlight" in request.query) {
-            if (request.query.setlight == "1") {
-                device.send("mclock.set.light", 1);
-                prefs.on = true;
-            } else {
-                device.send("mclock.set.light", 0);
-                prefs.on = false;
-            }
-
-            response.send(200, "Light switched");
-
-            if (server.save(prefs) == 0) {
-                if (debug) server.log("Display light setting saved");
-            } else {
-                if (debug) server.log("Display light setting not saved");
-            }
-
-            return;
-        }
-
-        // If the command has not been recognised, inform the app
-        response.send(200, "Command not recognised");
-    } catch(error) {
-        response.send(500, ("Agent error: " + error));
+    // Add d indicate disconnected, or c
+    if (!device.isconnected()) {
+        rs = rs + "d";
+    } else {
+        rs = rs + "c";
     }
+
+    return rs;
 }
 
 function reset() {
@@ -297,9 +360,6 @@ function reset() {
 }
 
 // PROGRAM START
-
-// Register an agent event trigger for HTTP requests from app
-http.onrequest(requestHandler);
 
 // IMPORTANT Set firstRun at the top of the listing to reset settings
 if (firstRun) server.save({});
@@ -336,3 +396,158 @@ if (loadedPrefs.len() != 0) {
 
 // Register device event triggers
 device.on("mclock.get.prefs", sendPrefsToDevice);
+
+// Set up the API
+api = Rocky();
+
+api.get("/", function(context) {
+    context.send(200, format(HTML_STRING, http.agenturl()));
+});
+
+api.get("/state", function(context) {
+    local a = (device.isconnected() ? "c" : "d");
+    context.send(200, a);
+});
+
+api.get("/settings", function(context) {
+    context.send(200, appResponse());
+});
+
+api.post("/settings", function(context) {
+    try {
+        local data = http.jsondecode(context.req.rawbody);
+
+        // Check for a mode-set message
+        if ("setmode" in data) {
+            if (data.setmode == "1") {
+                prefs.hrmode = true;
+            } else if (data.setmode == "0") {
+                prefs.hrmode = false;
+            } else {
+                if (debug) server.error("Mis-formed parameter to setmode");
+                context.send(400, "Mis-formed parameter sent");
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save mode setting");
+            if (debug) server.log("Clock mode turned to " + (prefs.hrmode ? "24 hour" : "12 hour"));
+            device.send("clock.switch.mode", (prefs.hrmode ? 24 : 12));
+        }
+
+        // Check for a BST set/unset message
+        if ("setbst" in data) {
+            if (data.setbst == "1") {
+                prefs.bst = true;
+            } else if (data.setbst == "0") {
+                prefs.bst = false;
+            }  else {
+                if (debug) server.error("Mis-formed parameter to setbst");
+                context.send(400, "Mis-formed parameter sent");
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
+            if (debug) server.log("Clock bst observance turned " + (prefs.bst ? "on" : "off"));
+            device.send("clock.switch.bst", (prefs.bst ? 1 : 0));
+        }
+
+        // Check for a set brightness message
+        if ("setbright" in data) {
+            prefs.brightness = data.setbright.tointeger();
+            if (server.save(prefs) != 0) server.error("Could not save brightness setting");
+            if (debug) server.log(format("Brightness set to %i", prefs.brightness));
+            device.send("clock.set.brightness", prefs.brightness);
+        }
+
+        // Check for a set flash message
+        if ("setflash" in data) {
+            if (data.setflash == "1") {
+                prefs.flash = true;
+            } else if (data.setflash == "0") {
+                prefs.flash = false;
+            } else {
+                if (debug) server.error("Mis-formed parameter to setflash");
+                context.send(400, "Mis-formed parameter sent");
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save colon flash setting");
+            if (debug) server.log("Clock colon flash turned " + (prefs.flash ? "on" : "off"));
+            device.send("clock.switch.flash", (prefs.flash ? 1 : 0));
+        }
+
+        // Check for a set colon show message
+        if ("setcolon" in data) {
+            if (data.setcolon == "1") {
+                prefs.colon = true;
+            } else if (data.setcolon == "0") {
+                prefs.colon = false;
+            } else {
+                if (debug) server.error("Attempt to pass an mis-formed parameter to setcolon");
+                context.send(400, "Mis-formed parameter sent");
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save colon visibility setting");
+            if (debug) server.log("Clock colon turned " + (prefs.colon ? "on" : "off"));
+            device.send("clock.switch.colon", (prefs.colon ? 1 : 0));
+        }
+
+        // Check for set light message
+        if ("setlight" in data) {
+            if (data.setlight == "1") {
+                prefs.on = true;
+            } else if (data.setlight == "0") {
+                prefs.on = false;
+            } else {
+                if (debug) server.error("Attempt to pass an mis-formed parameter to setlight");
+                contex.send(400, "Mis-formed parameter sent");
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save display light setting");
+            if (debug) server.log("Clock display turned " + (prefs.on ? "on" : "off"));
+            device.send("clock.set.light", (prefs.on ? 1 : 0));
+        }
+
+        context.send(200, "OK");
+    } catch (err) {
+        server.error(err);
+        context.send(400, "Bad data posted");
+        return;
+    }
+
+    context.send(200, "OK");
+});
+
+api.post("/action", function(context) {
+    try {
+        local data = http.jsondecode(context.req.rawbody);
+
+        if ("action" in data) {
+            if (data.action == "reset") {
+                resetToDefaults();
+                device.send("clock.set.prefs", prefs);
+                if (debug) server.log("Clock settings reset");
+                if (server.save(prefs) != 0) server.error("Could not save clock settings after reset");
+            }
+
+            if (data.action == "debug") {
+                if (data.action.debug == "1") {
+                    debug = true;
+                } else if (data.action.debug == "0") {
+                    debug = false;
+                }
+
+                device.send("clock.set.debug", (debug ? 1 : 0));
+                server.log("Debug mode " + (debug ? "on" : "off"));
+            }
+        }
+
+        context.send(200, "OK");
+    } catch (err) {
+        context.send(400, "Bad data posted");
+        server.error(err);
+        return;
+    }
+});

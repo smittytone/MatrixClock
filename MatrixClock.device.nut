@@ -1,6 +1,5 @@
 // Matrix Clock
 // Copyright 2016-17, Tony Smith
-// Version 1.1
 
 #require "utilities.nut:1.0.0"
 
