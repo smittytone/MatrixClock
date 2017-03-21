@@ -548,12 +548,14 @@ api.post("/settings", function(context) {
         if ("setutc" in data) {
             if (data.setutc == "0") {
                 prefs.utc = false;
-                device.send("clock.set.utc", "N");
+                device.send("mclock.set.utc", "N");
             } else if (data.setutc == "1") {
                 prefs.utc = true;
                 if ("utcval" in data) {
                     prefs.utcoffset = data.utcval.tointeger();
-                    device.send("clock.set.utc", data.utcval);
+                    device.send("mclock.set.utc", prefs.utcoffset);
+                } else {
+                    device.send("mclock.set.utc", prefs.utcoffset);
                 }
             } else {
                 if (debug) server.error("Attempt to pass an mis-formed parameter to setutc");
@@ -562,7 +564,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save world time setting");
-            if (debug) server.log("World time turned " + (prefs.utc ? "on" : "off") + ", offset: " + prefs.offset);
+            if (debug) server.log("World time turned " + (prefs.utc ? "on" : "off") + ", offset: " + prefs.utcoffset);
         }
 
         context.send(200, "OK");

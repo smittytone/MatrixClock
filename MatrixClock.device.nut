@@ -55,9 +55,21 @@ function getTime() {
     month = now.month;
     year = now.year;
 
-    // Adjust the hour for BST and midnight rollover
-    if (prefs.bst && utilities.bstCheck()) hour++;
-    if (hour > 23) hour = 0;
+    // Update the value of 'hours' to reflect displayed time
+    if (prefs.utc) {
+        // If UTC is set, add the international time offset
+        hour = hour + prefs.offset - 12;
+        if (hour > 24) {
+            hour = hour - 24;
+        } else if (hour < 0) {
+            hour = hour + 24;
+        }
+    } else {
+        // We are displaying local time -
+        // is daylight savings being observed?
+        if (prefs.bst && utilities.bstCheck()) hours++;
+        if (hour > 23) hour = 0;
+    }
 
     // AM or PM?
     pmFlag = (hour > 11) ? true : false;
@@ -134,6 +146,9 @@ function displayTime() {
 
     // AM or PM?
     if (!prefs.mode && pmFlag) faces[3].plot(7, 7, 1).plot(7, 6, 1).plot(6, 7, 1).plot(6, 6, 1);
+
+    // UTC
+    if (prefs.utc) faces[3].plot(7, 1, 1).plot(7, 0, 1).plot(6, 1, 1).plot(6, 0, 1);
 
     // Check whether the colon should appear
     if (prefs.colon) {
@@ -216,7 +231,7 @@ function setPrefs(settings) {
     prefs.flash = settings.flash;
     prefs.colon = settings.colon;
     prefs.utc = settings.utc;
-    prefs.offset = settings.utcoffset - 12;
+    prefs.offset = settings.utcoffset;
 
     // Clear the display
     if (settings.on != prefs.on) setLight(settings.on ? 1 : 0);
@@ -248,12 +263,12 @@ function setMode(value) {
 
 function setUTC(string) {
     // This function is called when the app sets or unsets UTC
-    if (debug) server.log("Setting UTC " + ((string == "N") ? "on" : "off"));
+    if (debug) server.log("Setting UTC " + ((string == "N") ? "off" : "on"));
     if (string == "N") {
         prefs.utc = false;
     } else {
         prefs.utc = true;
-        prefs.offset = string.tointeger() - 12;
+        prefs.offset = string.tointeger();
     }
 }
 
