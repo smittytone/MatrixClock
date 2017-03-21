@@ -216,7 +216,7 @@ function setPrefs(settings) {
     prefs.flash = settings.flash;
     prefs.colon = settings.colon;
     prefs.utc = settings.utc;
-    prefs.offset = 12 - settings.utcoffset;
+    prefs.offset = settings.utcoffset - 12;
 
     // Clear the display
     if (settings.on != prefs.on) setLight(settings.on ? 1 : 0);
@@ -253,7 +253,7 @@ function setUTC(string) {
         prefs.utc = false;
     } else {
         prefs.utc = true;
-        prefs.offset = 12 - string.tointeger();
+        prefs.offset = string.tointeger() - 12;
     }
 }
 
@@ -287,6 +287,10 @@ function setLight(value) {
         prefs.on = false;
         powerDown();
     }
+}
+
+function setDebug(state) {
+    debug = (state == 1);
 }
 
 // OFFLINE OPERATION FUNCTIONS
@@ -383,7 +387,7 @@ agent.on("mclock.set.brightness", setBright);
 agent.on("mclock.set.flash", setFlash);
 agent.on("mclock.set.colon", setColon);
 agent.on("mclock.set.light", setLight);
-agent.on("mclock.set.debug", function(d) { debug = d; });
+agent.on("mclock.set.debug", setDebug);
 
 // Get preferences from server
 agent.send("mclock.get.prefs", true);
