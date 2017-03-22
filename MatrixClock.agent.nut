@@ -15,6 +15,8 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
         <link href='//fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
         <link href='//fonts.googleapis.com/css?family=Monofett' rel='stylesheet'>
         <link href='//fonts.googleapis.com/css?family=Questrial' rel='stylesheet'>
+        <link rel='apple-touch-icon' href='https://smittytone.github.io/images/ati-matrix.png'>
+        <link rel='shortcut icon' href='https://smittytone.github.io/images/ico-matrix.ico' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <style>
             .center { margin-left: auto; margin-right: auto; margin-bottom: auto; margin-top: auto; }
