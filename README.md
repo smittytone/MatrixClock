@@ -1,4 +1,4 @@
-# MatrixClock 1.2
+# MatrixClock 1.3
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -39,11 +39,28 @@ The Matrix Clock device code is currently hardwired for UK usage: it adjusts to 
 
 The Matrix Clock can be controlled by accessing its agent URL.
 
+![Matrix Click UI](grab01.png)
+
 ## Casing
 
 You can use the file `clock.svg` to produce a simple laser-cut case/mounting frame for the Matrix Clock.
 
 [![Matrix Clock](laser.jpg)](clock.svg)
+
+## Release Notes
+
+### 1.3
+
+- Add support for world time display, including web UI controls
+- Add favicon and iOS home page icon
+
+### 1.2
+
+- Add web UI controls
+
+### 1.1
+
+- Initial public release
 
 ## Licence
 

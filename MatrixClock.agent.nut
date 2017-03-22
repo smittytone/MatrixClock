@@ -5,8 +5,8 @@
 
 // CONSTANTS
 
-const APP_NAME = "Clock";
-const APP_VERSION = "1.2";
+const APP_NAME = "Matrix Clock";
+const APP_VERSION = "1.3";
 const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
 <html>
     <head>
