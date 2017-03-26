@@ -67,7 +67,7 @@ function getTime() {
     } else {
         // We are displaying local time -
         // is daylight savings being observed?
-        if (prefs.bst && utilities.bstCheck()) hours++;
+        if (prefs.bst && utilities.bstCheck()) hour++;
         if (hour > 23) hour = 0;
     }
 
