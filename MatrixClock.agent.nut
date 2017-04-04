@@ -12,9 +12,9 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
     <head>
         <title>Matrix Clock</title>
         <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css'>
-        <link href='//fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
-        <link href='//fonts.googleapis.com/css?family=Monofett' rel='stylesheet'>
-        <link href='//fonts.googleapis.com/css?family=Questrial' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Rubik' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Monofett' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=Questrial' rel='stylesheet'>
         <link rel='apple-touch-icon' href='https://smittytone.github.io/images/ati-matrix.png'>
         <link rel='shortcut icon' href='https://smittytone.github.io/images/ico-matrix.ico' />
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
@@ -81,7 +81,7 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
                         <td width='20%%'>&nbsp;</td>
                     </tr>
                 </table>
-                <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-17 Tony Smith</small><br>&nbsp;<br><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></p>
+                <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-17 Tony Smith</small><br>&nbsp;<br><a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></a></p>
             </div>
         </div>
 
