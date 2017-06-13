@@ -350,6 +350,9 @@ function reconnect() {
     }
 }
 
+// Load in generic boot message code
+#include "../generic/bootmessage.nut"
+
 // START PROGRAM
 
 // Set up disconnection handler
