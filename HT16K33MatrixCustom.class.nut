@@ -1,3 +1,11 @@
+// HT16K33 registers and HT16K33-specific variables
+const HT16K33_MAT_CUSTOM_CLASS_REGISTER_DISPLAY_ON  = "\x81"
+const HT16K33_MAT_CUSTOM_CLASS_REGISTER_DISPLAY_OFF = "\x80"
+const HT16K33_MAT_CUSTOM_CLASS_REGISTER_SYSTEM_ON   = "\x21"
+const HT16K33_MAT_CUSTOM_CLASS_REGISTER_SYSTEM_OFF  = "\x20"
+const HT16K33_MAT_CUSTOM_CLASS_DISPLAY_ADDRESS      = "\x00"
+const HT16K33_MAT_CUSTOM_CLASS_I2C_ADDRESS          = 0x70
+
 class HT16K33MatrixCustom {
     // Squirrel class for 1.2-inch 8x8 LED matrix displays driven by the HT16K33 controller
     // For example: http://www.adafruit.com/products/1854
@@ -7,15 +15,7 @@ class HT16K33MatrixCustom {
     // Copyright 2014-17
     // Issued under the MIT license (MIT)
 
-    static VERSION = "1.2.0";
-
-    // HT16K33 registers and HT16K33-specific variables
-    static HT16K33_REGISTER_DISPLAY_ON  = "\x81"
-    static HT16K33_REGISTER_DISPLAY_OFF = "\x80"
-    static HT16K33_REGISTER_SYSTEM_ON   = "\x21"
-    static HT16K33_REGISTER_SYSTEM_OFF  = "\x20"
-    static HT16K33_DISPLAY_ADDRESS      = "\x00"
-    static HT16K33_I2C_ADDRESS          = 0x70
+    static VERSION = "1.2.1";
 
     // Proportionally space character set
     static PCHARSET = [
@@ -225,14 +225,14 @@ class HT16K33MatrixCustom {
 
     function powerDown() {
         if (_debug) server.log("Turning the HT16K33 Matrix off");
-        _led.write(_ledAddress, HT16K33_REGISTER_DISPLAY_OFF);
-        _led.write(_ledAddress, HT16K33_REGISTER_SYSTEM_OFF);
+        _led.write(_ledAddress, HT16K33_MAT_CUSTOM_CLASS_REGISTER_DISPLAY_OFF);
+        _led.write(_ledAddress, HT16K33_MAT_CUSTOM_CLASS_REGISTER_SYSTEM_OFF);
     }
 
     function powerUp() {
         if (_debug) server.log("Turning the HT16K33 Matrix on");
-        _led.write(_ledAddress, HT16K33_REGISTER_SYSTEM_ON);
-        _led.write(_ledAddress, HT16K33_REGISTER_DISPLAY_ON);
+        _led.write(_ledAddress, HT16K33_MAT_CUSTOM_CLASS_REGISTER_SYSTEM_ON);
+        _led.write(_ledAddress, HT16K33_MAT_CUSTOM_CLASS_REGISTER_DISPLAY_ON);
     }
 
     function displayIcon(glyphMatrix, center = false) {
@@ -480,7 +480,7 @@ class HT16K33MatrixCustom {
         // Takes the contents of _buffer and writes it to the LED matrix
         // Uses function processByte() to manipulate regular values to
         // Adafruit 8x8 matrix's format
-        local dataString = HT16K33_DISPLAY_ADDRESS;
+        local dataString = HT16K33_MAT_CUSTOM_CLASS_DISPLAY_ADDRESS;
         local writedata = clone(_buffer);
         if (_rotationAngle != 0) writedata = _rotateMatrix(writedata, _rotationAngle);
 
