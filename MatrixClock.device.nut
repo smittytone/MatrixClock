@@ -1,7 +1,7 @@
 // Matrix Clock
 // Copyright 2016-17, Tony Smith
 
-#require "utilities.nut:1.0.0"
+#import "../generic/utilities.nut"
 
 #import "HT16K33MatrixCustom.class.nut"
 
@@ -350,10 +350,10 @@ function reconnect() {
     }
 }
 
+// START PROGRAM
+
 // Load in generic boot message code
 #include "../generic/bootmessage.nut"
-
-// START PROGRAM
 
 // Set up disconnection handler
 server.onunexpecteddisconnect(disconnectHandler);

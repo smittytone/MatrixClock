@@ -27,17 +27,28 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
             td {color: white; font-family: Questrial}
             hr {border-color: #33cc00}
             .error-message {color: white}
+            .tabborder {width: 20%%}
+            .tabcontent {width: 60%%}
+            .uicontent {border: 2px solid #33cc00}
+            .container {padding: 20px}
+
+            @media only screen and (max-width: 640px) {
+                .tabborder {width: 5%%}
+                .tabcontent {width: 90%%}
+                .container {padding: 5px}
+                .uicontent {border: 0px}
+            }
         </style>
     </head>
     <body>
-        <div class='container' style='padding: 20px;'>
-            <div style='border: 2px solid #33cc00' align='center'>
+        <div class='container'>
+            <div class='uicontent' align='center'>
                 <h2 align='center'>Matrix Clock</h2>
                 <p align='center'>&nbsp;</p>
                 <table width='100%%'>
                     <tr>
-                        <td width='20%%'>&nbsp;</td>
-                        <td width='60%%'>
+                        <td class='tabborder'>&nbsp;</td>
+                        <td class='tabcontent'>
                             <h4>General Settings</h4>
                             <div class='mode-checkbox' style='color:white;font-family:Questrial'>
                                 <input type='checkbox' name='mode' id='mode' value='mode'> 24-Hour Mode (Switch off for AM/PM)
@@ -78,7 +89,7 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
                                 <button type='submit' id='reset' style='height:28px;width:200px'>Reset Matrix Clock</button>
                             </div>
                         </td>
-                        <td width='20%%'>&nbsp;</td>
+                        <td class='tabborder'>&nbsp;</td>
                     </tr>
                 </table>
                 <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-17 Tony Smith</small><br>&nbsp;<br><a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></a></p>
