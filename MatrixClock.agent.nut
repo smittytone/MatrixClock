@@ -621,3 +621,11 @@ api.post("/action", function(context) {
         return;
     }
 });
+
+// GET at /info returns device capabilities (EXPERIMENTAL)
+api.get("/info", function(context) {
+    local info = {};
+    info.app <- "0028C36B-444A-408D-B862-F8E4C17CB6D6";
+    info.watchsupported <- "true";
+    context.send(200, http.jsonencode(info));
+});
