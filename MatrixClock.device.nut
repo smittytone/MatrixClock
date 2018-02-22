@@ -1,21 +1,22 @@
 // Matrix Clock
-// Copyright 2016-17, Tony Smith
+// Copyright 2016-18, Tony Smith
 
+// IMPORTS
 #import "../generic/utilities.nut"
-
 #import "HT16K33MatrixCustom.class.nut"
 
+
+// EARLY LOAD CODE
 // Set up connectivity policy
 server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
 
-// CONSTANTS
 
+// CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
 const TICK_DURATION = 0.5;
 const INITIAL_ANGLE = 0;
 
 // GLOBALS
-
 local faces = null;
 local tickTimer = null;
 local syncTimer = null;
@@ -38,8 +39,8 @@ local day = 0;
 local month = 0;
 local year = 0;
 
-// TIME FUNCTIONS
 
+// TIME FUNCTIONS
 function getTime() {
     // This is the main clock loop
     // Queue the function to run again in tickDuration seconds
@@ -217,8 +218,8 @@ function clearDisplay() {
     faces[3].clearDisplay();
 }
 
-// PREFERENCES FUNCTIONS
 
+// PREFERENCES FUNCTIONS
 function setPrefs(settings) {
     // Cancel the 'Sync' display timer if it has yet to fire
     if (debug) server.log("Received preferences from agent");
@@ -308,8 +309,8 @@ function setDebug(state) {
     debug = (state == 1);
 }
 
-// OFFLINE OPERATION FUNCTIONS
 
+// OFFLINE OPERATION FUNCTIONS
 function disconnectHandler(reason) {
     // Called if the server connection is broken or re-established
     // Sets 'disFlag' true if there is no connection
@@ -349,6 +350,7 @@ function reconnect() {
         server.connect(disconnectHandler, 30);
     }
 }
+
 
 // START PROGRAM
 
