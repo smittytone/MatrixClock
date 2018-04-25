@@ -11,6 +11,7 @@ server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
 
 // CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
+const RECONNECT_TIMEOUT = 30;
 const TICK_DURATION = 0.5;
 const INITIAL_ANGLE = 0;
 
@@ -317,12 +318,14 @@ function disconnectHandler(reason) {
         // Server is not connected
         if (!disFlag) {
             disFlag = true;
-            disTime = time();
             local now = date();
             disMessage = "Went offline at " + now.hour + ":" + now.min + ":" + now.sec + ". Reason: " + reason;
         }
 
-        imp.wakeup(DISCONNECT_TIMEOUT, reconnect);
+        imp.wakeup(DISCONNECT_TIMEOUT, function() {
+             faces[0].plot(0,0,1).draw();
+             server.connect(disconnectHandler, RECONNECT_TIMEOUT);
+        });
     } else {
         // Server is connected
         if (debug) {
@@ -330,21 +333,13 @@ function disconnectHandler(reason) {
             server.log("Back online after " + (time() - disTime) + " seconds");
         }
 
-        disTime = -1;
         disFlag = false;
         disMessage = null;
         agent.send("mclock.get.prefs", 1);
     }
 }
 
-function reconnect() {
-    if (server.isconnected()) {
-        disconnectHandler(SERVER_CONNECTED);
-    } else {
-        faces[0].plot(0,0,1).draw();
-        server.connect(disconnectHandler, 30);
-    }
-}
+
 
 // START PROGRAM
 
