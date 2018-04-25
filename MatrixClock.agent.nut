@@ -1,12 +1,15 @@
 // Matrix Clock
-// Copyright 2016-17, Tony Smith
+// Copyright 2016-18, Tony Smith
 
+// IMPORTS
 #require "Rocky.class.nut:2.0.0"
 
-// CONSTANTS
+// If you are NOT using Squinter or a similar tool, comment out the following line...
+#import "~/Dropbox/Programming/Imp/Codes/matrixclock.nut"
+// ...and uncomment and fill in this line:
+// const APP_CODE = "YOUR_APP_UUID";
 
-const APP_NAME = "Matrix Clock";
-const APP_VERSION = "1.3";
+// CONSTANTS
 const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
 <html>
     <head>
@@ -317,7 +320,6 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
 </html>";
 
 // MAIN VARIABLES
-
 local prefs = null;
 local saveResponse = null;
 local api = null;
@@ -327,7 +329,6 @@ local debug = true;
 local firstRun = false;
 
 // CLOCK FUNCTIONS
-
 function sendPrefsToDevice(value) {
     // Matrix Clock has requested the current set-up data
     if (debug) server.log("Sending stored preferences to the Matrix Clock");
@@ -622,10 +623,15 @@ api.post("/action", function(context) {
     }
 });
 
-// GET at /info returns device capabilities (EXPERIMENTAL)
-api.get("/info", function(context) {
-    local info = {};
-    info.app <- "0028C36B-444A-408D-B862-F8E4C17CB6D6";
-    info.watchsupported <- "true";
+// GET at /controller/info returns Controller app UUID
+api.get("/controller/info", function(context) {
+    local info = { "appcode": APP_CODE,
+                   "watchsupported": "true" };
     context.send(200, http.jsonencode(info));
+});
+
+// GET at /controller/state returns device state
+api.get("/controller/state", function(context) {
+    local data = device.isconnected() ? "1" : "0"
+    context.send(200, data);
 });

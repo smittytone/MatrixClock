@@ -5,11 +5,9 @@
 #import "../generic/utilities.nut"
 #import "HT16K33MatrixCustom.class.nut"
 
-
-// EARLY LOAD CODE
+// EARLY-CALL FUNCTIONS
 // Set up connectivity policy
 server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
-
 
 // CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
@@ -40,7 +38,6 @@ local day = 0;
 local month = 0;
 local year = 0;
 
-
 // TIME FUNCTIONS
 function getTime() {
     // This is the main clock loop
@@ -69,7 +66,7 @@ function getTime() {
     } else {
         // We are displaying local time -
         // is daylight savings being observed?
-        if (prefs.bst && utilities.bstCheck()) hour++;
+        if (prefs.bst && Utilities.bstCheck()) hour++;
         if (hour > 23) hour = 0;
     }
 
@@ -219,7 +216,6 @@ function clearDisplay() {
     faces[3].clearDisplay();
 }
 
-
 // PREFERENCES FUNCTIONS
 function setPrefs(settings) {
     // Cancel the 'Sync' display timer if it has yet to fire
@@ -310,7 +306,6 @@ function setDebug(state) {
     debug = (state == 1);
 }
 
-
 // OFFLINE OPERATION FUNCTIONS
 function disconnectHandler(reason) {
     // Called if the server connection is broken or re-established
@@ -356,7 +351,7 @@ server.onunexpecteddisconnect(disconnectHandler);
 
 // Set up I2C hardware
 hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
-utilities.debugI2C(hardware.i2c89);
+Utilities.debugI2C(hardware.i2c89);
 
 // Set up the clock faces: 0-3 (L-R)
 faces = [];
