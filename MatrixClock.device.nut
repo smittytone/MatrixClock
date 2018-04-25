@@ -65,7 +65,7 @@ function getTime() {
     } else {
         // We are displaying local time -
         // is daylight savings being observed?
-        if (prefs.bst && utilities.bstCheck()) hour++;
+        if (prefs.bst && Utilities.bstCheck()) hour++;
         if (hour > 23) hour = 0;
     }
 
@@ -356,7 +356,7 @@ server.onunexpecteddisconnect(disconnectHandler);
 
 // Set up I2C hardware
 hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
-utilities.debugI2C(hardware.i2c89);
+Utilities.debugI2C(hardware.i2c89);
 
 // Set up the clock faces: 0-3 (L-R)
 faces = [];
