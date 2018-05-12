@@ -311,23 +311,33 @@ function disconnectHandler(reason) {
     // Called if the server connection is broken or re-established
     // Sets 'disFlag' true if there is no connection
 
-    // Clear face 0, pixel 0,0 to show we're attempting to connect
-    faces[0].plot(0,0,0).draw();
-
     if (reason != SERVER_CONNECTED) {
-        // Server is not connected
+        // Set face 0, pixel 0,0 to show the clock is disconnected
+        faces[0].plot(0,0,1).draw();
+
+        // If we haven't already registered the disconnection, register it now
+        // and set the time of the disconnection
         if (!disFlag) {
             disFlag = true;
             local now = date();
             disMessage = "Went offline at " + now.hour + ":" + now.min + ":" + now.sec + ". Reason: " + reason;
+            disTime = time();
         }
 
+        // Schedule a reconnection attempt in DISCONNECT_TIMEOUT seconds
         imp.wakeup(DISCONNECT_TIMEOUT, function() {
-             faces[0].plot(0,0,1).draw();
-             server.connect(disconnectHandler, RECONNECT_TIMEOUT);
+            if (!server.isconnected()) {
+                // Clock is not connected, so attempt a connection
+                server.connect(disconnectHandler, RECONNECT_TIMEOUT);
+            } else {
+                // If we're already connected at this point (this does seem to happen) then
+                // just call 'disconnectHandler()' to ensure the re-connected flow occurs
+                disconnectHandler(SERVER_CONNECTED);
+            }
         });
     } else {
-        // Server is connected
+        // We're re-connected to the server, so display the log information
+        // as appropriate and update the clock UI
         if (debug) {
             server.log(disMessage);
             server.log("Back online after " + (time() - disTime) + " seconds");
@@ -335,10 +345,12 @@ function disconnectHandler(reason) {
 
         disFlag = false;
         disMessage = null;
+        faces[0].plot(0,0,1).draw();
+
+        // Check for settings changes
         agent.send("mclock.get.prefs", 1);
     }
 }
-
 
 
 // START PROGRAM
