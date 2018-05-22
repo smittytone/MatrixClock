@@ -2,7 +2,7 @@
 // Copyright 2016-18, Tony Smith
 
 // IMPORTS
-#require "Rocky.class.nut:2.0.0"
+#require "Rocky.class.nut:2.0.1"
 
 // If you are NOT using Squinter or a similar tool, comment out the following line...
 #import "~/Dropbox/Programming/Imp/Codes/matrixclock.nut"

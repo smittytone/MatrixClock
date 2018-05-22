@@ -3,11 +3,8 @@
 
 // IMPORTS
 #import "../generic/utilities.nut"
+#import "../generic/disconnect.nut"
 #import "HT16K33MatrixCustom.class.nut"
-
-// EARLY-CALL FUNCTIONS
-// Set up connectivity policy
-server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
 
 // CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
@@ -20,15 +17,16 @@ local faces = null;
 local tickTimer = null;
 local syncTimer = null;
 local prefs = null;
-local disMessage = null;
-local disTime = -1;
-local disFlag = false;
+local isDisconnected = false;
+local isConnecting = false;
 local tickCount = 0;
 local tickFlag = true;
 local tickTotal = (1.0 / TICK_DURATION).tointeger() * 2;
 local halfTickTotal = tickTotal / 2;
-local pmFlag = false;
+local isPM = false;
 local debug = true;
+local ca = [0,7,1,7,1,6,0,6];
+local cc = 0;
 
 local seconds = 0;
 local minutes = 0;
@@ -66,12 +64,12 @@ function getTime() {
     } else {
         // We are displaying local time -
         // is daylight savings being observed?
-        if (prefs.bst && Utilities.bstCheck()) hour++;
+        if (prefs.bst && utilities.bstCheck()) hour++;
         if (hour > 23) hour = 0;
     }
 
     // AM or PM?
-    pmFlag = (hour > 11) ? true : false;
+    isPM = (hour > 11) ? true : false;
 
     // Update the tick counter
     tickCount++;
@@ -141,10 +139,17 @@ function displayTime() {
     }
 
     // Is the clock disconnected? If so, flag the fact
-    if (disFlag) faces[0].plot(0, 7, 1).plot(0, 6, 1).plot(1, 7, 1).plot(1, 6, 1);
+    if (isDisconnected) faces[0].plot(0, 7, 1).plot(0, 6, 1).plot(1, 7, 1).plot(1, 6, 1);
+
+    // Is the clock connecting? If so, display the fact with animation
+    if (isConnecting) {
+        cc += 2;
+        if (cc > 6) cc = 0;
+        faces[0].plot(ca[cc], ca[cc + 1], 0);
+    }
 
     // AM or PM?
-    if (!prefs.mode && pmFlag) faces[3].plot(7, 7, 1).plot(7, 6, 1).plot(6, 7, 1).plot(6, 6, 1);
+    if (!prefs.mode && isPM) faces[3].plot(7, 7, 1).plot(7, 6, 1).plot(6, 7, 1).plot(6, 6, 1);
 
     // UTC
     if (prefs.utc) faces[3].plot(7, 1, 1).plot(7, 0, 1).plot(6, 1, 1).plot(6, 0, 1);
@@ -174,10 +179,7 @@ function syncText() {
 
     // Display the word 'SYNC' on the LED
     local letters = [83, 121, 110, 99];
-    foreach (index, character in letters) {
-        faces[index].displayChar(character, 2);
-    }
-
+    foreach (index, character in letters) faces[index].displayChar(character, 2);
     updateDisplay();
 }
 
@@ -307,48 +309,24 @@ function setDebug(state) {
 }
 
 // OFFLINE OPERATION FUNCTIONS
-function disconnectHandler(reason) {
+function disHandler(event) {
     // Called if the server connection is broken or re-established
-    // Sets 'disFlag' true if there is no connection
+    if ("message" in event) server.log("Disconnection Manager: " + event.message);
 
-    if (reason != SERVER_CONNECTED) {
-        // Set face 0, pixel 0,0 to show the clock is disconnected
-        faces[0].plot(0,0,1).draw();
-
-        // If we haven't already registered the disconnection, register it now
-        // and set the time of the disconnection
-        if (!disFlag) {
-            disFlag = true;
-            local now = date();
-            disMessage = "Went offline at " + now.hour + ":" + now.min + ":" + now.sec + ". Reason: " + reason;
-            disTime = time();
+    if ("type" in event) {
+        if (event.type == "disconnected") {
+            isDisconnected = true;
+            isConnecting = false;
         }
 
-        // Schedule a reconnection attempt in DISCONNECT_TIMEOUT seconds
-        imp.wakeup(DISCONNECT_TIMEOUT, function() {
-            if (!server.isconnected()) {
-                // Clock is not connected, so attempt a connection
-                server.connect(disconnectHandler, RECONNECT_TIMEOUT);
-            } else {
-                // If we're already connected at this point (this does seem to happen) then
-                // just call 'disconnectHandler()' to ensure the re-connected flow occurs
-                disconnectHandler(SERVER_CONNECTED);
-            }
-        });
-    } else {
-        // We're re-connected to the server, so display the log information
-        // as appropriate and update the clock UI
-        if (debug) {
-            server.log(disMessage);
-            server.log("Back online after " + (time() - disTime) + " seconds");
+        if (event.type == "connecting") isConnecting = true;
+
+        if (event.type == "connected") {
+            // Check for settings changes
+            agent.send("mclock.get.prefs", 1);
+            isDisconnected = false;
+            isConnecting = false;
         }
-
-        disFlag = false;
-        disMessage = null;
-        faces[0].plot(0,0,1).draw();
-
-        // Check for settings changes
-        agent.send("mclock.get.prefs", 1);
     }
 }
 
@@ -359,11 +337,13 @@ function disconnectHandler(reason) {
 #include "../generic/bootmessage.nut"
 
 // Set up disconnection handler
-server.onunexpecteddisconnect(disconnectHandler);
+disconnectionManager.setCallback(disHandler);
+disconnectionManager.reconnectDelay = DISCONNECT_TIMEOUT;
+disconnectionManager.reconnectTimeout = RECONNECT_TIMEOUT;
+disconnectionManager.start();
 
 // Set up I2C hardware
 hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
-Utilities.debugI2C(hardware.i2c89);
 
 // Set up the clock faces: 0-3 (L-R)
 faces = [];
@@ -377,9 +357,7 @@ matrix = HT16K33MatrixCustom(hardware.i2c89, 0x75, debug);
 faces.append(matrix);
 
 // Set the initial brightness and display angle
-foreach (face in faces) {
-    face.init(15, INITIAL_ANGLE);
-}
+foreach (face in faces) face.init(15, INITIAL_ANGLE);
 
 // Load in default prefs
 prefs = {};
