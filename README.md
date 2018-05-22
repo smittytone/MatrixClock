@@ -51,6 +51,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 - 1.5
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
+    - Update to [JQuery 3.3.1](https://jquery.com)
 - 1.4
     - Minor changes; bringing everything up to date
 - 1.3

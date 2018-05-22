@@ -95,11 +95,11 @@ const HTML_STRING = @"<!DOCTYPE html><html lang='en-US'><meta charset='UTF-8'>
                         <td class='tabborder'>&nbsp;</td>
                     </tr>
                 </table>
-                <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-17 Tony Smith</small><br>&nbsp;<br><a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></a></p>
+                <p class='text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-18 Tony Smith</small><br>&nbsp;<br><a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></a></p>
             </div>
         </div>
 
-        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+        <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
         <script>
           // Variables
           var agenturl = '%s';
