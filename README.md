@@ -52,6 +52,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 - 1.5
     - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
         - Update Web UI based on Bootstrap
+        - Separate out Web UI code into own file for clarity
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
     - Update to [JQuery 3.3.1](https://jquery.com)
 - 1.4
