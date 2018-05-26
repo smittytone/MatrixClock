@@ -85,7 +85,7 @@
           <div class='utc-controls'>
             <h4>World Time</h4>
             <label class='checkarea'> Show World Time
-              <input type='checkbox'  name='utc' id='utc' value='utc'><span class='checkmark'></span>
+              <input type='checkbox' name='utc' id='utc' value='utc'><span class='checkmark'></span>
             </label>
             <div class='utc-slider'>
               <input type='range' class='slider' name='utcs' id='utcs' value='0' min='0' max='24'>
@@ -209,7 +209,8 @@
         if (error) {
           $('.clock-status span').text(error);
         }
-      }
+      },
+      cache: false
     });
   }
 
@@ -225,7 +226,8 @@
         if (error) {
           $('.clock-status span').text(error);
         }
-      }
+      },
+      cache: false
     });
   }
 
@@ -273,13 +275,14 @@
       type: 'POST',
       data: JSON.stringify(data),
       success: function() {
-      getState(updateReadout);
+        getState(updateReadout);
       },
       error : function(xhr, textStatus, error) {
-      if (error) {
-        $('.clock-status span').text(error);
-      }
-      }
+        if (error) {
+          $('.clock-status span').text(error);
+        }
+      },
+      cache: false
     });
   }
 
@@ -290,8 +293,9 @@
       type: 'POST',
       data: JSON.stringify({ 'action' : 'reset' }),
       success : function(response) {
-      getState(updateReadout);
-      }
+        getState(updateReadout);
+      },
+      cache: false
     });
   }
 
@@ -302,10 +306,11 @@
       type: 'POST',
       data: JSON.stringify({ 'action' : 'debug', 'debug' : document.getElementById('debug').checked }),
       error : function(xhr, textStatus, error) {
-      if (error) {
-        $('.clock-status span').text(error);
-      }
-      }
+        if (error) {
+          $('.clock-status span').text(error);
+        }
+      },
+      cache: false
     });
   }
 
@@ -319,10 +324,11 @@
       getState(updateReadout);
       },
       error : function(xhr, textStatus, error) {
-      if (error) {
-        $('.clock-status span').text(error);
-      }
-      }
+        if (error) {
+          $('.clock-status span').text(error);
+        }
+      },
+      cache: false
     });
   }
   </script>
