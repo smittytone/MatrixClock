@@ -49,7 +49,9 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 1.5
+- 1.6 *unreleased*
+    - Update to [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut) 1.1.0
+- 1.5 *June 7, 2018*
     - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
         - Update Web UI based on Bootstrap
         - Separate out Web UI code into own file for clarity
