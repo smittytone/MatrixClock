@@ -30,14 +30,7 @@ function sendPrefsToDevice(value) {
     // Matrix Clock has requested the current set-up data
     if (debug) server.log("Sending stored preferences to the Matrix Clock");
     device.send("mclock.set.prefs", prefs);
-
-    if (debug) {
-    	// Also switch the device to debug mode
-    	device.send("mclock.set.debug", 1);
-    	server.log("Clock told to enter debug mode");
-    } else {
-    	device.send("mclock.set.debug", 0);
-    }
+    device.send("mclock.set.debug", (debug ? 1 : 0));
 }
 
 function appResponse() {
@@ -193,7 +186,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
-            if (debug) server.log("Clock bst observance turned " + (prefs.bst ? "on" : "off"));
+            if (debug) server.log("Clock BST observance turned " + (prefs.bst ? "on" : "off"));
             device.send("mclock.set.bst", (prefs.bst ? 1 : 0));
         }
 
