@@ -1,4 +1,4 @@
-# MatrixClock 1.5 #
+# MatrixClock 1.6 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -49,7 +49,10 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 1.5
+- 1.6 *In Development*
+    - Add ‘Advanced Settings’ area to UI and move Reset button into it
+    - Add Debug checkbox to Advanced Settings
+- 1.5 *June 7, 2018*
     - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
         - Update Web UI based on Bootstrap
         - Separate out Web UI code into own file for clarity
