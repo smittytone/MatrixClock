@@ -24,7 +24,7 @@ local tickFlag = true;
 local tickTotal = (1.0 / TICK_DURATION).tointeger() * 2;
 local halfTickTotal = tickTotal / 2;
 local isPM = false;
-local debug = true;
+local debug = false;
 local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
 
