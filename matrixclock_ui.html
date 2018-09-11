@@ -16,6 +16,8 @@
     .uicontent {border: 2px solid #33cc00}
     .container {padding: 20px}
     .btn-success {background-color: #33cc00}
+    .showhide { -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none;
+                -moz-user-select: none; -ms-user-select: none; user-select: none; cursor: pointer }
     .slider { -webkit-appearance: none; width: 100%%; height: 25px; background: #000000 outline: none;}
     .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px;
                                     border-radius: 50%%; background: #33cc00; cursor: pointer;}
@@ -53,7 +55,7 @@
       <div class='row' align='center'>
         <div class='col'>
             <h2>Matrix Clock</h2>
-            <h4 align='center' class='clock-status'><i><span>This Matrix Clock is online</span></i><br>&nbsp;</h4>
+            <h4 align='center' class='clock-status'><i><span>This Matrix Clock is online</span></i><br />&nbsp;</h4>
         </div>
       </div>
       <!-- Settings and Controls Row -->
@@ -97,8 +99,18 @@
             </div>
           </div>
           <hr>
-          <div class='reset-button' style='font-family:Rubik;weight:bold' align='center'>
-            <button type='submit' class='btn btn-danger' id='reset' style=' width:200px'>Reset Matrix Clock</button>
+          <div class='advancedsettings' >
+            <h4 class='showhide'>Show Advanced Settings</h4>
+            <div class='advanced' align='center'>
+              <div class='debug-checkbox' style='color:white;font-family:Abel,sans-serif'>
+                <input type='checkbox' name='debug' id='debug' value='debug'> Debug Mode
+              </div>
+              <br />
+              <div class='reset-button' style='font-family:Rubik;weight:bold' align='center'>
+                <button type='submit' class='btn btn-danger' id='reset' style=' width:200px'>Reset Matrix Clock</button>
+              </div>
+              <br />
+            </div>
           </div>
         </div>
         <div class='col-2'>&nbsp;</div>
@@ -106,8 +118,8 @@
       <!-- Colophon Row -->
       <div class='row'>
         <div class='col'>
-          <p class='colophon text-center'>&nbsp;<br><small>Matrix Clock copyright &copy; 2014-18 Tony Smith</small><br>
-          <a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32'></a></p>
+          <p class='colophon text-center'>&nbsp;<br /><small>Matrix Clock copyright &copy; 2014-18 Tony Smith</small><br />
+          <a href='https://github.com/smittytone/MatrixClock'><img src='https://smittytone.github.io/images/rassilon.png' width='32' height='32' /></a></p>
         </div>
       </div>
     </div>
@@ -115,6 +127,8 @@
 
   <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
   <script>
+  $('.advanced').hide();
+  
   // Variables
   var agenturl = '%s';
   var displayon = true;
@@ -129,7 +143,7 @@
   $('#seconds').click(setcolon);
   $('#flash').click(setflash);
   $('#utc').click(setutc);
-  // $('#debug').click(setdebug);
+  $('#debug').click(setdebug);
 
   // Buttons
   $('.reset-button button').click(reset);
@@ -149,6 +163,13 @@
   $('.utc-status span').text(slider.value);
   $('#utcs').css('background', '#222222');
 
+  // Advanced Settings Area
+  $('.showhide').click(function(){
+    $('.advanced').toggle();
+    var isVis = $('.advanced').is(':visible');
+    $('.showhide').text(isVis ? 'Hide Advanced Settings' : 'Show Advanced Settings');
+  });
+
   // Functions
   function updateSlider() {
     $('.brightness-status span').text($('#brightness').val());
@@ -165,24 +186,33 @@
 
   function updateReadout(data) {
     var s = data.split('.');
+    
+    // Set the settings checkboxes
     document.getElementById('mode').checked = (s[0] == '1') ? true : false;
     document.getElementById('bst').checked = (s[1] == '1') ? true : false;
     document.getElementById('seconds').checked = (s[3] == '1') ? true : false;
     document.getElementById('flash').checked = (s[2] == '1') ? true : false;
     document.getElementById('utc').checked = (s[5] == '1') ? true : false;
-
+    
+    // Set the world time slider and value readout
     var b = parseInt(s[6]);
-    $('.utc-status span').text(b - 12);
     $('#utcs').val(b);
-
+    $('.utc-status span').text(b - 12);
+    
+    // Set the on/off button text
     $('.onoff-button button').text((s[7] == '1') ? 'Turn Display Off' : 'Turn Display On');
     displayon = (s[7] == '1');
-
+    
+    // Set the brightness slider and value readout
     b = parseInt(s[4]);
-    $('.brightness-status span').text(b);
     $('#brightness').val(b);
-
+    $('.brightness-status span').text(b);
+    
+    // Set the clock state line
     updateState(s[8]);
+    
+    // Set the debug checkbox
+    document.getElementById('debug').checked = (s[9] == '1') ? true : false;
 
     // Auto-reload data in 120 seconds
     if (!stateflag) {
@@ -192,11 +222,7 @@
   }
 
   function updateState(s) {
-    if (s == 'd') {
-      $('.clock-status span').text('This Matrix Clock is offline');
-    } else {
-      $('.clock-status span').text('This Matrix Clock is online');
-    }
+    $('.clock-status span').text((s == 'd') ? 'This Matrix Clock is offline' : 'This Matrix Clock is online');
   }
 
   function getState(callback) {
@@ -308,7 +334,7 @@
     $.ajax({
       url : agenturl + '/action',
       type: 'POST',
-      data: JSON.stringify({ 'action' : 'debug', 'debug' : document.getElementById('debug').checked }),
+      data: JSON.stringify({ 'action' : 'debug', 'debug' : (document.getElementById('debug').checked ? '1' : '0') }),
       error : function(xhr, textStatus, error) {
         if (error) {
           $('.clock-status span').text(error);

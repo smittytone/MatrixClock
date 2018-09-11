@@ -8,7 +8,7 @@
 
 // CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
-const RECONNECT_TIMEOUT = 30;
+const RECONNECT_TIMEOUT = 15;
 const TICK_DURATION = 0.5;
 const INITIAL_ANGLE = 0;
 
@@ -24,7 +24,7 @@ local tickFlag = true;
 local tickTotal = (1.0 / TICK_DURATION).tointeger() * 2;
 local halfTickTotal = tickTotal / 2;
 local isPM = false;
-local debug = true;
+local debug = false;
 local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
 
@@ -347,14 +347,10 @@ hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
 
 // Set up the clock faces: 0-3 (L-R)
 faces = [];
-local matrix = HT16K33MatrixCustom(hardware.i2c89, 0x70, debug);
-faces.append(matrix);
-matrix = HT16K33MatrixCustom(hardware.i2c89, 0x71, debug);
-faces.append(matrix);
-matrix = HT16K33MatrixCustom(hardware.i2c89, 0x74, debug);
-faces.append(matrix);
-matrix = HT16K33MatrixCustom(hardware.i2c89, 0x75, debug);
-faces.append(matrix);
+faces.append(HT16K33MatrixCustom(hardware.i2c89, 0x70));
+faces.append(HT16K33MatrixCustom(hardware.i2c89, 0x71));
+faces.append(HT16K33MatrixCustom(hardware.i2c89, 0x74));
+faces.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
 
 // Set the initial brightness and display angle
 foreach (face in faces) face.init(15, INITIAL_ANGLE);
@@ -389,4 +385,5 @@ agent.on("mclock.set.light", setLight);
 agent.on("mclock.set.debug", setDebug);
 
 // Get preferences from server
-agent.send("mclock.get.prefs", true);
+// NOTE no longer need this here as it's handled via DisconnectManager
+// agent.send("mclock.get.prefs", true);

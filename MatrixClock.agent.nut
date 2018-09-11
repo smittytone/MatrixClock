@@ -10,7 +10,7 @@
 // const APP_CODE = "YOUR_APP_UUID";
 
 // CONSTANTS
-// If you are NOT using Squinter or a similar tool, replace the #import statement
+// If you are NOT using Squinter or a similar tool, replace the following #import statement
 // with the contents of the named file (matrixclock_ui.html)
 const HTML_STRING = @"
 #import "matrixclock_ui.html"
@@ -20,7 +20,7 @@ const HTML_STRING = @"
 local prefs = null;
 local saveResponse = null;
 local api = null;
-local debug = true;
+local debug = false;
 
 // USE 'true' TO ZAP THE STORED DEFAULTS
 local firstRun = false;
@@ -30,21 +30,14 @@ function sendPrefsToDevice(value) {
     // Matrix Clock has requested the current set-up data
     if (debug) server.log("Sending stored preferences to the Matrix Clock");
     device.send("mclock.set.prefs", prefs);
-
-    if (debug) {
-    	// Also switch the device to debug mode
-    	device.send("mclock.set.debug", 1);
-    	server.log("Clock told to enter debug mode");
-    } else {
-    	device.send("mclock.set.debug", 0);
-    }
+    device.send("mclock.set.debug", (debug ? 1 : 0));
 }
 
 function appResponse() {
     // Responds to the app's request for the clock's set-up data
     // Generates a string in the form:
     //
-    //   1.1.1.1.01.1.01.1.d
+    //   1.1.1.1.01.1.01.1.d.1
     //
     // for the values
     //   0. mode
@@ -56,6 +49,7 @@ function appResponse() {
     //   6. utc offset
     //   7. display state
     //   8. connection status
+    //   9. debug state
     //
     // UTC offset is the value for the app's UI slider, ie. 0 to 24
     // (mapping in device code to offset values of +12 to -12)
@@ -86,7 +80,10 @@ function appResponse() {
 	rs = rs + ((prefs.on) ? "1." : "0.");
 
     // Add d indicate disconnected, or c
-    rs = rs + (device.isconnected() ? "c" : "d");
+    rs = rs + (device.isconnected() ? "c." : "d.");
+
+    // Add debug state as 1-digit value
+    rs = rs + ((prefs.debug) ? "1" : "0");
 
     return rs;
 }
@@ -99,6 +96,7 @@ function resetToDefaults() {
     prefs.flash = true;
     prefs.colon = true;
     prefs.on = true;
+    prefs.debug = false;
     prefs.utcoffset = 12;
     prefs.brightness = 15;
 }
@@ -126,6 +124,7 @@ prefs.bst <- true;
 prefs.colon <- true;
 prefs.flash <- true;
 prefs.utc <- false;
+prefs.debug <- false;
 prefs.utcoffset <- 12;
 prefs.brightness <- 15;
 
@@ -134,6 +133,11 @@ local loadedPrefs = server.load();
 if (loadedPrefs.len() != 0) {
     // Table is NOT empty so set the prefs to the loaded table
     prefs = loadedPrefs;
+    
+    // Handle prefs added post-release
+    if (!("debug" in prefs)) prefs.debug <- false;
+    debug = prefs.debug;
+    
     if (debug) server.log("Clock settings loaded: " + appResponse());
 } else {
     // Table is empty, so this must be a first run
@@ -193,7 +197,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
-            if (debug) server.log("Clock bst observance turned " + (prefs.bst ? "on" : "off"));
+            if (debug) server.log("Clock BST observance turned " + (prefs.bst ? "on" : "off"));
             device.send("mclock.set.bst", (prefs.bst ? 1 : 0));
         }
 
@@ -301,14 +305,17 @@ api.post("/action", function(context) {
             }
 
             if (data.action == "debug") {
-                if (data.action.debug == "1") {
+                if (data.debug == "1") {
                     debug = true;
-                } else if (data.action.debug == "0") {
+                    prefs.debug = true;
+                } else if (data.debug == "0") {
                     debug = false;
+                    prefs.debug = false;
                 }
 
                 device.send("mclock.set.debug", (debug ? 1 : 0));
                 server.log("Debug mode " + (debug ? "on" : "off"));
+                if (server.save(prefs) != 0) server.error("Could not save clock settings after debug switch");
             }
         }
 
