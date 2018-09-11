@@ -49,7 +49,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 1.6 &mdash; *In Development*
+- 1.6 &mdash; *11 September 2018*
     - Add ‘Advanced Settings’ area to UI and move Reset button into it
     - Add Debug checkbox to Advanced Settings
 - 1.5 &mdash; *7 June 2018*
