@@ -251,14 +251,14 @@ function setPrefs(settings) {
 
 function setBST(value) {
     // This function is called when the app sets or unsets BST
-    if (debug) server.log("Setting BST monitoring " + ((value == 1) ? "on" : "off"));
-    prefs.bst = (value == 1);
+    if (debug) server.log("Setting BST monitoring " + (value? "on" : "off"));
+    prefs.bst = value;
 }
 
 function setMode(value) {
     // This function is called when 12/24 modes are switched by app
-    if (debug) server.log("Setting 24-hour mode " + ((value == 24) ? "on" : "off"));
-    prefs.mode = (value == 24 && prefs.mode == false);
+    if (debug) server.log("Setting 24-hour mode " + (value ? "on" : "off"));
+    prefs.mode = (value && prefs.mode == false);
 }
 
 function setUTC(string) {
@@ -283,19 +283,19 @@ function setBright(brightness) {
 
 function setFlash(value) {
     // This function is called when the app sets or unsets the colon flash
-    if (debug) server.log("Setting colon flash " + ((value == 1) ? "on" : "off"));
-    prefs.flash = (value == 1);
+    if (debug) server.log("Setting colon flash " + (value ? "on" : "off"));
+    prefs.flash = value;
 }
 
 function setColon(value) {
     // This function is called when the app sets or unsets the colon flash
-    if (debug) server.log("Setting colon state " + ((value == 1) ? "on" : "off"));
-    prefs.colon = (value == 1);
+    if (debug) server.log("Setting colon state " + (value ? "on" : "off"));
+    prefs.colon = value;
 }
 
 function setLight(value) {
-    if (debug) server.log("Setting light " + ((value == 1) ? "on" : "off"));
-    if (value == 1) {
+    if (debug) server.log("Setting light " + (value ? "on" : "off"));
+    if (value) {
         prefs.on = true;
         powerUp();
     } else {
@@ -305,7 +305,7 @@ function setLight(value) {
 }
 
 function setDebug(state) {
-    debug = (state == 1);
+    debug = state;
 }
 
 // OFFLINE OPERATION FUNCTIONS

@@ -18,12 +18,9 @@ const HTML_STRING = @"
 
 // MAIN VARIABLES
 local prefs = null;
-local saveResponse = null;
+local savedResponse = null;
 local api = null;
 local debug = false;
-
-// USE 'true' TO ZAP THE STORED DEFAULTS
-local firstRun = false;
 
 // CLOCK FUNCTIONS
 function sendPrefsToDevice(value) {
@@ -88,45 +85,74 @@ function appResponse() {
     return rs;
 }
 
-function resetToDefaults() {
-    // Reset clock prefs to the defaults
-    prefs.hrmode = true;
-    prefs.bst = true;
-    prefs.utc = false;
-    prefs.flash = true;
-    prefs.colon = true;
-    prefs.on = true;
-    prefs.debug = false;
-    prefs.utcoffset = 12;
-    prefs.brightness = 15;
+function encodePrefsForUI() {
+    // Responds to the UI's request for the clock's settings
+    // with all the clock's settings
+    local data = { "mode"        : prefs.hrmode,
+                   "bst"         : prefs.bst,
+                   "flash"       : prefs.flash,
+                   "colon"       : prefs.colon,
+                   "bright"      : prefs.brightness,
+                   "world"       : { "utc"    : prefs.utc,
+                                     "offset" : prefs.offset + 12 },
+                   "on"          : prefs.on,
+                   "debug"       : debug,
+                   "isconnected" : device.isconnected() };
+    
+    return http.jsonencode(data, {"compact":true});
 }
+
+function encodePrefsForWatch() {
+    // Responds to Controller's request for the clock's settings
+    // with a subset of the current device settings
+    local data = { "mode"        : prefs.hrmode,
+                   "bright"      : prefs.brightness,
+                   "world"       : { "utc" : prefs.utc },
+                   "on"          : prefs.on,
+                   "isconnected" : device.isconnected() };
+    return http.jsonencode(data, {"compact":true});
+}
+
+function resetPrefs() {
+    // Clear the prefs and re-save
+    // NOTE This is handy if we change the number of keys in prefs table
+	server.save({});
+
+	// Reset 'prefs' values to the defaults
+	setPrefs();
+
+    // Resave the prefs
+    server.save(prefs);
+}
+
+function setPrefs() {
+    // Set the clock preferences
+    // The table is formatted thus:
+    //    ON: true/false for display on
+    //    HRMODE: true/false for 24/12-hour view
+    //    BST: true/false for adapt for daylight savings/stick to GMT
+    //    COLON: true/false for colon shown if NOT flashing
+    //    FLASH: true/false for colon flash
+    //    UTC: true/false for UTC set/unset
+    //    UTCOFFSET: 0-24 for GMT offset (subtract 12 for actual value)
+    //    BRIGHTNESS: 1 to 15 for boot-set LED brightness
+    prefs = {};
+    prefs.on <- true;
+    prefs.hrmode <- true;
+    prefs.bst <- true;
+    prefs.colon <- true;
+    prefs.flash <- true;
+    prefs.utc <- false;
+    prefs.debug <- false;
+    prefs.utcoffset <- 12;
+    prefs.brightness <- 15;
+}
+
 
 // PROGRAM START
 
-// IMPORTANT Set firstRun at the top of the listing to reset settings
-if (firstRun) server.save({});
-
-// Set the clock preferences
-// The table is formatted thus:
-//    ON: true/false for display on
-//    HRMODE: true/false for 24/12-hour view
-//    BST: true/false for adapt for daylight savings/stick to GMT
-//    COLON: true/false for colon shown if NOT flashing
-//    FLASH: true/false for colon flash
-//    UTC: true/false for UTC set/unset
-//    UTCOFFSET: 0-24 for GMT offset (subtract 12 for actual value)
-//    BRIGHTNESS: 1 to 15 for boot-set LED brightness
-
-prefs = {};
-prefs.on <- true;
-prefs.hrmode <- true;
-prefs.bst <- true;
-prefs.colon <- true;
-prefs.flash <- true;
-prefs.utc <- false;
-prefs.debug <- false;
-prefs.utcoffset <- 12;
-prefs.brightness <- 15;
+// Initialize the clock's preferences - we will read in saved values, if any, next
+setPrefs();
 
 local loadedPrefs = server.load();
 
@@ -135,10 +161,12 @@ if (loadedPrefs.len() != 0) {
     prefs = loadedPrefs;
     
     // Handle prefs added post-release
-    if (!("debug" in prefs)) prefs.debug <- false;
-    debug = prefs.debug;
-    
-    if (debug) server.log("Clock settings loaded: " + appResponse());
+    if (!("debug" in prefs)) {
+        prefs.debug <- debug;
+        server.save(prefs);
+    }
+
+    if (debug) server.log("Clock settings loaded: " +  encodePrefsForUI());
 } else {
     // Table is empty, so this must be a first run
     if (debug) server.log("First Matrix Clock run");
@@ -181,7 +209,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save mode setting");
             if (debug) server.log("Clock mode turned to " + (prefs.hrmode ? "24 hour" : "12 hour"));
-            device.send("mclock.set.mode", (prefs.hrmode ? 24 : 12));
+            device.send("mclock.set.mode", prefs.hrmode);
         }
 
         // Check for a BST set/unset message
@@ -198,7 +226,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
             if (debug) server.log("Clock BST observance turned " + (prefs.bst ? "on" : "off"));
-            device.send("mclock.set.bst", (prefs.bst ? 1 : 0));
+            device.send("mclock.set.bst", prefs.bst);
         }
 
         // Check for a set brightness message
@@ -223,7 +251,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon flash setting");
             if (debug) server.log("Clock colon flash turned " + (prefs.flash ? "on" : "off"));
-            device.send("mclock.set.flash", (prefs.flash ? 1 : 0));
+            device.send("mclock.set.flash", prefs.flash);
         }
 
         // Check for a set colon show message
@@ -240,7 +268,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon visibility setting");
             if (debug) server.log("Clock colon turned " + (prefs.colon ? "on" : "off"));
-            device.send("mclock.set.colon", (prefs.colon ? 1 : 0));
+            device.send("mclock.set.colon", prefs.colon);
         }
 
         // Check for set light message
@@ -257,7 +285,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save display light setting");
             if (debug) server.log("Clock display turned " + (prefs.on ? "on" : "off"));
-            device.send("mclock.set.light", (prefs.on ? 1 : 0));
+            device.send("mclock.set.light", prefs.on);
         }
 
         if ("setutc" in data) {
@@ -298,22 +326,24 @@ api.post("/action", function(context) {
 
         if ("action" in data) {
             if (data.action == "reset") {
-                resetToDefaults();
+                // A RESET message sent
+                resetPrefs();
                 device.send("mclock.set.prefs", prefs);
                 if (debug) server.log("Clock settings reset");
                 if (server.save(prefs) != 0) server.error("Could not save clock settings after reset");
             }
 
             if (data.action == "debug") {
-                if (data.debug == "1") {
+                // A DEBUG message sent
+                if (data.debug == true) {
                     debug = true;
                     prefs.debug = true;
-                } else if (data.debug == "0") {
+                } else {
                     debug = false;
                     prefs.debug = false;
                 }
 
-                device.send("mclock.set.debug", (debug ? 1 : 0));
+                device.send("mclock.set.debug", debug);
                 server.log("Debug mode " + (debug ? "on" : "off"));
                 if (server.save(prefs) != 0) server.error("Could not save clock settings after debug switch");
             }
@@ -336,6 +366,7 @@ api.get("/controller/info", function(context) {
 
 // GET at /controller/state returns device state
 api.get("/controller/state", function(context) {
-    local data = device.isconnected() ? "1" : "0"
-    context.send(200, data);
+    // GET call to /controller/state returns device status
+    // Send a relevant subset of the settings as JSON
+    context.send(200, encodePrefsForWatch());
 });

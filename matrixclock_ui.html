@@ -334,7 +334,7 @@
     $.ajax({
       url : agenturl + '/action',
       type: 'POST',
-      data: JSON.stringify({ 'action' : 'debug', 'debug' : (document.getElementById('debug').checked ? '1' : '0') }),
+      data: JSON.stringify({ 'action' : 'debug', 'debug' : document.getElementById('debug').checked }),
       error : function(xhr, textStatus, error) {
         if (error) {
           $('.clock-status span').text(error);

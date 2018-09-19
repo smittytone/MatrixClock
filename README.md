@@ -1,4 +1,4 @@
-# MatrixClock 1.6 #
+# MatrixClock 2.0.0 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -49,24 +49,26 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 1.6 &mdash; *11 September 2018*
+- 2.0.0 &mdash; *In Development*
+    - Send settings in JSON format 
+- 1.6.0 &mdash; *11 September 2018*
     - Add ‘Advanced Settings’ area to UI and move Reset button into it
     - Add Debug checkbox to Advanced Settings
-- 1.5 &mdash; *7 June 2018*
+- 1.5.0 &mdash; *7 June 2018*
     - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
         - Update Web UI based on Bootstrap
         - Separate out Web UI code into own file for clarity
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
     - Update to [JQuery 3.3.1](https://jquery.com)
     - Prevent Ajax XHR cacheing
-- 1.4
+- 1.4.0
     - Minor changes; bringing everything up to date
-- 1.3
+- 1.3.0
     - Add support for world time display, including web UI controls
     - Add favicon and iOS home page icon
-- 1.2
+- 1.2.0
     - Add web UI controls
-- 1.1
+- 1.1.0
     - Initial public release
 
 ## Licence ##
