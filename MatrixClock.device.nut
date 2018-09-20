@@ -306,6 +306,7 @@ function setLight(value) {
 
 function setDebug(state) {
     debug = state;
+    server.log("Setting device debugging " + (state ? "on" : "off"));
 }
 
 // OFFLINE OPERATION FUNCTIONS
@@ -374,6 +375,7 @@ syncText();
 syncTimer = imp.wakeup(30.0, getTime);
 
 // Set up Agent notification response triggers
+// First, settings-related actions
 agent.on("mclock.set.prefs", setPrefs);
 agent.on("mclock.set.bst", setBST);
 agent.on("mclock.set.mode", setMode);
@@ -383,6 +385,11 @@ agent.on("mclock.set.flash", setFlash);
 agent.on("mclock.set.colon", setColon);
 agent.on("mclock.set.light", setLight);
 agent.on("mclock.set.debug", setDebug);
+
+// Next, other actions
+agent.on("mclock.do.reboot", function(dummy) {
+    server.restart();
+});
 
 // Get preferences from server
 // NOTE no longer need this here as it's handled via DisconnectManager
