@@ -261,15 +261,14 @@ function setMode(value) {
     prefs.mode = (value && prefs.mode == false);
 }
 
-function setUTC(string) {
+function setUTC(value) {
     // This function is called when the app sets or unsets UTC
-    if (debug) server.log("Setting UTC " + ((string == "N") ? "off" : "on"));
-    if (string == "N") {
-        prefs.utc = false;
-    } else {
-        prefs.utc = true;
-        prefs.offset = string.tointeger();
+    if ("state" in value) {
+        prefs.utc = value.state;
+        if (debug) server.log("Setting UTC " + (value.state ? "on" : "off"));
     }
+
+    if ("offset" in value) prefs.offset = value.offset;
 }
 
 function setBright(brightness) {

@@ -182,9 +182,7 @@
         function updateutc() {
             var u = $('#utcs').val();
             $('.utc-status span').text(u - 12);
-            if (document.getElementById('utc').checked == true) {
-                setutc();
-            }
+            setutc();
         }
 
         function updateReadout(data) {
@@ -289,14 +287,13 @@
         function setlight() {
             displayon = !displayon;
             $('.onoff-button button').text(displayon ? 'Turn off Display' : 'Turn on Display');
-            // var s = (displayon ? 'true' : 'false');
             var d = { 'setlight' :  displayon };
             sendstate(d);
         }
 
         function setutc() {
             var d = { 'setutc' : document.getElementById('utc').checked, 
-                    'utcval' : $('#utcs').val() };
+                      'utcval' : ($('#utcs').val()) };
             sendstate(d);
         }
 

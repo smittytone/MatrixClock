@@ -30,6 +30,7 @@ function sendPrefsToDevice(value) {
     device.send("mclock.set.debug", (debug ? 1 : 0));
 }
 
+/*
 function appResponse() {
     // Responds to the app's request for the clock's set-up data
     // Generates a string in the form:
@@ -84,6 +85,7 @@ function appResponse() {
 
     return rs;
 }
+*/
 
 function encodePrefsForUI() {
     // Responds to the UI's request for the clock's settings
@@ -293,17 +295,24 @@ api.post("/settings", function(context) {
         }
 
         if ("setutc" in data) {
+            // Is there an offset value?
+            if ("utcval" in data) {
+                try {
+                    prefs.utcoffset = data.utcval.tointeger();
+                } catch (err) {
+                    // 'utcval' not an integer-compatible string.
+                    // Just ignore the error as we won't set anything
+                    if (debug) server.error(err + " attempting to set UTC offset");
+                }
+            }
+            
+            // Is world time switch on or off
             if (!data.setutc) {
                 prefs.utc = false;
-                device.send("mclock.set.utc", "N");
+                device.send("mclock.set.utc", { "state" : prefs.utc });
             } else if (data.setutc) {
                 prefs.utc = true;
-                if ("utcval" in data) {
-                    prefs.utcoffset = data.utcval.tointeger();
-                    device.send("mclock.set.utc", prefs.utcoffset);
-                } else {
-                    device.send("mclock.set.utc", prefs.utcoffset);
-                }
+                device.send("mclock.set.utc", { "state" : prefs.utc, "offset" : prefs.utcoffset });
             } else {
                 if (debug) server.error("Attempt to pass an mis-formed parameter to setutc");
                 contex.send(400, "Mis-formed parameter sent");
