@@ -94,9 +94,9 @@ function encodePrefsForUI() {
                    "colon"       : prefs.colon,
                    "bright"      : prefs.brightness,
                    "world"       : { "utc"    : prefs.utc,
-                                     "offset" : prefs.offset + 12 },
+                                     "offset" : prefs.utcoffset },
                    "on"          : prefs.on,
-                   "debug"       : debug,
+                   "debug"       : prefs.debug,
                    "isconnected" : device.isconnected() };
     
     return http.jsonencode(data, {"compact":true});
@@ -144,7 +144,7 @@ function setPrefs() {
     prefs.flash <- true;
     prefs.utc <- false;
     prefs.debug <- false;
-    prefs.utcoffset <- 12;
+    prefs.utcoffset <- 12;  // ie. no offset
     prefs.brightness <- 15;
 }
 
@@ -164,6 +164,8 @@ if (loadedPrefs.len() != 0) {
     if (!("debug" in prefs)) {
         prefs.debug <- debug;
         server.save(prefs);
+    } else {
+        debug = prefs.debug;
     }
 
     if (debug) server.log("Clock settings loaded: " +  encodePrefsForUI());
@@ -182,13 +184,15 @@ api.get("/", function(context) {
     context.send(200, format(HTML_STRING, http.agenturl()));
 });
 
+/*
 api.get("/state", function(context) {
     local a = (device.isconnected() ? "c" : "d");
     context.send(200, a);
 });
+*/
 
 api.get("/settings", function(context) {
-    context.send(200, appResponse());
+    context.send(200, encodePrefsForUI());
 });
 
 api.post("/settings", function(context) {
@@ -197,9 +201,9 @@ api.post("/settings", function(context) {
 
         // Check for a mode-set message
         if ("setmode" in data) {
-            if (data.setmode == "1") {
+            if (data.setmode) {
                 prefs.hrmode = true;
-            } else if (data.setmode == "0") {
+            } else if (!data.setmode) {
                 prefs.hrmode = false;
             } else {
                 if (debug) server.error("Mis-formed parameter to setmode");
@@ -214,9 +218,9 @@ api.post("/settings", function(context) {
 
         // Check for a BST set/unset message
         if ("setbst" in data) {
-            if (data.setbst == "1") {
+            if (data.setbst) {
                 prefs.bst = true;
-            } else if (data.setbst == "0") {
+            } else if (!data.setbst) {
                 prefs.bst = false;
             }  else {
                 if (debug) server.error("Mis-formed parameter to setbst");
@@ -239,9 +243,9 @@ api.post("/settings", function(context) {
 
         // Check for a set flash message
         if ("setflash" in data) {
-            if (data.setflash == "1") {
+            if (data.setflash) {
                 prefs.flash = true;
-            } else if (data.setflash == "0") {
+            } else if (!data.setflash) {
                 prefs.flash = false;
             } else {
                 if (debug) server.error("Mis-formed parameter to setflash");
@@ -256,9 +260,9 @@ api.post("/settings", function(context) {
 
         // Check for a set colon show message
         if ("setcolon" in data) {
-            if (data.setcolon == "1") {
+            if (data.setcolon) {
                 prefs.colon = true;
-            } else if (data.setcolon == "0") {
+            } else if (!data.setcolon) {
                 prefs.colon = false;
             } else {
                 if (debug) server.error("Attempt to pass an mis-formed parameter to setcolon");
@@ -273,9 +277,9 @@ api.post("/settings", function(context) {
 
         // Check for set light message
         if ("setlight" in data) {
-            if (data.setlight == "1") {
+            if (data.setlight) {
                 prefs.on = true;
-            } else if (data.setlight == "0") {
+            } else if (!data.setlight) {
                 prefs.on = false;
             } else {
                 if (debug) server.error("Attempt to pass an mis-formed parameter to setlight");
@@ -289,10 +293,10 @@ api.post("/settings", function(context) {
         }
 
         if ("setutc" in data) {
-            if (data.setutc == "0") {
+            if (!data.setutc) {
                 prefs.utc = false;
                 device.send("mclock.set.utc", "N");
-            } else if (data.setutc == "1") {
+            } else if (data.setutc) {
                 prefs.utc = true;
                 if ("utcval" in data) {
                     prefs.utcoffset = data.utcval.tointeger();
@@ -335,7 +339,7 @@ api.post("/action", function(context) {
 
             if (data.action == "debug") {
                 // A DEBUG message sent
-                if (data.debug == true) {
+                if (data.state == true) {
                     debug = true;
                     prefs.debug = true;
                 } else {
@@ -344,8 +348,14 @@ api.post("/action", function(context) {
                 }
 
                 device.send("mclock.set.debug", debug);
-                server.log("Debug mode " + (debug ? "on" : "off"));
+                server.log("Setting agent debugging " + (debug ? "on" : "off"));
                 if (server.save(prefs) != 0) server.error("Could not save clock settings after debug switch");
+            }
+
+            if (data.action == "reboot") {
+                // A REBOOT message sent
+                device.send("mclock.do.reboot", true);
+                if (debug) server.log("Clock told to reboot");
             }
         }
 
