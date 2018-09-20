@@ -258,7 +258,7 @@ function setBST(value) {
 function setMode(value) {
     // This function is called when 12/24 modes are switched by app
     if (debug) server.log("Setting 24-hour mode " + (value ? "on" : "off"));
-    prefs.mode = (value && prefs.mode == false);
+    prefs.mode = value;
 }
 
 function setUTC(value) {
