@@ -37,9 +37,10 @@ The Matrix Clock device code is currently hardwired for UK usage: it adjusts to 
 
 ### Control UI ###
 
-The Matrix Clock can be controlled by accessing its agent URL.
+The Matrix Clock can be controlled by accessing its agent URL:
 
-![Matrix Click UI](images/grab01.png)
+<p><img src="images/grab01.png" width="740" alt="Matrix Clock UI"></p>
+
 
 ## Casing ###
 
