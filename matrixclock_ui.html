@@ -102,12 +102,12 @@
                     <div class='advancedsettings' >
                         <h4 class='showhide'>Show Advanced Settings</h4>
                         <div class='advanced' align='center'>
-                            <div class='debug-checkbox' style='color:white;font-family:Abel,sans-serif'>
+                            <div style='color:white;font-family:Abel,sans-serif'>
                                 <input type='checkbox' name='debug' id='debug' value='debug'> Debug Mode
                             </div>
                             <br />
-                            <div class='reset-button' style='font-family:Rubik;weight:bold' align='center'>
-                                <button type='submit' class='btn btn-danger' id='reset' style=' width:200px'>Reset Matrix Clock</button>
+                            <div style='font-family:Rubik;weight:bold' align='center'>
+                                <button type='submit' class='btn btn-danger' id='resetbutton' style=' width:200px'>Reset Matrix Clock</button>
                             </div>
                             <br />
                         </div>
@@ -141,16 +141,16 @@
         var stateTimer = setInterval(checkState, 120000);
 
         // Set UI click actions: Checkboxes
-        $('#mode').click(setmode);
-        $('#bst').click(setbst);
-        $('#seconds').click(setcolon);
-        $('#flash').click(setflash);
-        $('#utc').click(setutc);
-        $('#debug').click(setdebug);
+        $('#mode').click(setMode);
+        $('#bst').click(setBST);
+        $('#seconds').click(setColon);
+        $('#flash').click(setFlash);
+        $('#utc').click(setUTC);
+        $('#debug').click(setDebug);
 
         // Buttons
-        $('.reset-button button').click(reset);
-        $('#onoffbutton').click(setlight);
+        $('#resetbutton').click(reset);
+        $('#onoffbutton').click(setLight);
 
         // Slider
         var slider = document.getElementById('brightness');
@@ -161,8 +161,8 @@
 
         // World Time Slider
         slider = document.getElementById('utcs');
-        slider.addEventListener('mouseup', updateutc);
-        slider.addEventListener('touchend', updateutc);
+        slider.addEventListener('mouseup', updateUTC);
+        slider.addEventListener('touchend', updateUTC);
         $('.utc-status span').text(slider.value);
         $('#utcs').css('background', '#222222');
 
@@ -174,20 +174,8 @@
         });
 
         // Functions
-        function updateSlider() {
-            $('.brightness-status span').text($('#brightness').val());
-            setbright();
-        }
-
-        function updateutc() {
-            var u = $('#utcs').val();
-            $('.utc-status span').text(u - 12);
-            setutc();
-        }
-
-        function updateReadout(data) {
-            //var s = data.split('.');
-            var s = JSON.parse(data);
+        function updateReadout(jsondata) {
+            var s = JSON.parse(jsondata);
 
             // Set the settings checkboxes
             document.getElementById('mode').checked = s['mode'];
@@ -199,8 +187,9 @@
             
             // Set the world time slider and value readout
             var u = parseInt(s['world']['offset']);
-            $('.utc-status span').text(u - 12);
             $('#utcs').val(u);
+            // Setting (0-24) is displayed as (-12 to +12)
+            $('.utc-status span').text(u - 12);
             
             // Set the on/off button text
             $('#onoffbutton').text(s['on'] ? 'Turn Display Off' : 'Turn Display On');
@@ -216,7 +205,19 @@
         }
 
         function updateState(s) {
-            $('.clock-status span').text(s ? 'This Matrix Clock is online' : 'This Matrix Clock is offline');
+            // Update the clock status readout
+            $('.clock-status span').text('This Matrix Clock is ' + (s ? 'online' : 'offline'));
+        }
+
+        function updateSlider() {
+            $('.brightness-status span').text($('#brightness').val());
+            setbright();
+        }
+
+        function updateUTC() {
+            var u = $('#utcs').val();
+            $('.utc-status span').text(u - 12);
+            setutc();
         }
 
         function getState(callback) {
@@ -247,7 +248,7 @@
                 success : function(response) {
                     var j = JSON.parse(response);
                     if ('isconnected' in j) {
-                        showState(j['isconnected']);
+                        updateState(j['isconnected']);
                     };
                 },
                 error : function(xhr, textStatus, error) {
@@ -259,45 +260,54 @@
             });
         }
 
-        function setmode() {
+        function setMode() {
+            // Send clock mode as bool: true = 24-hour, false = 12-hour 
             var d = { 'setmode' : document.getElementById('mode').checked };
-            sendstate(d);
+            sendState(d);
         }
 
-        function setbst() {
+        function setBST() {
+            // Send clock use BST setting as bool
             var d = { 'setbst' : document.getElementById('bst').checked };
-            sendstate(d);
+            sendState(d);
         }
 
-        function setcolon() {
+        function setColon() {
+            // Send clock show colon setting as bool
             var d = { 'setcolon' : document.getElementById('seconds').checked };
-            sendstate(d);
+            sendState(d);
         }
 
-        function setflash() {
+        function setFlash() {
+            // Send clock flash colon setting as bool
             var d = { 'setflash' : document.getElementById('flash').checked };
-            sendstate(d);
+            sendState(d);
         }
 
         function setbright() {
+            // Send clock display brightness setting as string
             var d = { 'setbright' : ($('#brightness').val()) };
             sendstate(d);
         }
 
-        function setlight() {
+        function setLight() {
+            // Send clock display state as bool: true = on, false = off
             displayon = !displayon;
             $('.onoff-button button').text(displayon ? 'Turn off Display' : 'Turn on Display');
             var d = { 'setlight' :  displayon };
-            sendstate(d);
+            sendState(d);
         }
 
-        function setutc() {
+        function setUTC() {
+            // Send clock world time setting:
+            //   Display world time as bool: true = yes, false = no
+            //   Offset (0-24) as string
             var d = { 'setutc' : document.getElementById('utc').checked, 
                       'utcval' : ($('#utcs').val()) };
-            sendstate(d);
+            sendState(d);
         }
 
-        function sendstate(data) {
+        function sendState(data) {
             $.ajax({
                 url : agenturl + '/settings',
                 type: 'POST',
@@ -314,20 +324,9 @@
             });
         }
 
-        function reset() {
-            // Trigger a settings reset
-            $.ajax({
-                url : agenturl + '/action',
-                type: 'POST',
-                data: JSON.stringify({ 'action' : 'reset' }),
-                success : function(response) {
-                    getState(updateReadout);
-                },
-                cache: false
-            });
-        }
+        // The following are action functions: POST to /action
 
-        function setdebug() {
+        function setDebug() {
             // Tell the device to enter or leave debug mode
             $.ajax({
                 url : agenturl + '/action',
@@ -337,6 +336,20 @@
                     if (error) {
                         $('.clock-status span').text(error);
                     }
+                },
+                cache: false
+            });
+        }
+
+        function reset() {
+            // Trigger a settings reset
+            $.ajax({
+                url : agenturl + '/action',
+                type: 'POST',
+                data: JSON.stringify({ 'action' : 'reset' }),
+                success : function(response) {
+                    // This changes the settings, so we should reacquire them immediately
+                    getState(updateReadout);
                 },
                 cache: false
             });
