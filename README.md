@@ -50,7 +50,11 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 ## Release Notes ##
 
 - 2.0.0 &mdash; *In Development*
-    - Send settings in JSON format 
+    - Restructure API to use JSON
+    - Improved [Apple Watch Controller](https://github.com/smittytone/Controller) support
+    - Improved error handling
+    - Improved settings handling
+    - Improved web UI code
 - 1.6.0 &mdash; *11 September 2018*
     - Add ‘Advanced Settings’ area to UI and move Reset button into it
     - Add Debug checkbox to Advanced Settings
