@@ -37,9 +37,10 @@ The Matrix Clock device code is currently hardwired for UK usage: it adjusts to 
 
 ### Control UI ###
 
-The Matrix Clock can be controlled by accessing its agent URL.
+The Matrix Clock can be controlled by accessing its agent URL:
 
-![Matrix Click UI](images/grab01.png)
+<p><img src="images/grab01.png" width="740" alt="Matrix Clock UI"></p>
+
 
 ## Casing ###
 
@@ -50,7 +51,11 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 ## Release Notes ##
 
 - 2.0.0 &mdash; *In Development*
-    - Send settings in JSON format 
+    - Restructure API to use JSON
+    - Improved [Apple Watch Controller](https://github.com/smittytone/Controller) support
+    - Improved error handling
+    - Improved settings handling
+    - Improved web UI code
 - 1.6.0 &mdash; *11 September 2018*
     - Add ‘Advanced Settings’ area to UI and move Reset button into it
     - Add Debug checkbox to Advanced Settings
