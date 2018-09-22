@@ -212,13 +212,13 @@
 
         function updateSlider() {
             $('.brightness-status span').text($('#brightness').val());
-            setbright();
+            setBright();
         }
 
         function updateUTC() {
             var u = $('#utcs').val();
             $('.utc-status span').text(u - 12);
-            setutc();
+            setUTC();
         }
 
         function getState(callback) {
@@ -285,10 +285,10 @@
             sendState(d);
         }
 
-        function setbright() {
+        function setBright() {
             // Send clock display brightness setting as string
             var d = { 'setbright' : ($('#brightness').val()) };
-            sendstate(d);
+            sendState(d);
         }
 
         function setLight() {
