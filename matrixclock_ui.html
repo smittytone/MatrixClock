@@ -138,8 +138,8 @@
         // Get initial readings
         getState(updateReadout);
 
-        // Begin the online status update loop
-        var stateTimer = setInterval(checkState, 120000);
+        // Begin the online status update loop (fires every minute)
+        var stateTimer = setInterval(checkState, 60000);
 
         // Set UI click actions: Checkboxes
         $('#mode').click(setMode);
