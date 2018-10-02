@@ -102,6 +102,7 @@ function reportAPIError(func) {
     return ("Mis-formed parameter sent (" + func +")");
 }
 
+
 // PROGRAM START
 
 // Initialize the clock's preferences - we will read in saved values, if any, next
@@ -134,6 +135,17 @@ device.on("mclock.get.prefs", sendPrefsToDevice);
 
 // Set up the control and data API
 api = Rocky();
+
+api.authorize(function(context) {
+    // Mandate HTTPS connections
+    if (context.getHeader("x-forwarded-proto") != "https") return false;
+    return true;
+});
+
+api.onUnauthorized(function(context) {
+    // Incorrect level of access security
+    context.send(401, "Insecure access forbidden");
+});
 
 // Serve the web UI for a GET at the agent root
 api.get("/", function(context) {
