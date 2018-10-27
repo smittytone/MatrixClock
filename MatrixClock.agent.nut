@@ -123,7 +123,8 @@ if (loadedPrefs.len() != 0) {
     }
 
     if (debug) {
-        server.log("Clock settings loaded: \n" + encodePrefsForUI());
+        server.log("Clock settings loaded:");
+        server.log(encodePrefsForUI());
     }
 } else {
     // Table is empty, so this must be a first run
