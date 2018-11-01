@@ -251,25 +251,24 @@ function setPrefs(settings) {
 
 function setBST(value) {
     // This function is called when the app sets or unsets BST
-    if (debug) server.log("Setting BST monitoring " + ((value == 1) ? "on" : "off"));
-    prefs.bst = (value == 1);
+    if (debug) server.log("Setting BST monitoring " + (value? "on" : "off"));
+    prefs.bst = value;
 }
 
 function setMode(value) {
     // This function is called when 12/24 modes are switched by app
-    if (debug) server.log("Setting 24-hour mode " + ((value == 24) ? "on" : "off"));
-    prefs.mode = (value == 24 && prefs.mode == false);
+    if (debug) server.log("Setting 24-hour mode " + (value ? "on" : "off"));
+    prefs.mode = value;
 }
 
-function setUTC(string) {
+function setUTC(value) {
     // This function is called when the app sets or unsets UTC
-    if (debug) server.log("Setting UTC " + ((string == "N") ? "off" : "on"));
-    if (string == "N") {
-        prefs.utc = false;
-    } else {
-        prefs.utc = true;
-        prefs.offset = string.tointeger();
+    if ("state" in value) {
+        prefs.utc = value.state;
+        if (debug) server.log("Setting UTC " + (value.state ? "on" : "off"));
     }
+
+    if ("offset" in value) prefs.offset = value.offset;
 }
 
 function setBright(brightness) {
@@ -283,19 +282,19 @@ function setBright(brightness) {
 
 function setFlash(value) {
     // This function is called when the app sets or unsets the colon flash
-    if (debug) server.log("Setting colon flash " + ((value == 1) ? "on" : "off"));
-    prefs.flash = (value == 1);
+    if (debug) server.log("Setting colon flash " + (value ? "on" : "off"));
+    prefs.flash = value;
 }
 
 function setColon(value) {
     // This function is called when the app sets or unsets the colon flash
-    if (debug) server.log("Setting colon state " + ((value == 1) ? "on" : "off"));
-    prefs.colon = (value == 1);
+    if (debug) server.log("Setting colon state " + (value ? "on" : "off"));
+    prefs.colon = value;
 }
 
 function setLight(value) {
-    if (debug) server.log("Setting light " + ((value == 1) ? "on" : "off"));
-    if (value == 1) {
+    if (debug) server.log("Setting light " + (value ? "on" : "off"));
+    if (value) {
         prefs.on = true;
         powerUp();
     } else {
@@ -305,7 +304,8 @@ function setLight(value) {
 }
 
 function setDebug(state) {
-    debug = (state == 1);
+    debug = state;
+    server.log("Setting device debugging " + (state ? "on" : "off"));
 }
 
 // OFFLINE OPERATION FUNCTIONS
@@ -374,6 +374,7 @@ syncText();
 syncTimer = imp.wakeup(30.0, getTime);
 
 // Set up Agent notification response triggers
+// First, settings-related actions
 agent.on("mclock.set.prefs", setPrefs);
 agent.on("mclock.set.bst", setBST);
 agent.on("mclock.set.mode", setMode);
@@ -383,6 +384,11 @@ agent.on("mclock.set.flash", setFlash);
 agent.on("mclock.set.colon", setColon);
 agent.on("mclock.set.light", setLight);
 agent.on("mclock.set.debug", setDebug);
+
+// Next, other actions
+agent.on("mclock.do.reboot", function(dummy) {
+    server.restart();
+});
 
 // Get preferences from server
 // NOTE no longer need this here as it's handled via DisconnectManager
