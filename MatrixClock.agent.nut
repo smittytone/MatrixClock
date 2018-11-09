@@ -154,7 +154,7 @@ if (loadedPrefs.len() != 0) {
 
 // Register device event triggers
 device.on("mclock.get.prefs", sendPrefsToDevice);
-devcie.on("display.state", function(state) {
+device.on("display.state", function(state) {
     prefs.on = state;
 });
 

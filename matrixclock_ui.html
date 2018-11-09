@@ -62,6 +62,7 @@
             <div class='row'>
                 <div class='col-2'>&nbsp;</div>
                 <div class='col-8'>
+                    <!-- Main checkboxes -->
                     <h4>General Settings</h4>
                     <label class='checkarea'> 24-Hour Mode (Switch off for AM/PM)
                         <input type='checkbox' name='mode' id='mode' value='mode'><span class='checkmark'></span>
@@ -75,14 +76,18 @@
                     <label class='checkarea'> Flash Seconds Indicator
                         <input type='checkbox' name='flash' id='flash' value='flash'><span class='checkmark'></span>
                     </label>
+                    <label class='checkarea'> Show World Time
+                        <input type='checkbox' name='utc' id='utc' value='utc'><span class='checkmark'></span>
+                    </label>
                     <label class='checkarea'> Night Mode (turns the display off between the times set below)
-                            <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
-                        </label>
+                        <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
+                    </label>
                     &nbsp;
                     <div class='onoff-button' style='font-family:Rubik;weight:bold' align='center'>
                         <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
                     </div>
                     &nbsp;
+                    <!-- Display brightness slider -->
                     <div>
                         <p>Clock Brightness</p>
                         <input type='range' class='slider' name='brightness' id='brightness' value='15' min='0' max='15'>
@@ -90,11 +95,9 @@
                         <p class='brightness-status' align='right'>Brightness: <span></span></p>
                     </div>
                     <hr>
-                    <div class='utc-controls'>
-                        <h4>World Time</h4>
-                        <label class='checkarea'> Show World Time
-                            <input type='checkbox' name='utc' id='utc' value='utc'><span class='checkmark'></span>
-                        </label>
+                    <!-- World time slider -->
+                    <div>
+                        <h4 class='utc-head'>World Time <span>Disabled</span></h4>
                         <div class='utc-slider'>
                             <input type='range' class='slider' name='utcs' id='utcs' value='0' min='0' max='24'>
                             <table width='100%%'><tr><td width='30%%' align='left'>-12</td><td width='40%%' align='center'>0</td><td width='30%%' align='right'>+12</td></tr></table>
@@ -103,8 +106,9 @@
                         </div>
                     </div>
                     <hr>
+                    <!-- Night mode time text fields -->
                     <div>
-                        <h4 class='night-mode-head'>Night Mode <span>Enabled</span></h4>
+                        <h4 class='night-mode-head'>Night Mode <span>Disabled</span></h4>
                         <div class='form-group row'>
                             <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>&nbsp;</label>
                             <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Hour</label>
@@ -132,6 +136,7 @@
                         </div>
                     </div>
                     <hr>
+                    <!-- Advanced settings -->
                     <div class='advancedsettings' >
                         <h4 class='showhide'>Show Advanced Settings</h4>
                         <div class='advanced' align='center'>
@@ -226,7 +231,8 @@
             $('#utcs').val(u);
             // Setting (0-24) is displayed as (-12 to +12)
             $('.utc-status span').text(u - 12);
-            
+            $('.utc-head span').text(s['world']['utc'] ? 'Enabled' : 'Disabled');
+
             // Set the on/off button text
             $('#onoffbutton').text(s['on'] ? 'Turn Display Off' : 'Turn Display On');
             displayon = s['on'];
