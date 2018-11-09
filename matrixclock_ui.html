@@ -73,14 +73,17 @@
                         <input type='checkbox' name='seconds' id='seconds' value='seconds'><span class='checkmark'></span>
                     </label>
                     <label class='checkarea'> Flash Seconds Indicator
-                        <input type='checkbox' name='flash' id='flash' value='seconds'><span class='checkmark'></span>
+                        <input type='checkbox' name='flash' id='flash' value='flash'><span class='checkmark'></span>
                     </label>
+                    <label class='checkarea'> Night Mode (turns the display off between the times set below)
+                            <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
+                        </label>
                     &nbsp;
                     <div class='onoff-button' style='font-family:Rubik;weight:bold' align='center'>
                         <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
                     </div>
                     &nbsp;
-                    <div class='bslider'>
+                    <div>
                         <p>Clock Brightness</p>
                         <input type='range' class='slider' name='brightness' id='brightness' value='15' min='0' max='15'>
                         <table width='100%%'><tr><td width='50%%' align='left'><small>Low</small></td><td width='50%%' align='right'><small>High</small></td></tr></table>
@@ -100,14 +103,43 @@
                         </div>
                     </div>
                     <hr>
+                    <div>
+                        <h4 class='night-mode-head'>Night Mode <span>Enabled</span></h4>
+                        <div class='form-group row'>
+                            <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>&nbsp;</label>
+                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Hour</label>
+                            <label for='colFormLabel' class='col-4 col-form-label' align='left' style='color:white'>Min</label>
+                            <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode Start Time</label>
+                            <div class='col-2' align='left'>
+                                <input type='text' class='form-control' id='dimmerstarthour' min='0' max='22' style='width:60px;color:CornflowerBlue' placeholder='22'>
+                            </div>
+                            <div class='col-4' align='left'>
+                                    <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='00'>
+                            </div>
+                        </div>
+                        <div class='form-group row'>
+                            <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode End Time</label>
+                            <div class='col-2' align='left'>
+                                <input type='text' class='form-control' id='dimmerendhour' min='1' max='23' style='width:60px;color:CornflowerBlue' placeholder='23'>
+                            </div>
+                            <div class='col-4' align='left'>
+                                <input type='text' class='form-control' id='dimmerendmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='59'>
+                            </div>
+                        </div>
+                        <p class='text-center'><small>Please set the on and off times in the 24-hour clock format</small></p>
+                        <div class='update-button' align='center' style='font-family:Rubik; weight:bold;'>
+                            <button type='submit' class='btn btn-success' id='dimmer'>Set Night Mode Times</button>
+                        </div>
+                    </div>
+                    <hr>
                     <div class='advancedsettings' >
                         <h4 class='showhide'>Show Advanced Settings</h4>
                         <div class='advanced' align='center'>
-                            <div style='color:white;font-family:Abel,sans-serif'>
+                            <div style='color:white;font-family:Abel,sans-serif;'>
                                 <input type='checkbox' name='debug' id='debug' value='debug'> Debug Mode
                             </div>
                             <br />
-                            <div style='font-family:Rubik;weight:bold' align='center'>
+                            <div style='font-family:Rubik; weight:bold;' align='center'>
                                 <button type='submit' class='btn btn-danger' id='resetbutton' style=' width:200px'>Reset Matrix Clock</button>
                             </div>
                             <br />
@@ -138,8 +170,8 @@
         // Get initial readings
         getState(updateReadout);
 
-        // Begin the online status update loop (fires every minute)
-        var stateTimer = setInterval(checkState, 60000);
+        // Begin the online status update loop (fires every 15s)
+        var stateTimer = setInterval(checkState, 15000);
 
         // Set UI click actions: Checkboxes
         $('#mode').click(setMode);
@@ -148,11 +180,13 @@
         $('#flash').click(setFlash);
         $('#utc').click(setUTC);
         $('#debug').click(setDebug);
+        $('#night').click(setNight);
 
         // Buttons
         $('#resetbutton').click(reset);
         $('#onoffbutton').click(setLight);
-
+        $('#dimmer').click(setDimmer);
+        
         // Slider
         var slider = document.getElementById('brightness');
         slider.addEventListener('mouseup', updateSlider);
@@ -185,6 +219,7 @@
             document.getElementById('flash').checked = s['flash'];
             document.getElementById('utc').checked = s['world']['utc'];
             document.getElementById('debug').checked = s['debug'];
+            document.getElementById('night').checked = s['timer']['isset'];
             
             // Set the world time slider and value readout
             var u = parseInt(s['world']['offset']);
@@ -200,6 +235,17 @@
             var b = parseInt(s['bright']);
             $('.brightness-status span').text(b);
             $('#brightness').val(b);
+
+            // Set the nighttime dimmer times
+            var u = parseInt(s['timer']['on']['hour']);
+            $('#dimmerstarthour').val(u);
+            u = parseInt(s['timer']['on']['min']);
+            $('#dimmerstartmin').val(u);
+            u = parseInt(s['timer']['off']['hour']);
+            $('#dimmerendhour').val(u);
+            u = parseInt(s['timer']['off']['min']);
+            $('#dimmerendmin').val(u);
+            $('.night-mode-head span').text(s['timer']['isset'] ? 'Enabled' : 'Disabled');
             
             // Set the clock state line
             updateState(s['isconnected']);
@@ -285,6 +331,12 @@
             sendState(d);
         }
 
+        function setNight() {
+            // Send clock night mode setting as bool
+            var d = { 'setnight' : document.getElementById('night').checked };
+            sendState(d);
+        }
+
         function setBright() {
             // Send clock display brightness setting as string
             var d = { 'setbright' : ($('#brightness').val()) };
@@ -305,6 +357,19 @@
             //   Offset (0-24) as string
             var d = { 'setutc' : document.getElementById('utc').checked, 
                       'utcval' : ($('#utcs').val()) };
+            sendState(d);
+        }
+
+        function setDimmer(e){
+            // Set the night mode duration
+            e.preventDefault();
+            var sh = document.getElementById('dimmerstarthour').value;
+            var sm = document.getElementById('dimmerstartmin').value;
+            var eh = document.getElementById('dimmerendhour').value;
+            var em = document.getElementById('dimmerendmin').value;
+            var d = { 'setdimmer' : true,
+                      'dimmeron' : { 'hour' : sh, 'min' : sm },
+                      'dimmeroff' : { 'hour' : eh, 'min' : em }};
             sendState(d);
         }
 

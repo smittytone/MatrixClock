@@ -24,6 +24,7 @@ local tickFlag = true;
 local tickTotal = (1.0 / TICK_DURATION).tointeger() * 2;
 local halfTickTotal = tickTotal / 2;
 local isPM = false;
+local isAdvanceSet = false;
 local debug = false;
 local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
@@ -76,16 +77,64 @@ function getTime() {
     if (tickCount >= tickTotal) tickCount = 0;
     tickFlag = (tickCount < halfTickTotal) ? true : false;
 
-    // Present the current time
-    displayTime();
-}
+    local shouldShow = showDisplay();
+    if (prefs.on != shouldShow) {
+        // Change of state
+        if (shouldShow) {
+            powerUp();
+            agent.send("display.state", true);
+            if (debug) server.log("Brightening display at " + hour + ":" + minutes);
+        } else {
+            clearDisplay();
+            powerDown();
+            agent.send("display.state", false);
+            if (debug) server.log("Dimming display at " + hour + ":" + minutes);
+        }
 
-function displayTime() {
-    if (!prefs.on) {
-        clearDisplay();
-        return;
+        prefs.on = shouldShow;
     }
 
+    // Present the current time
+    if (prefs.on) displayTime();
+}
+
+function showDisplay() {
+    // ADDED IN 2.10
+    // Returns true if the display should be on, false otherwise - default is true / on
+    // If we have auto-dimming set, we need only check whether we need to turn the display off
+    local shouldShowDisplay = true;
+    
+    // Are we using night mode?
+    if (prefs.timer.isset) {
+        // Disable the advance, if it's set and we've hit the start or end end of the nighttime period
+        // NOTE 'isAdvanceSet' is ONLY set if 'prefs.timer.isset' is true
+        if (isAdvanceSet) {
+            if (hour == prefs.timer.on.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
+            if (hour == prefs.timer.off.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
+        }
+
+        // Have we crossed into the nighttime period? If so, unset 'shouldShowDisplay'
+        local start = prefs.timer.on.hour * 60 + prefs.timer.on.min;
+        local end = prefs.timer.off.hour * 60 + prefs.timer.off.min;
+        local now = hour * 60 + minutes;
+        local delta = end - start;
+        
+        // End and start times are identical, so just keep the display on
+        if (delta == 0) return !isAdvanceSet;
+        
+        if (delta > 0) {
+            if (now >= start && now < end) shouldShowDisplay = false;
+            
+        } else {
+            if (now >= start || now < end) shouldShowDisplay = false;
+        }
+    }
+
+    return (isAdvanceSet ? !shouldShowDisplay : shouldShowDisplay);
+}
+
+
+function displayTime() {
     // Note 'hour' already adjusted for BST
     local a = hour;
     local b = 0;
@@ -232,9 +281,24 @@ function setPrefs(settings) {
     prefs.colon = settings.colon;
     prefs.utc = settings.utc;
     prefs.offset = settings.utcoffset;
+    prefs.timer.on.hour = settings.timer.on.hour;
+    prefs.timer.on.min = settings.timer.on.min;
+    prefs.timer.off.hour = settings.timer.off.hour;
+    prefs.timer.off.min = settings.timer.off.min;
+    prefs.timer.isset = settings.timer.isset;
+
+    // ADDED 2.1.0: Make use of display disable times
+    // NOTE We change settings.on, so the the local state record, prefs.on,
+    //      is correctly updated in the next stanza
+    if (prefs.timer.isset) {
+        local now = date();
+        if (now.hour > prefs.timer.off.hour || now.hour < prefs.timer.on.hour) settings.on = false;
+        if (now.hour == prefs.timer.off.hour && now.min >= prefs.timer.off.min) settings.on = false;
+        if (now.hour == prefs.timer.off.hour && now.min < prefs.timer.on.min) settings.on = false;
+    }
 
     // Clear the display
-    if (settings.on != prefs.on) setLight(settings.on ? 1 : 0);
+    if (settings.on != prefs.on) setLight(settings.on);
 
     // Set the brightness
     if (settings.brightness != prefs.brightness) {
@@ -293,20 +357,52 @@ function setColon(value) {
 }
 
 function setLight(value) {
+    // This function is called when the app turns the clock display on or off
     if (debug) server.log("Setting light " + (value ? "on" : "off"));
-    if (value) {
-        prefs.on = true;
-        powerUp();
-    } else {
-        prefs.on = false;
-        powerDown();
-    }
+    
+    if (prefs.timer.isset) isAdvanceSet = !isAdvanceSet;
+    prefs.on = value;
 }
+
+function setNight(value) {
+    // This function is called when the app enables or disables night mode
+    if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
+
+    // Just set the preference because it will be applied almost immediately
+    // via the getTime() loop
+    prefs.timer.isset = value;        
+}
+
+function setNightTime(data) {
+    prefs.timer.on.hour = data.on.hour;
+    prefs.timer.on.min = data.on.min;
+    prefs.timer.off.hour = data.off.hour;
+    prefs.timer.off.min = data.off.min;
+    
+    if (debug) server.log("Matrix Clock night dimmer to start at " + prefs.timer.on.hour + ":" + prefs.timer.on.min + " and end at " + prefs.timer.off.hour + ":" + prefs.timer.off.min);
+}
+
 
 function setDebug(state) {
     debug = state;
     server.log("Setting device debugging " + (state ? "on" : "off"));
 }
+
+function setDefaultPrefs() {
+    prefs = {};
+    prefs.on <- true;
+    prefs.mode <- true;
+    prefs.bst <- true;
+    prefs.colon <- true;
+    prefs.flash <- true;
+    prefs.brightness <- 15;
+    prefs.utc <- false;
+    prefs.offset <- 12;
+    prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+                     "off" : { "hour" : 22, "min" : 30 },
+                     "isset" : false };
+}
+
 
 // OFFLINE OPERATION FUNCTIONS
 function disHandler(event) {
@@ -356,15 +452,7 @@ faces.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
 foreach (face in faces) face.init(15, INITIAL_ANGLE);
 
 // Load in default prefs
-prefs = {};
-prefs.on <- true;
-prefs.mode <- true;
-prefs.bst <- true;
-prefs.colon <- true;
-prefs.flash <- true;
-prefs.brightness <- 15;
-prefs.utc <- false;
-prefs.offset <- 12;
+setDefaultPrefs();
 
 // Show the ‘sync’ message then give the text no more than
 // 30 seconds to appear. If the prefs data comes from the
@@ -384,6 +472,8 @@ agent.on("mclock.set.flash", setFlash);
 agent.on("mclock.set.colon", setColon);
 agent.on("mclock.set.light", setLight);
 agent.on("mclock.set.debug", setDebug);
+agent.on("mclock.set.nightmode", setNight);
+agent.on("mclock.set.nighttime", setNightTime);
 
 // Next, other actions
 agent.on("mclock.do.reboot", function(dummy) {

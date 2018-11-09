@@ -31,7 +31,7 @@ function sendPrefsToDevice(value) {
     // The Matrix Clock unit has requested the current set-up data
     if (debug) server.log("Sending stored preferences to the Matrix Clock");
     device.send("mclock.set.prefs", prefs);
-    device.send("mclock.set.debug", (debug ? 1 : 0));
+    device.send("mclock.set.debug", debug);
 }
 
 function encodePrefsForUI() {
@@ -46,6 +46,10 @@ function encodePrefsForUI() {
                                      "offset" : prefs.utcoffset },
                    "on"          : prefs.on,
                    "debug"       : prefs.debug,
+                   // ADDED IN 2.1.0: times to disbale clock (eg. over night)
+                   "timer"       : { "on"  : { "hour" : prefs.timer.on.hour,  "min"  : prefs.timer.on.min },
+                                     "off" : { "hour" : prefs.timer.off.hour, "min" : prefs.timer.off.min },
+                                     "isset" : prefs.timer.isset }
                    "isconnected" : device.isconnected() };
     
     return http.jsonencode(data, {"compact":true});
@@ -95,6 +99,11 @@ function initialisePrefs() {
     prefs.debug <- false;
     prefs.utcoffset <- 12;  // ie. no offset
     prefs.brightness <- 15;
+
+    // ADDED IN 2.1.0: times to disbale clock (eg. over night)
+    prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+                     "off" : { "hour" : 22, "min" : 30 },
+                     "isset" : false };
 }
 
 function reportAPIError(func) {
@@ -122,6 +131,18 @@ if (loadedPrefs.len() != 0) {
         debug = prefs.debug;
     }
 
+    // ADDED IN 2.1.0: times to disbale clock (eg. over night)
+    if (!("timer" in prefs)) {
+        prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+                         "off" : { "hour" : 22, "min" : 30 },
+                         "isset" : false };
+        server.save(prefs);
+    } else if (!("isset" in prefs.timer)) {
+        prefs.timer.isset <- false;
+        server.save(prefs);
+    }
+
+    // This has to go LAST
     if (debug) {
         server.log("Clock settings loaded:");
         server.log(encodePrefsForUI());
@@ -133,6 +154,9 @@ if (loadedPrefs.len() != 0) {
 
 // Register device event triggers
 device.on("mclock.get.prefs", sendPrefsToDevice);
+devcie.on("display.state", function(state) {
+    prefs.on = state;
+});
 
 // Set up the control and data API
 api = Rocky();
@@ -300,6 +324,48 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save world time setting");
             if (debug) server.log("World time turned " + (prefs.utc ? "on" : "off") + ", offset: " + prefs.utcoffset);
+        }
+
+        // ADDED IN 2.1.0
+        if ("setnight" in data) {
+            if (data.setnight) {
+                prefs.timer.isset = true;
+            } else if (!data.setnight) {
+                prefs.timer.isset = false;
+            } else {
+                local e = reportAPIError("setnight");
+                if (debug) server.error(e);
+                context.send(400, e);
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save night mode setting");
+            if (debug) server.log("Matrix Clock told to " + (prefs.timer.isset ? "enable" : "disable") + " nighttime power down");
+            device.send("mclock.set.nightmode", prefs.timer.isset);
+        }
+
+        if ("setdimmer" in data) {
+            local set = false;
+            if ("dimmeron" in data) {
+                prefs.timer.on = { "hour" : data.dimmeron.hour.tointeger(),  "min" : data.dimmeron.min.tointeger() };
+                set = true;
+            }
+
+            if ("dimmeroff" in data) {
+                prefs.timer.off = { "hour" : data.dimmeroff.hour.tointeger(),  "min" : data.dimmeroff.min.tointeger() };
+                set = true;
+            }
+
+            if (!set) {
+                local e = reportAPIError("setdimmer");
+                if (debug) server.error(e);
+                context.send(400, e);
+                return;
+            }
+
+            if (server.save(prefs) > 0) server.error("Could not save night mode times");
+            if (debug) server.log("Matrix Clock told to set night dimmer to start at " + prefs.timer.on.hour + ":" + prefs.timer.on.min + " and end at " + prefs.timer.off.hour + ":" + prefs.timer.off.min);
+            device.send("mclock.set.nighttime", prefs.timer);
         }
 
         context.send(200, "OK");
