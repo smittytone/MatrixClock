@@ -364,7 +364,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save night mode times");
-            if (debug) server.log("Matrix Clock told to set night dimmer to start at " + prefs.timer.on.hour + ":" + prefs.timer.on.min + " and end at " + prefs.timer.off.hour + ":" + prefs.timer.off.min);
+            if (debug) server.log("Matrix Clock told to set night dimmer to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
             device.send("mclock.set.nighttime", prefs.timer);
         }
 

@@ -352,7 +352,7 @@
         function setLight() {
             // Send clock display state as bool: true = on, false = off
             displayon = !displayon;
-            $('.onoff-button button').text(displayon ? 'Turn off Display' : 'Turn on Display');
+            $('.onoff-button button').text(displayon ? 'Turn Display Off' : 'Turn Display On');
             var d = { 'setlight' :  displayon };
             sendState(d);
         }

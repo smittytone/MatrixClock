@@ -80,17 +80,7 @@ function getTime() {
     local shouldShow = showDisplay();
     if (prefs.on != shouldShow) {
         // Change of state
-        if (shouldShow) {
-            powerUp();
-            agent.send("display.state", true);
-            if (debug) server.log("Brightening display at " + hour + ":" + minutes);
-        } else {
-            clearDisplay();
-            powerDown();
-            agent.send("display.state", false);
-            if (debug) server.log("Dimming display at " + hour + ":" + minutes);
-        }
-
+        setDisplay(shouldShow);
         prefs.on = shouldShow;
     }
 
@@ -102,10 +92,11 @@ function showDisplay() {
     // ADDED IN 2.10
     // Returns true if the display should be on, false otherwise - default is true / on
     // If we have auto-dimming set, we need only check whether we need to turn the display off
-    local shouldShowDisplay = true;
     
     // Are we using night mode?
     if (prefs.timer.isset) {
+        local shouldShowDisplay = true;
+    
         // Disable the advance, if it's set and we've hit the start or end end of the nighttime period
         // NOTE 'isAdvanceSet' is ONLY set if 'prefs.timer.isset' is true
         if (isAdvanceSet) {
@@ -128,11 +119,26 @@ function showDisplay() {
         } else {
             if (now >= start || now < end) shouldShowDisplay = false;
         }
+
+        return (isAdvanceSet ? !shouldShowDisplay : shouldShowDisplay);
     }
 
-    return (isAdvanceSet ? !shouldShowDisplay : shouldShowDisplay);
+    // If we're not in night mode, just return the current display state setting
+    return prefs.on;
 }
 
+function setDisplay(state) {
+    if (state) {
+        powerUp();
+        agent.send("display.state", true);
+        if (debug) server.log("Brightening display at " + format("%02i", hour) + ":" + format("%02i", minutes));
+    } else {
+        clearDisplay();
+        powerDown();
+        agent.send("display.state", false);
+        if (debug) server.log("Dimming display at " + format("%02i", hour) + ":" + format("%02i", minutes));
+    }
+}
 
 function displayTime() {
     // Note 'hour' already adjusted for BST
@@ -360,8 +366,15 @@ function setLight(value) {
     // This function is called when the app turns the clock display on or off
     if (debug) server.log("Setting light " + (value ? "on" : "off"));
     
-    if (prefs.timer.isset) isAdvanceSet = !isAdvanceSet;
-    prefs.on = value;
+    if (prefs.timer.isset) {
+        // If we're in night mode, we treat this as an advance of the timer
+        // NOTE This will cause prefs.on to be set elsewhere
+        isAdvanceSet = !isAdvanceSet;
+    } else {
+        // We're not in night mode, so just turn the light off
+        prefs.on = value;
+        setDisplay(value);        
+    }
 }
 
 function setNight(value) {
@@ -370,7 +383,11 @@ function setNight(value) {
 
     // Just set the preference because it will be applied almost immediately
     // via the getTime() loop
-    prefs.timer.isset = value;        
+    prefs.timer.isset = value;     
+
+    // Disable the timer advance setting as it's only relevant if night mode is
+    // on AND it has been triggered since night mode was enabled
+    isAdvanceSet = false;
 }
 
 function setNightTime(data) {
@@ -379,7 +396,7 @@ function setNightTime(data) {
     prefs.timer.off.hour = data.off.hour;
     prefs.timer.off.min = data.off.min;
     
-    if (debug) server.log("Matrix Clock night dimmer to start at " + prefs.timer.on.hour + ":" + prefs.timer.on.min + " and end at " + prefs.timer.off.hour + ":" + prefs.timer.off.min);
+    if (debug) server.log("Matrix Clock night dimmer to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
 }
 
 
@@ -402,7 +419,6 @@ function setDefaultPrefs() {
                      "off" : { "hour" : 22, "min" : 30 },
                      "isset" : false };
 }
-
 
 // OFFLINE OPERATION FUNCTIONS
 function disHandler(event) {
