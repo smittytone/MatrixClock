@@ -28,6 +28,7 @@ local isAdvanceSet = false;
 local debug = false;
 local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
+local disTime = 0;
 
 local seconds = 0;
 local minutes = 0;
@@ -37,7 +38,8 @@ local day = 0;
 local month = 0;
 local year = 0;
 
-// TIME FUNCTIONS
+
+// TIME AND DISPLAY CONTROL FUNCTIONS
 function getTime() {
     // This is the main clock loop
     // Queue the function to run again in tickDuration seconds
@@ -77,57 +79,63 @@ function getTime() {
     if (tickCount >= tickTotal) tickCount = 0;
     tickFlag = (tickCount < halfTickTotal) ? true : false;
 
-    local shouldShow = showDisplay();
-    if (prefs.on != shouldShow) {
-        // Change of state
-        setDisplay(shouldShow);
-        prefs.on = shouldShow;
+    // ADDED IN 2.1.0
+    // Should the display be enabled or not?
+    if (prefs.timer.isset) {
+        local should = shouldShowDisplay();
+        if (prefs.on != should) {
+            // Change the state of the display
+            setDisplay(should);
+            prefs.on = should;
+        }
     }
 
     // Present the current time
     if (prefs.on) displayTime();
 }
 
-function showDisplay() {
-    // ADDED IN 2.10
+function shouldShowDisplay() {
+    // ADDED IN 2.1.0
     // Returns true if the display should be on, false otherwise - default is true / on
     // If we have auto-dimming set, we need only check whether we need to turn the display off
-    
-    // Are we using night mode?
-    if (prefs.timer.isset) {
-        local shouldShowDisplay = true;
-    
-        // Disable the advance, if it's set and we've hit the start or end end of the nighttime period
-        // NOTE 'isAdvanceSet' is ONLY set if 'prefs.timer.isset' is true
-        if (isAdvanceSet) {
-            if (hour == prefs.timer.on.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
-            if (hour == prefs.timer.off.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
-        }
+    // NOTE The function should only be called if 'prefs.timer.isset' is true, ie. we're
+    //      in night mode
 
-        // Have we crossed into the nighttime period? If so, unset 'shouldShowDisplay'
-        local start = prefs.timer.on.hour * 60 + prefs.timer.on.min;
-        local end = prefs.timer.off.hour * 60 + prefs.timer.off.min;
-        local now = hour * 60 + minutes;
-        local delta = end - start;
-        
-        // End and start times are identical, so just keep the display on
-        if (delta == 0) return !isAdvanceSet;
-        
-        if (delta > 0) {
-            if (now >= start && now < end) shouldShowDisplay = false;
-            
-        } else {
-            if (now >= start || now < end) shouldShowDisplay = false;
-        }
+    // Assume we will enable the display
+    local shouldShow = true;
 
-        return (isAdvanceSet ? !shouldShowDisplay : shouldShowDisplay);
+    // Should we disable the advance? Only if it's set and we've hit the start or end end 
+    // of the night period
+    // NOTE 'isAdvanceSet' is ONLY set if 'prefs.timer.isset' is TRUE
+    if (isAdvanceSet) {
+        // 'isAdvanceSet' is unset when the next event time (display goes on or off) is reached
+        if (hour == prefs.timer.on.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
+        if (hour == prefs.timer.off.hour && minutes >= prefs.timer.on.min) isAdvanceSet = false;
     }
 
-    // If we're not in night mode, just return the current display state setting
-    return prefs.on;
+    // Have we crossed into the night period? If so, unset 'shouldShow'
+    // Check by converting all times to minutes
+    local start = prefs.timer.on.hour * 60 + prefs.timer.on.min;
+    local end = prefs.timer.off.hour * 60 + prefs.timer.off.min;
+    local now = hour * 60 + minutes;
+    local delta = end - start;
+    
+    // End and start times are identical
+    if (delta == 0) return !isAdvanceSet;
+    
+    if (delta > 0) {
+        if (now >= start && now < end) shouldShow = false;
+    } else {
+        if (now >= start || now < end) shouldShow = false;
+    }
+
+    // 'isAdvancedSet' inverts the expected state
+    return (isAdvanceSet ? !shouldShow : shouldShow);
 }
 
 function setDisplay(state) {
+    // ADDED IN 2.1.0
+    // Power up or power down the display according to the supplied state (true or false)
     if (state) {
         powerUp();
         agent.send("display.state", true);
@@ -194,13 +202,13 @@ function displayTime() {
     }
 
     // Is the clock disconnected? If so, flag the fact
-    if (isDisconnected) faces[0].plot(0, 7, 1).plot(0, 6, 1).plot(1, 7, 1).plot(1, 6, 1);
+    if (isDisconnected && !isConnecting) faces[0].plot(0, 7, 1).plot(0, 6, 1).plot(1, 7, 1).plot(1, 6, 1);
 
     // Is the clock connecting? If so, display the fact with animation
     if (isConnecting) {
         cc += 2;
         if (cc > 6) cc = 0;
-        faces[0].plot(ca[cc], ca[cc + 1], 0);
+        faces[0].plot(ca[cc], ca[cc + 1], 1);
     }
 
     // AM or PM?
@@ -272,6 +280,7 @@ function clearDisplay() {
     faces[2].clearDisplay();
     faces[3].clearDisplay();
 }
+
 
 // PREFERENCES FUNCTIONS
 function setPrefs(settings) {
@@ -366,9 +375,10 @@ function setLight(value) {
     // This function is called when the app turns the clock display on or off
     if (debug) server.log("Setting light " + (value ? "on" : "off"));
     
+    // ADDED IN 2.1.0
     if (prefs.timer.isset) {
         // If we're in night mode, we treat this as an advance of the timer
-        // NOTE This will cause prefs.on to be set elsewhere
+        // NOTE This will cause prefs.on to be set elsewhere (see 'getTime()')
         isAdvanceSet = !isAdvanceSet;
     } else {
         // We're not in night mode, so just turn the light off
@@ -378,19 +388,25 @@ function setLight(value) {
 }
 
 function setNight(value) {
+    // ADDED IN 2.1.0
     // This function is called when the app enables or disables night mode
-    if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
-
+    
     // Just set the preference because it will be applied almost immediately
-    // via the getTime() loop
+    // via the 'getTime()' loop
     prefs.timer.isset = value;     
 
     // Disable the timer advance setting as it's only relevant if night mode is
     // on AND it has been triggered since night mode was enabled
     isAdvanceSet = false;
+
+    if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
 }
 
 function setNightTime(data) {
+    // ADDED IN 2.1.0
+    // Record the times at which the display may turn on and off
+    // NOTE The display will not actually change at these times unless
+    //      'prefs.timer.isset' is set, ie. we're in night mode
     prefs.timer.on.hour = data.on.hour;
     prefs.timer.on.min = data.on.min;
     prefs.timer.off.hour = data.off.hour;
@@ -399,8 +415,8 @@ function setNightTime(data) {
     if (debug) server.log("Matrix Clock night dimmer to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
 }
 
-
 function setDebug(state) {
+    // Enable or disble debugging messaging in response to a message from the UI via the agent
     debug = state;
     server.log("Setting device debugging " + (state ? "on" : "off"));
 }
@@ -420,15 +436,17 @@ function setDefaultPrefs() {
                      "isset" : false };
 }
 
+
 // OFFLINE OPERATION FUNCTIONS
 function disHandler(event) {
     // Called if the server connection is broken or re-established
-    if ("message" in event) server.log("Disconnection Manager: " + event.message);
+    if ("message" in event) server.log("Connection Manager: " + event.message + " @ " + event.ts.tostring());
 
     if ("type" in event) {
         if (event.type == "disconnected") {
             isDisconnected = true;
             isConnecting = false;
+            disTime = event.ts;
         }
 
         if (event.type == "connecting") isConnecting = true;
@@ -438,6 +456,12 @@ function disHandler(event) {
             agent.send("mclock.get.prefs", 1);
             isDisconnected = false;
             isConnecting = false;
+            
+            if (disTime != 0) {
+                local delta = event.ts - disTime;
+                server.log("Disconnection duration: " + delta + " seconds");
+                disTime = 0;
+            }
         }
     }
 }
