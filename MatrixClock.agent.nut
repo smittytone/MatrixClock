@@ -202,7 +202,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save mode setting");
-            if (debug) server.log("Clock mode turned to " + (prefs.hrmode ? "24 hour" : "12 hour"));
+            if (debug) server.log("UI says change mode to " + (prefs.hrmode ? "24 hour" : "12 hour"));
             device.send("mclock.set.mode", prefs.hrmode);
         }
 
@@ -220,7 +220,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
-            if (debug) server.log("Clock BST observance turned " + (prefs.bst ? "on" : "off"));
+            if (debug) server.log("UI says turn BST observance " + (prefs.bst ? "on" : "off"));
             device.send("mclock.set.bst", prefs.bst);
         }
 
@@ -238,7 +238,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save colon visibility setting");
-            if (debug) server.log("Clock colon turned " + (prefs.colon ? "on" : "off"));
+            if (debug) server.log("UI says turn colon " + (prefs.colon ? "on" : "off"));
             device.send("mclock.set.colon", prefs.colon);
         }
 
@@ -256,7 +256,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save colon flash setting");
-            if (debug) server.log("Clock colon flash turned " + (prefs.flash ? "on" : "off"));
+            if (debug) server.log("UI says turn colon flashing " + (prefs.flash ? "on" : "off"));
             device.send("mclock.set.flash", prefs.flash);
         }
 
@@ -266,7 +266,7 @@ api.post("/settings", function(context) {
             try {
                 prefs.brightness = data.setbright.tointeger();
                 if (server.save(prefs) != 0) server.error("Could not save brightness setting");
-                if (debug) server.log(format("Brightness set to %i", prefs.brightness));
+                if (debug) server.log(format("UI says set display brightness to %i", prefs.brightness));
                 device.send("mclock.set.brightness", prefs.brightness);
             } catch (err) {
                 local e = reportAPIError("setbright");
@@ -290,7 +290,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save display light setting");
-            if (debug) server.log("Clock display turned " + (prefs.on ? "on" : "off"));
+            if (debug) server.log("UI says turn display " + (prefs.on ? "on" : "off"));
             device.send("mclock.set.light", prefs.on);
         }
 
@@ -323,7 +323,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save world time setting");
-            if (debug) server.log("World time turned " + (prefs.utc ? "on" : "off") + ", offset: " + prefs.utcoffset);
+            if (debug) server.log("UI says turn world time mode " + (prefs.utc ? "on" : "off") + ", offset: " + prefs.utcoffset);
         }
 
         // ADDED IN 2.1.0
@@ -340,7 +340,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save night mode setting");
-            if (debug) server.log("Matrix Clock told to " + (prefs.timer.isset ? "enable" : "disable") + " nighttime power down");
+            if (debug) server.log("UI says " + (prefs.timer.isset ? "enable" : "disable") + " night mode");
             device.send("mclock.set.nightmode", prefs.timer.isset);
         }
 
@@ -364,7 +364,7 @@ api.post("/settings", function(context) {
             }
 
             if (server.save(prefs) > 0) server.error("Could not save night mode times");
-            if (debug) server.log("Matrix Clock told to set night dimmer to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
+            if (debug) server.log("UI says set night time to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
             device.send("mclock.set.nighttime", prefs.timer);
         }
 
