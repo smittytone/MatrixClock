@@ -138,12 +138,12 @@ function setDisplay(state) {
     // Power up or power down the display according to the supplied state (true or false)
     if (state) {
         powerUp();
-        agent.send("display.state", true);
+        agent.send("display.state", { "on" : true, "advance" : isAdvanceSet });
         if (debug) server.log("Brightening display at " + format("%02i", hour) + ":" + format("%02i", minutes));
     } else {
         clearDisplay();
         powerDown();
-        agent.send("display.state", false);
+        agent.send("display.state", { "on" : false, "advance" : isAdvanceSet });
         if (debug) server.log("Dimming display at " + format("%02i", hour) + ":" + format("%02i", minutes));
     }
 }
@@ -301,15 +301,16 @@ function setPrefs(settings) {
     prefs.timer.off.hour = settings.timer.off.hour;
     prefs.timer.off.min = settings.timer.off.min;
     prefs.timer.isset = settings.timer.isset;
+    isAdvanceSet = settings.timer.isadv;
 
     // ADDED 2.1.0: Make use of display disable times
     // NOTE We change settings.on, so the the local state record, prefs.on,
     //      is correctly updated in the next stanza
     if (prefs.timer.isset) {
         local now = date();
-        if (now.hour > prefs.timer.off.hour || now.hour < prefs.timer.on.hour) settings.on = false;
+        if (now.hour > prefs.timer.on.hour || now.hour < prefs.timer.off.hour) settings.on = false;
         if (now.hour == prefs.timer.off.hour && now.min >= prefs.timer.off.min) settings.on = false;
-        if (now.hour == prefs.timer.off.hour && now.min < prefs.timer.on.min) settings.on = false;
+        if (now.hour == prefs.timer.on.hour && now.min < prefs.timer.on.min) settings.on = false;
     }
 
     // Clear the display

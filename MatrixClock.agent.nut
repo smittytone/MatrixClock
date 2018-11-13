@@ -103,7 +103,8 @@ function initialisePrefs() {
     // ADDED IN 2.1.0: times to disbale clock (eg. over night)
     prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
                      "off" : { "hour" : 22, "min" : 30 },
-                     "isset" : false };
+                     "isset" : false,
+                     "isadv" : false };
 }
 
 function reportAPIError(func) {
@@ -135,11 +136,23 @@ if (loadedPrefs.len() != 0) {
     if (!("timer" in prefs)) {
         prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
                          "off" : { "hour" : 22, "min" : 30 },
-                         "isset" : false };
+                         "isset" : false,
+                         "isadv" : false };
         server.save(prefs);
-    } else if (!("isset" in prefs.timer)) {
-        prefs.timer.isset <- false;
-        server.save(prefs);
+    } else {
+        local doSave = false;
+        
+        if (!("isset" in prefs.timer)) {
+            prefs.timer.isset <- false;
+            doSave = true;
+        }
+
+        if (!("isadv" in prefs.timer)) {
+            prefs.timer.isadv <- false;
+            doSave = true;
+        }
+
+        if (doSave) server.save(prefs);
     }
 
     // This has to go LAST
@@ -155,7 +168,9 @@ if (loadedPrefs.len() != 0) {
 // Register device event triggers
 device.on("mclock.get.prefs", sendPrefsToDevice);
 device.on("display.state", function(state) {
-    prefs.on = state;
+    prefs.on = state.on;
+    prefs.timer.isadv = state.advance;
+    if (server.save(prefs) > 0) server.error("Could not save settings");
 });
 
 // Set up the control and data API
