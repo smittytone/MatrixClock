@@ -4,7 +4,7 @@ An [Electric Imp](https://electricimp.com/) imp001-based digital clock using fou
 
 ## Hardware ##
 
-<p><img src="images/matrixclock.jpg" width="760" alt="Matrix Clock in use"></p>
+<p><img src="images/matrixclock.jpg" width="760" alt="The Matrix Clock in use" /></p>
 
 ### Ingredients ##
 
@@ -15,7 +15,7 @@ An [Electric Imp](https://electricimp.com/) imp001-based digital clock using fou
 
 ### Circuit ###
 
-<p><img src="images/circuit.png" width="760" alt="Matrix Clock circuit"></p>
+<p><img src="images/circuit.png" width="760" alt="The Matrix Clock circuit design" /></p>
 
 The circuit shown is idealised. Power comes from the imp breakout board’s USB port (VIN). In practice, you will want to re-position the imp relative to the LED matrices, and I added to barrel jack power ports in parallel and positioned so that you can run a cable into the top of the clock or up to its base, depending on where you plan to site the clock. The jacks were wired directly to the GND and power rails, and from there to the imp board’s P+ and P- panels. The jumper on the board was adjusted accordingly.
 
@@ -33,13 +33,13 @@ Visit Electric Imp’s [Getting Started Guide](https://developer.electricimp.com
 
 ### UK/US Usage ###
 
-The Matrix Clock device code is currently hardwired for UK usage: it adjusts to British Summer Time (BST) and back to Greenwich Mean Time (GMT) as appropriate. To do so, it makes use of Electric Imp’s [Utilities library](https://developer.electricimp.com/libraries/utilities/utilities) and its *bstCheck()* function. This call can be replaced with the *dstCheck()* function if you wish to use a Matrix Clock in the US. This change will cause the clock to adjust to US Daylight Savings Time. The code can readily be adapted to match other territories’ daylight savings periods.
+The Matrix Clock device code is currently hardwired for UK usage: it adjusts to British Summer Time (BST) and back to Greenwich Mean Time (GMT) as appropriate. To do so, it makes use of my [Utilities library](https://github.com/smittytone/generic) and its *bstCheck()* function. This call can be replaced with the *dstCheck()* function if you wish to use a Matrix Clock in the US. This change will cause the clock to adjust to US Daylight Savings Time. The code can readily be adapted to match other territories’ daylight savings periods.
 
 ### Control UI ###
 
 The Matrix Clock can be controlled by accessing its agent URL:
 
-<p><img src="images/grab01.png" width="460" alt="Matrix Clock UI"></p>
+<p><img src="images/grab01.png" width="460" alt="The Matrix Clock web-based UI" /></p>
 
 ### Night Mode ###
 
@@ -91,4 +91,4 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 The design and software for Matrix Clock are made available under the [MIT Licence](./LICENSE).
 
-Copyright 2016-2018, Tony Smith
+Copyright &copy; 2016-2018, Tony Smith
