@@ -33,16 +33,23 @@ Visit Electric Imp’s [Getting Started Guide](https://developer.electricimp.com
 
 ### UK/US Usage ###
 
-The Matrix Clock device code is currently hardwired for UK usage: it adjusts to British Summer Time (BST) and back to Greenwich Mean Time (GMT) as appropriate. To do so, it makes use of Electric Imp’s [Utilities library](https://developer.electricimp.com/libraries/utilities/utilities) and its *bstCheck()* function. This call can be replaced with the *dstCheck()* function if you wish to use a Matrix Clock in the US. This change will cause the clock to adjust to US Daylight Savings Time.
+The Matrix Clock device code is currently hardwired for UK usage: it adjusts to British Summer Time (BST) and back to Greenwich Mean Time (GMT) as appropriate. To do so, it makes use of Electric Imp’s [Utilities library](https://developer.electricimp.com/libraries/utilities/utilities) and its *bstCheck()* function. This call can be replaced with the *dstCheck()* function if you wish to use a Matrix Clock in the US. This change will cause the clock to adjust to US Daylight Savings Time. The code can readily be adapted to match other territories’ daylight savings periods.
 
 ### Control UI ###
 
 The Matrix Clock can be controlled by accessing its agent URL:
 
-<p><img src="images/grab01.png" width="740" alt="Matrix Clock UI"></p>
+<p><img src="images/grab01.png" width="460" alt="Matrix Clock UI"></p>
 
+### Night Mode ###
 
-## Casing ###
+Version 2.1.0 introduces a new option: night mode. Using night mode, which is enabled or disabled through the web UI, the clock will power down its display overnight. This can be useful if you don't like the clock filling the room with light at night. Even with the LED brightness set to minimum, it will generate a lot of illumination in a darkened room. You may find this unappealing, especially if the clock is placed in a bedroom, and night mode allows you to deal with this without having to manually turn off the display at nighttime.
+
+When you enable night mode in the UI, the clock turns off the display automatically at a time you specify. It then turns on the display at a subsequent time. You set these times &mdash; respectively, night start and end &mdash; in the UI using 24-hour clock values. The default values are: start 22:30, end 07:00.
+
+You can still turn the clock display on (or off) during unlit (or lit) periods using the UIs ‘Turn Display On/Off’ button. 
+
+## Casing ##
 
 You can use the file `clock.svg` to produce a simple laser-cut case/mounting frame for the Matrix Clock.
 
@@ -51,7 +58,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 ## Release Notes ##
 
 - 2.1.0 &mdash; *In development*
-    - Add the option to turn off the clock display overnight
+    - Add an option to automatically [turn off the clock display overnight](#night-mode)
 - 2.0.0 &mdash; *1 November 2018*
     - Update dependencies
     - Restructure API to use JSON
@@ -60,17 +67,18 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
     - Improved settings handling
     - Improved web UI code
 - 1.6.0 &mdash; *11 September 2018*
-    - Add ‘Advanced Settings’ area to UI and move Reset button into it
-    - Add Debug checkbox to Advanced Settings
+    - Add **Advanced Settings** area to UI and move Reset button into it
+    - Add Debug checkbox to **Advanced Settings**
 - 1.5.0 &mdash; *7 June 2018*
     - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
         - Update Web UI based on Bootstrap
         - Separate out Web UI code into own file for clarity
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
     - Update to [JQuery 3.3.1](https://jquery.com)
-    - Prevent Ajax XHR cacheing
+    - Prevent Ajax XHR caching
 - 1.4.0
-    - Minor changes; bringing everything up to date
+    - Minor changes
+    - Bring dependencies up to date
 - 1.3.0
     - Add support for world time display, including web UI controls
     - Add favicon and iOS home page icon
