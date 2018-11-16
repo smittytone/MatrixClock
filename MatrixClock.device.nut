@@ -240,11 +240,7 @@ function displayTime() {
     // Check whether the colon should appear
     if (settings.colon) {
         // Colon is set to be displayed. Will it flash?
-        if (settings.flash) {
-            if (tickFlag) drawColon();
-        } else {
-            drawColon();
-        }
+        if (!settings.flash || (settings.flash && tickFlag)) drawColon();
     }
 
     // Draw the display
@@ -268,27 +264,38 @@ function updateDisplay() {
 }
 
 function powerUp() {
+    // Tell all four LEDs to power up - in reverse order (R to L)
+    // NOTE This probably happens too quickly to matter - may need to add a delay
     display[3].powerUp();
+    imp.sleep(0.25);
     display[2].powerUp();
+    imp.sleep(0.25);
     display[1].powerUp();
+    imp.sleep(0.25);
     display[0].powerUp();
 }
 
 function powerDown() {
+    // Tell all four LEDs to power down - in order (L to R)
     display[0].powerDown();
+    imp.sleep(0.25);
     display[1].powerDown();
+    imp.sleep(0.25);
     display[2].powerDown();
+    imp.sleep(0.25);
     display[3].powerDown();
 }
 
-function setBrightness(br) {
-    display[0].setBrightness(br);
-    display[1].setBrightness(br);
-    display[2].setBrightness(br);
-    display[3].setBrightness(br);
+function setBrightness(b) {
+    // Set all four LEDs' brightness
+    display[0].setBrightness(b);
+    display[1].setBrightness(b);
+    display[2].setBrightness(b);
+    display[3].setBrightness(b);
 }
 
 function clearDisplay() {
+    // Clear all four LEDs
     display[0].clearDisplay();
     display[1].clearDisplay();
     display[2].clearDisplay();
@@ -296,7 +303,7 @@ function clearDisplay() {
 }
 
 function syncText() {
-    // Display 'SYNC' after the clock is powered up and until it receives its preferences from the agent
+    // Display 'Sync' after the clock is powered up and until it receives its preferences from the agent
     if (!settings.on) return;
     local letters = [0x53, 0x79, 0x6E, 0x63];
     foreach (index, char in letters) display[index].displayChar(char, 2);
@@ -305,48 +312,50 @@ function syncText() {
 
 
 // PREFERENCES FUNCTIONS
-function setPrefs(prefsTable) {
-    // Cancel the 'Sync' display timer if it has yet to fire
+function setPrefs(prefsData) {
+    // Log receipt of prefs data
     if (debug) server.log("Received preferences from agent");
+    
+    // Cancel the 'Sync' display timer if it has yet to fire
     if (syncTimer) imp.cancelwakeup(syncTimer);
     syncTimer = null;
 
     // Set the debug state
-    if ("debug" in prefsTable) setDebug(prefsTable.debug);
+    if ("debug" in prefsData) setDebug(prefsData.debug);
 
     // Parse the set-up data table provided by the agent
-    settings.mode = prefsTable.hrmode;
-    settings.bst = prefsTable.bst;
-    settings.flash = prefsTable.flash;
-    settings.colon = prefsTable.colon;
-    settings.utc = prefsTable.utc;
-    settings.offset = prefsTable.utcoffset;
-    settings.timer.on.hour = prefsTable.timer.on.hour;
-    settings.timer.on.min = prefsTable.timer.on.min;
-    settings.timer.off.hour = prefsTable.timer.off.hour;
-    settings.timer.off.min = prefsTable.timer.off.min;
-    settings.timer.isset = prefsTable.timer.isset;
-    isAdvanceSet = prefsTable.timer.isadv;
+    settings.mode = prefsData.hrmode;
+    settings.bst = prefsData.bst;
+    settings.flash = prefsData.flash;
+    settings.colon = prefsData.colon;
+    settings.utc = prefsData.utc;
+    settings.offset = prefsData.utcoffset;
+    settings.timer.on.hour = prefsData.timer.on.hour;
+    settings.timer.on.min = prefsData.timer.on.min;
+    settings.timer.off.hour = prefsData.timer.off.hour;
+    settings.timer.off.min = prefsData.timer.off.min;
+    settings.timer.isset = prefsData.timer.isset;
+    isAdvanceSet = prefsData.timer.isadv;
 
     // ADDED 2.1.0: Make use of display disable times
     // NOTE We change settings.on, so the the local state record, settings.on,
     //      is correctly updated in the next stanza
     if (settings.timer.isset) {
         local now = date();
-        if (now.hour > settings.timer.on.hour || now.hour < settings.timer.off.hour) prefsTable.on = false;
-        if (now.hour == settings.timer.off.hour && now.min >= settings.timer.off.min) prefsTable.on = false;
-        if (now.hour == settings.timer.on.hour && now.min < settings.timer.on.min) prefsTable.on = false;
+        if (now.hour > settings.timer.on.hour || now.hour < settings.timer.off.hour) prefsData.on = false;
+        if (now.hour == settings.timer.off.hour && now.min >= settings.timer.off.min) prefsData.on = false;
+        if (now.hour == settings.timer.on.hour && now.min < settings.timer.on.min) prefsData.on = false;
     }
 
     // Set the display state
-    if (settings.on != prefsTable.on) setLight(prefsTable.on);
+    if (settings.on != prefsData.on) setLight(prefsData.on);
 
     // Set the brightness
-    if (settings.brightness != prefsTable.brightness) {
-        settings.brightness = prefsTable.brightness;
+    if (settings.brightness != prefsData.brightness) {
+        settings.brightness = prefsData.brightness;
 
         // Only set the brightness now if the display is on
-        if (settings.on) setBrightness(prefsTable.brightness);
+        if (settings.on) setBrightness(prefsData.brightness);
     }
 
     // Only call clockTick() if we have come here *before*
@@ -378,15 +387,15 @@ function setUTC(value) {
     if ("offset" in value) settings.offset = value.offset;
 }
 
-function setBright(brightness) {
+function setBright(value) {
     // This function is called when the app changes the clock's brightness
-    // 'brightness' is passed in from the agent as an integer
-    if (brightness < 0 || brightness > 15 || brightness == settings.brightness) return;
-    if (debug) server.log("Setting display brightness " + brightness);
-    settings.brightness = brightness;
+    // 'value' is passed in from the agent as an integer
+    if (value < 0 || value > 15 || value == settings.brightness) return;
+    if (debug) server.log("Setting display brightness " + value);
+    settings.brightness = value;
     
     // Tell the display(s) to change their brightness
-    setBrightness(brightness);
+    setBrightness(value);
 }
 
 function setFlash(value) {
@@ -429,7 +438,8 @@ function setDebug(state) {
 function setNight(value) {
     // ADDED IN 2.1.0
     // This function is called when the app enables or disables night mode
-    
+    // 'value' is passed in from the agent as a bool
+
     // Just set the preference because it will be applied almost immediately
     // via the 'clockTick()' loop
     settings.timer.isset = value;     
@@ -527,14 +537,17 @@ display.append(HT16K33MatrixCustom(hardware.i2c89, 0x74));
 display.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
 
 // Set the initial brightness and display angle
-foreach (face in display) face.init(15, INITIAL_ANGLE);
+foreach (led in display) led.init(15, INITIAL_ANGLE);
 
 // Show the ‘sync’ message then give the text no more than
 // 30 seconds to appear. If the prefs data comes from the
 // agent before then, the text will automatically be cleared
 // (and the timer cancelled)
 syncText();
-syncTimer = imp.wakeup(30.0, clockTick);
+syncTimer = imp.wakeup(30.0, function() {
+    syncTimer = null;
+    clockTick();
+});
 
 // Set up Agent notification response triggers
 // First, settings-related actions
