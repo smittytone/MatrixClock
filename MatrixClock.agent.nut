@@ -30,8 +30,7 @@ local debug = false;
 function sendPrefsToDevice(value) {
     // The Matrix Clock unit has requested the current set-up data
     if (debug) server.log("Sending stored preferences to the Matrix Clock");
-    device.send("mclock.set.prefs", prefs);
-    device.send("mclock.set.debug", debug);
+    device.send("clock.set.prefs", prefs);
 }
 
 function encodePrefsForUI() {
@@ -166,7 +165,7 @@ if (loadedPrefs.len() != 0) {
 }
 
 // Register device event triggers
-device.on("mclock.get.prefs", sendPrefsToDevice);
+device.on("clock.get.prefs", sendPrefsToDevice);
 device.on("display.state", function(state) {
     prefs.on = state.on;
     prefs.timer.isadv = state.advance;
@@ -218,7 +217,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save mode setting");
             if (debug) server.log("UI says change mode to " + (prefs.hrmode ? "24 hour" : "12 hour"));
-            device.send("mclock.set.mode", prefs.hrmode);
+            device.send("clock.set.mode", prefs.hrmode);
         }
 
         // Check for a BST set/unset message (value arrives as a bool)
@@ -236,7 +235,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save BST/GMT setting");
             if (debug) server.log("UI says turn BST observance " + (prefs.bst ? "on" : "off"));
-            device.send("mclock.set.bst", prefs.bst);
+            device.send("clock.set.bst", prefs.bst);
         }
 
         // Check for a set colon show message (value arrives as a bool)
@@ -254,7 +253,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon visibility setting");
             if (debug) server.log("UI says turn colon " + (prefs.colon ? "on" : "off"));
-            device.send("mclock.set.colon", prefs.colon);
+            device.send("clock.set.colon", prefs.colon);
         }
 
         // Check for a set flash message (value arrives as a bool)
@@ -272,7 +271,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save colon flash setting");
             if (debug) server.log("UI says turn colon flashing " + (prefs.flash ? "on" : "off"));
-            device.send("mclock.set.flash", prefs.flash);
+            device.send("clock.set.flash", prefs.flash);
         }
 
         // Check for a set brightness message (value arrives as a string)
@@ -282,7 +281,7 @@ api.post("/settings", function(context) {
                 prefs.brightness = data.setbright.tointeger();
                 if (server.save(prefs) != 0) server.error("Could not save brightness setting");
                 if (debug) server.log(format("UI says set display brightness to %i", prefs.brightness));
-                device.send("mclock.set.brightness", prefs.brightness);
+                device.send("clock.set.brightness", prefs.brightness);
             } catch (err) {
                 local e = reportAPIError("setbright");
                 if (debug) server.error(e);
@@ -306,7 +305,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save display light setting");
             if (debug) server.log("UI says turn display " + (prefs.on ? "on" : "off"));
-            device.send("mclock.set.light", prefs.on);
+            device.send("clock.set.light", prefs.on);
         }
 
         // Check for set world time message (value arrives as a bool with subsidiary string value)
@@ -326,10 +325,10 @@ api.post("/settings", function(context) {
             // Is world time switch on or off
             if (!data.setutc) {
                 prefs.utc = false;
-                device.send("mclock.set.utc", { "state" : prefs.utc });
+                device.send("clock.set.utc", { "state" : prefs.utc });
             } else if (data.setutc) {
                 prefs.utc = true;
-                device.send("mclock.set.utc", { "state" : prefs.utc, "offset" : prefs.utcoffset });
+                device.send("clock.set.utc", { "state" : prefs.utc, "offset" : prefs.utcoffset });
             } else {
                 local e = reportAPIError("setutc");
                 if (debug) server.error(e);
@@ -356,7 +355,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save night mode setting");
             if (debug) server.log("UI says " + (prefs.timer.isset ? "enable" : "disable") + " night mode");
-            device.send("mclock.set.nightmode", prefs.timer.isset);
+            device.send("clock.set.nightmode", prefs.timer.isset);
         }
 
         if ("setdimmer" in data) {
@@ -380,7 +379,7 @@ api.post("/settings", function(context) {
 
             if (server.save(prefs) > 0) server.error("Could not save night mode times");
             if (debug) server.log("UI says set night time to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
-            device.send("mclock.set.nighttime", prefs.timer);
+            device.send("clock.set.nighttime", prefs.timer);
         }
 
         context.send(200, "OK");
@@ -401,7 +400,7 @@ api.post("/action", function(context) {
             if (data.action == "reset") {
                 // A RESET message sent to restore factory settings
                 resetPrefs();
-                device.send("mclock.set.prefs", prefs);
+                device.send("clock.set.prefs", prefs);
                 if (debug) server.log("Clock settings reset");
                 if (server.save(prefs) != 0) server.error("Could not save Matrix Clock settings after reset");
             }
@@ -416,14 +415,14 @@ api.post("/action", function(context) {
                     prefs.debug = false;
                 }
 
-                device.send("mclock.set.debug", debug);
+                device.send("clock.set.debug", debug);
                 server.log("Setting agent debugging " + (debug ? "on" : "off"));
                 if (server.save(prefs) != 0) server.error("Could not save Matrix Clock settings after debug switch");
             }
 
             if (data.action == "reboot") {
                 // A REBOOT message sent
-                device.send("mclock.do.reboot", true);
+                device.send("clock.do.reboot", true);
                 if (debug) server.log("Matrix Clock told to reboot");
             }
         }
