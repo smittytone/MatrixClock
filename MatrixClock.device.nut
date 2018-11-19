@@ -485,13 +485,13 @@ function setDefaultPrefs() {
 // OFFLINE OPERATION FUNCTIONS
 function discHandler(event) {
     // Called if the server connection is broken or re-established
-    if ("message" in event) server.log("Connection Manager: " + event.message + " @ " + event.ts.tostring());
+    if ("message" in event) server.log("Connection Manager: " + event.message);
 
     if ("type" in event) {
         if (event.type == "disconnected") {
             isDisconnected = true;
             isConnecting = false;
-            disTime = event.ts;
+            if (disTime == 0) disTime = event.ts;
         }
 
         if (event.type == "connecting") isConnecting = true;
