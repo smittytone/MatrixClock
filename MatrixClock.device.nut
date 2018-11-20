@@ -485,6 +485,7 @@ function setDefaultPrefs() {
 }
 
 
+// ADDED IN 2.1.0
 // ALARM FUNCTONS
 function checkAlarms() {
     // Do we need to display an alarm screen flash? **** EXPERIMENTAL ****

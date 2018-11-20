@@ -193,6 +193,7 @@ api.get("/", function(context) {
     context.send(200, format(HTML_STRING, http.agenturl()));
 });
 
+// ADDED IN 2.1.0
 // Serve the clock status for a GET to /status
 api.get("/status", function(context) {
     local r = { "isconnected" : device.isconnected() };
