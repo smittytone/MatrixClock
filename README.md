@@ -59,6 +59,8 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 - 2.1.0 &mdash; *In development*
     - Add an option to automatically [turn off the clock display overnight](#night-mode)
+    - Update matrix LED class
+    - Prep for 2.2.0
 - 2.0.0 &mdash; *1 November 2018*
     - Update dependencies
     - Restructure API to use JSON
