@@ -20,102 +20,102 @@ class HT16K33MatrixCustom {
 
     // Proportionally space character set
     static _pcharset = [
-		"\x00\x00",              // space - Ascii 32
-		"\xfa",                  // !
-		"\xc0\x00\xc0",          // "
-		"\x24\x7e\x24\x7e\x24",  // #
-		"\x24\xd4\x56\x48",      // $
-		"\xc6\xc8\x10\x26\xc6",  // %
-		"\x6c\x92\x6a\x04\x0a",  // &
-		"\xc0",                  // '
-		"\x7c\x82",              // (
-		"\x82\x7c",              // )
-		"\x10\x7c\x38\x7c\x10",  // *
-		"\x10\x10\x7c\x10\x10",  // +
-		"\x06\x07",              // ,
-		"\x10\x10\x10\x10\x10",  // -
-		"\x06\x06",              // .
-		"\x04\x08\x10\x20\x40",  // /
-		"\x7c\x8a\x92\xa2\x7c",  // 0 - Ascii 48
-		"\x42\xfe\x02",          // 1
-		"\x46\x8a\x92\x92\x62",  // 2
-		"\x44\x92\x92\x92\x6c",  // 3
-		"\x18\x28\x48\xfe\x08",  // 4
-		"\xf4\x92\x92\x92\x8c",  // 5
-		"\x3c\x52\x92\x92\x8c",  // 6
-		"\x80\x8e\x90\xa0\xc0",  // 7
-		"\x6c\x92\x92\x92\x6c",  // 8
-		"\x60\x92\x92\x94\x78",  // 9
-		"\x36\x36",              // : - Ascii 58
-		"\x36\x37",              // ;
-		"\x10\x28\x44\x82",      // <
-		"\x24\x24\x24\x24\x24",  // =
-		"\x82\x44\x28\x10",      // >
-		"\x60\x80\x9a\x90\x60",  // ?
-		"\x7c\x82\xba\xaa\x78",  // @
-		"\x7e\x90\x90\x90\x7e",  // A - Ascii 65
-		"\xfe\x92\x92\x92\x6c",  // B
-		"\x7c\x82\x82\x82\x44",  // C
-		"\xfe\x82\x82\x82\x7c",  // D
-		"\xfe\x92\x92\x92\x82",  // E
-		"\xfe\x90\x90\x90\x80",  // F
-		"\x7c\x82\x92\x92\x5c",  // G
-		"\xfe\x10\x10\x10\xfe",  // H
-		"\x82\xfe\x82",          // I
-		"\x0c\x02\x02\x02\xfc",  // J
-		"\xfe\x10\x28\x44\x82",  // K
-		"\xfe\x02\x02\x02\x02",  // L
-		"\xfe\x40\x20\x40\xfe",  // M
-		"\xfe\x40\x20\x10\xfe",  // N
-		"\x7c\x82\x82\x82\x7c",  // O
-		"\xfe\x90\x90\x90\x60",  // P
-		"\x7c\x82\x92\x8c\x7a",  // Q
-		"\xfe\x90\x90\x98\x66",  // R
-		"\x64\x92\x92\x92\x4c",  // S
-		"\x80\x80\xfe\x80\x80",  // T
-		"\xfc\x02\x02\x02\xfc",  // U
-		"\xf8\x04\x02\x04\xf8",  // V
-		"\xfc\x02\x3c\x02\xfc",  // W
-		"\xc6\x28\x10\x28\xc6",  // X
-		"\xe0\x10\x0e\x10\xe0",  // Y
-		"\x86\x8a\x92\xa2\xc2",  // Z - Ascii 90
-		"\xfe\x82\x82",          // [
-		"\x40\x20\x10\x08\x04",  // \
-		"\x82\x82\xfe",          // ]
-		"\x20\x40\x80\x40\x20",  // ^
-		"\x02\x02\x02\x02\x02",  // _
-		"\xc0\xe0",              // '
-		"\x04\x2a\x2a\x1e",      // a - Ascii 97
-		"\xfe\x22\x22\x1c",      // b
-		"\x1c\x22\x22\x22",      // c
-		"\x1c\x22\x22\xfc",      // d
-		"\x1c\x2a\x2a\x10",      // e
-		"\x10\x7e\x90\x80",      // f
-		"\x18\x25\x25\x3e",      // g
-		"\xfe\x20\x20\x1e",      // h
-		"\xbc\x02",              // i
-		"\x02\x01\x21\xbe",      // j
-		"\xfe\x08\x14\x22",      // k
-		"\xfc\x02",              // l
-		"\x3e\x20\x18\x20\x1e",  // m
-		"\x3e\x20\x20 \x1e",     // n
-		"\x1c\x22\x22\x1c",      // o
-		"\x3f\x22\x22\x1c",      // p
-		"\x1c\x22\x22\x3f",      // q
-		"\x22\x1e\x20\x10",      // r
-		"\x12\x2a\x2a\x04",      // s
-		"\x20\x7c\x22\x04",      // t
-		"\x3c\x02\x02\x3e",      // u
-		"\x38\x04\x02\x04\x38",  // v
-		"\x3c\x06\x0c\x06\x3c",  // w
-		"\x22\x14\x08\x14\x22",  // x
-		"\x39\x05\x06\x3c",      // y
-		"\x26\x2a\x2a\x32",      // z - Ascii 122
-		"\x10\x7c\x82\x82",      // {
-		"\xee",                  // |
-		"\x82\x82\x7c\x10",      // }
-		"\x40\x80\x40\x80",      // ~
-		"\x60\x90\x90\x60",      // Degrees sign - Ascii 127
+        "\x00\x00",              // space - Ascii 32
+        "\xfa",                  // !
+        "\xc0\x00\xc0",          // "
+        "\x24\x7e\x24\x7e\x24",  // #
+        "\x24\xd4\x56\x48",      // $
+        "\xc6\xc8\x10\x26\xc6",  // %
+        "\x6c\x92\x6a\x04\x0a",  // &
+        "\xc0",                  // '
+        "\x7c\x82",              // (
+        "\x82\x7c",              // )
+        "\x10\x7c\x38\x7c\x10",  // *
+        "\x10\x10\x7c\x10\x10",  // +
+        "\x06\x07",              // ,
+        "\x10\x10\x10\x10\x10",  // -
+        "\x06\x06",              // .
+        "\x04\x08\x10\x20\x40",  // /
+        "\x7c\x8a\x92\xa2\x7c",  // 0 - Ascii 48
+        "\x22\x42\xfe\x02\x02",  // 1
+        "\x46\x8a\x92\x92\x62",  // 2
+        "\x44\x92\x92\x92\x6c",  // 3
+        "\x18\x28\x48\xfe\x08",  // 4
+        "\xf4\x92\x92\x92\x8c",  // 5
+        "\x3c\x52\x92\x92\x8c",  // 6
+        "\x80\x8e\x90\xa0\xc0",  // 7
+        "\x6c\x92\x92\x92\x6c",  // 8
+        "\x60\x92\x92\x94\x78",  // 9
+        "\x36\x36",              // : - Ascii 58
+        "\x36\x37",              // ;
+        "\x10\x28\x44\x82",      // <
+        "\x24\x24\x24\x24\x24",  // =
+        "\x82\x44\x28\x10",      // >
+        "\x60\x80\x9a\x90\x60",  // ?
+        "\x7c\x82\xba\xaa\x78",  // @
+        "\x7e\x90\x90\x90\x7e",  // A - Ascii 65
+        "\xfe\x92\x92\x92\x6c",  // B
+        "\x7c\x82\x82\x82\x44",  // C
+        "\xfe\x82\x82\x82\x7c",  // D
+        "\xfe\x92\x92\x92\x82",  // E
+        "\xfe\x90\x90\x90\x80",  // F
+        "\x7c\x82\x92\x92\x5c",  // G
+        "\xfe\x10\x10\x10\xfe",  // H
+        "\x82\xfe\x82",          // I
+        "\x0c\x02\x02\x02\xfc",  // J
+        "\xfe\x10\x28\x44\x82",  // K
+        "\xfe\x02\x02\x02\x02",  // L
+        "\xfe\x40\x20\x40\xfe",  // M
+        "\xfe\x40\x20\x10\xfe",  // N
+        "\x7c\x82\x82\x82\x7c",  // O
+        "\xfe\x90\x90\x90\x60",  // P
+        "\x7c\x82\x92\x8c\x7a",  // Q
+        "\xfe\x90\x90\x98\x66",  // R
+        "\x64\x92\x92\x92\x4c",  // S
+        "\x80\x80\xfe\x80\x80",  // T
+        "\xfc\x02\x02\x02\xfc",  // U
+        "\xf8\x04\x02\x04\xf8",  // V
+        "\xfc\x02\x3c\x02\xfc",  // W
+        "\xc6\x28\x10\x28\xc6",  // X
+        "\xe0\x10\x0e\x10\xe0",  // Y
+        "\x86\x8a\x92\xa2\xc2",  // Z - Ascii 90
+        "\xfe\x82\x82",          // [
+        "\x40\x20\x10\x08\x04",  // \
+        "\x82\x82\xfe",          // ]
+        "\x20\x40\x80\x40\x20",  // ^
+        "\x02\x02\x02\x02\x02",  // _
+        "\xc0\xe0",              // '
+        "\x04\x2a\x2a\x1e",      // a - Ascii 97
+        "\xfe\x22\x22\x1c",      // b
+        "\x1c\x22\x22\x22",      // c
+        "\x1c\x22\x22\xfc",      // d
+        "\x1c\x2a\x2a\x10",      // e
+        "\x10\x7e\x90\x80",      // f
+        "\x18\x25\x25\x3e",      // g
+        "\xfe\x20\x20\x1e",      // h
+        "\xbc\x02",              // i
+        "\x02\x01\x21\xbe",      // j
+        "\xfe\x08\x14\x22",      // k
+        "\xfc\x02",              // l
+        "\x3e\x20\x18\x20\x1e",  // m
+        "\x3e\x20\x20 \x1e",     // n
+        "\x1c\x22\x22\x1c",      // o
+        "\x3f\x22\x22\x1c",      // p
+        "\x1c\x22\x22\x3f",      // q
+        "\x22\x1e\x20\x10",      // r
+        "\x12\x2a\x2a\x04",      // s
+        "\x20\x7c\x22\x04",      // t
+        "\x3c\x02\x02\x3e",      // u
+        "\x38\x04\x02\x04\x38",  // v
+        "\x3c\x06\x0c\x06\x3c",  // w
+        "\x22\x14\x08\x14\x22",  // x
+        "\x39\x05\x06\x3c",      // y
+        "\x26\x2a\x2a\x32",      // z - Ascii 122
+        "\x10\x7c\x82\x82",      // {
+        "\xee",                  // |
+        "\x82\x82\x7c\x10",      // }
+        "\x40\x80\x40\x80",      // ~
+        "\x60\x90\x90\x60"       // Degrees sign - Ascii 127
     ];
 
     // Class private properties
@@ -143,10 +143,10 @@ class HT16K33MatrixCustom {
         _ledAddress = i2cAddress << 1;
         
         if (typeof debug != "bool") debug = false;
-		_debug = debug;
+        _debug = debug;
 
         _buffer = blob(8);
-		_defchars = {};
+        _defchars = {};
     }
 
     function init(brightness = 15, angle = 0) {
@@ -160,8 +160,8 @@ class HT16K33MatrixCustom {
         if (angle < -360 || angle > 360) angle = 0;
 
         // Convert angle in degrees to internal value:
-		// 0 = none, 1 = 90 clockwise, 2 = 180, 3 = 90 anti-clockwise
-		if (angle < 0) angle = 360 + angle;
+        // 0 = none, 1 = 90 clockwise, 2 = 180, 3 = 90 anti-clockwise
+        if (angle < 0) angle = 360 + angle;
 
         if (angle > 3) {
             if (angle < 45 || angle > 360) angle = 0;
@@ -175,8 +175,8 @@ class HT16K33MatrixCustom {
 
         // Power up and set the brightness
         powerUp();
-		setBrightness(brightness);
-		clearDisplay();
+        setBrightness(brightness);
+        clearDisplay();
     }
 
     function setBrightness(brightness = 15) {
@@ -186,23 +186,23 @@ class HT16K33MatrixCustom {
         //   Nothing
         
         if (typeof brightness != "integer" && typeof brightness != "float") brightness = 15;
-		brightness = brightness.tointeger();
+        brightness = brightness.tointeger();
 
-		if (brightness > 15) {
-			brightness = 15;
-			if (_debug) server.error("HT16K33MatrixCustom.setBrightness() brightness out of range (0-15)");
-		}
+        if (brightness > 15) {
+            brightness = 15;
+            if (_debug) server.error("HT16K33MatrixCustom.setBrightness() brightness out of range (0-15)");
+        }
 
-		if (brightness < 0) {
-			brightness = 0;
-			if (_debug) server.error("HT16K33MatrixCustom.setBrightness() brightness out of range (0-15)");
-		}
+        if (brightness < 0) {
+            brightness = 0;
+            if (_debug) server.error("HT16K33MatrixCustom.setBrightness() brightness out of range (0-15)");
+        }
 
-		if (_debug) server.log("Brightness set to " + brightness);
-		brightness = brightness + 224;
+        if (_debug) server.log("Brightness set to " + brightness);
+        brightness = brightness + 224;
 
-		// Write the new brightness value to the HT16K33
-		_led.write(_ledAddress, brightness.tochar() + "\x00");
+        // Write the new brightness value to the HT16K33
+        _led.write(_ledAddress, brightness.tochar() + "\x00");
     }
 
     function clearDisplay() {
@@ -391,12 +391,12 @@ class HT16K33MatrixCustom {
         }
 
         if (_debug) {
-			if (asciiCode in _defchars) {
-				_logger.log("Character " + asciiCode + " already defined so redefining it");
-			} else {
-				_logger.log("Setting user-defined character " + asciiCode);
-			}
-		}
+            if (asciiCode in _defchars) {
+                _logger.log("Character " + asciiCode + " already defined so redefining it");
+            } else {
+                _logger.log("Setting user-defined character " + asciiCode);
+            }
+        }
 
         local matrix = "";
         for (local i = 0 ; i < glyphMatrix.len() ; i++) {
@@ -404,11 +404,11 @@ class HT16K33MatrixCustom {
         }
 
         // Save the string in the defchars table with the supplied Ascii code as its key
-		if (asciiCode in _defchars) {
-			_defchars[asciiCode] = matrix;
-		} else {
-			_defchars[asciiCode] <- matrix;
-		}
+        if (asciiCode in _defchars) {
+            _defchars[asciiCode] = matrix;
+        } else {
+            _defchars[asciiCode] <- matrix;
+        }
     }
 
     function plot(x, y, ink = 1, xor = false) {
