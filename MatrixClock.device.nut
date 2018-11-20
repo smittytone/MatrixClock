@@ -15,8 +15,11 @@ const RECONNECT_TIMEOUT = 15;
 const TICK_DURATION = 0.5;
 const TICK_TOTAL = 4;
 const HALF_TICK_TOTAL = 2;
-const ALARM_DURATION = 2;
 const INITIAL_ANGLE = 0;
+const ALARM_DURATION = 2;
+const ALARM_STATE_OFF = 0;
+const ALARM_STATE_ON = 1;
+const ALARM_STATE_DONE = 2;
 
 
 // GOLBAL VARIABLES
@@ -482,6 +485,124 @@ function setDefaultPrefs() {
 }
 
 
+// ALARM FUNCTONS
+function checkAlarms() {
+    // Do we need to display an alarm screen flash? **** EXPERIMENTAL ****
+    if (settings.alarms.len() > 0) {
+        foreach (alarm in settings.alarms) {
+            // Check if it's time to turn an alarm on
+            if (alarm.hour == hours && alarm.min == minutes) {
+                if (!alarm.on && !alarm.done) {
+                    // The alarm is not on, but should be, so turn it on now
+                    if (debug) server.log("Alarm triggered at " + format("%02i", hours) + ":" + format("%02i", minutes));
+                    alarmState = ALARM_STATE_ON;
+                    alarm.offmins = alarm.min + ALARM_DURATION;
+                    alarm.offhour = alarm.hour
+                    if (alarm.offmins > 59) {
+                        alarm.offmins = 60 - alarm.offmins;
+                        alarm.offhour++;
+                        if (alarm.offhour > 23) alarm.offhour = 24 - alarm.offhour;
+                    }
+
+                    alarm.on = true;
+                }
+            }
+
+            // Check if it's time to turn an alarm off
+            if (alarm.offhour == hours && alarm.offmins == minutes) {
+                alarmState = ALARM_STATE_DONE;
+                if (debug) server.log("Alarm stopped at " + format("%02i", hours) + ":" + format("%02i", minutes));
+                if (!alarm.repeat) alarm.done = true;
+            }
+        }
+
+        // Clear all completed alarms which are not on repeat
+        local i = 0;
+        local flag = false;
+        while (i < settings.alarms.len()) {
+            local alarm = settings.alarms[i];
+            if (alarm.done == true) {
+                // Alarm is only done if it's not on repeart
+                flag = true;
+                settings.alarms.remove(i);
+                if (debug) server.log("Alarm deleted");
+            } else {
+                i++;
+            }
+        }
+
+        // We have made changes, so inform the agent
+        if (flag) agent.send("update.alarms", alarms);
+    }
+}
+
+// Sort the alarms into incidence order
+function sortAlarms() {
+    settings.alarms.sort(function(a, b) {
+        // Match the hour first
+        if (a.hour > b.hour) return 1;
+        if (a.hour < b.hour) return -1;
+
+        // Hours match, so try the minutes
+        if (a.min > b.min) return 1;
+        if (a.min < b.min) return -1;
+
+        // The two alarms are the same
+        return 0;
+    });
+}
+
+function setAlarm(newAlarm) {
+    if (settings.alarms.len() > 0) {
+        // We have some alarms set, so check that the new one is not
+        // already on the list
+        foreach (alarm in settings.alarms) {
+            if (alarm.hour == newAlarm.hour && alarm.min == newAlarm.min) {
+                // Alarm matches an existing one - are we setting the repeat value?
+                if (alarm.repeat == newAlarm.repeat) return;
+                alarm.repeat = newAlarm.repeat;
+                if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " updated: repeat " + (alarm.repeat ? "on" : "off"));
+                
+                // Made a change so update the agent's master list
+                agent.send("update.alarms", alarms);
+                return;
+            }
+        }
+    }
+
+    // Add the new alarm to the list
+    newAlarm.on <- false;
+    newAlarm.done <- false;
+    newAlarm.offmins <- -1;
+    newAlarm.offhour <- -1;
+    settings.alarms.append(newAlarm);
+    sortAlarms();
+    if (debug) server.log("Alarm " + alarms.len() + " added. Time: " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min));
+    agent.send("update.alarms", alarms);
+}
+
+function clearAlarm(index) {
+    if (!(index > alarms.len() - 1)) {
+        local alarm = settings.alarm[index];
+        settings.alarms.remove(index);
+        if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
+        agent.send("update.alarms", alarms);
+    }
+}
+
+function stopAlarm(ignored) {
+    // Run through each alarm that's on and mark it done
+    if (settings.alarms.len() > 0) {
+        foreach (alarm in settings.alarms) {
+            if ("on" in alarm) {
+                alarm.done = true;
+                alarmState = ALARM_STATE_DONE;
+            }
+        }
+    }
+}
+
+
 // OFFLINE OPERATION FUNCTIONS
 function discHandler(event) {
     // Called if the server connection is broken or re-established
@@ -504,7 +625,7 @@ function discHandler(event) {
             
             if (disTime != 0) {
                 local delta = event.ts - disTime;
-                if (debug) server.log("Disconnection duration: " + delta + " seconds");
+                if (debug) server.log("Connection Manager: disconnection duration " + delta + " seconds");
                 disTime = 0;
             }
         }
