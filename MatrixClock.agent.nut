@@ -21,6 +21,7 @@ local prefs = null;
 local savedResponse = null;
 local api = null;
 local debug = false;
+local stateChange = false;
 
 // CLOCK FUNCTIONS
 // NOTE These primarily centre around device settings:
@@ -51,7 +52,7 @@ function encodePrefsForUI() {
                                      "isset" : prefs.timer.isset }
                    "isconnected" : device.isconnected() };
     
-    return http.jsonencode(data, {"compact":true});
+    return http.jsonencode(data, { "compact" : true });
 }
 
 function encodePrefsForWatch() {
@@ -62,7 +63,7 @@ function encodePrefsForWatch() {
                    "world"       : { "utc" : prefs.utc },
                    "on"          : prefs.on,
                    "isconnected" : device.isconnected() };
-    return http.jsonencode(data, {"compact":true});
+    return http.jsonencode(data, { "compact" : true });
 }
 
 function resetPrefs() {
@@ -167,6 +168,7 @@ if (loadedPrefs.len() != 0) {
 // Register device event triggers
 device.on("clock.get.prefs", sendPrefsToDevice);
 device.on("display.state", function(state) {
+    stateChange = true;
     prefs.on = state.on;
     prefs.timer.isadv = state.advance;
     if (server.save(prefs) > 0) server.error("Could not save settings");
@@ -189,6 +191,14 @@ api.onUnauthorized(function(context) {
 // Serve the web UI for a GET at the agent root
 api.get("/", function(context) {
     context.send(200, format(HTML_STRING, http.agenturl()));
+});
+
+// Serve the clock status for a GET to /status
+api.get("/status", function(context) {
+    local r = { "isconnected" : device.isconnected() };
+    if (stateChange) r.force <- true;
+    stateChange = false;
+    context.send(200, http.jsonencode(r, { "compact" : true }));
 });
 
 // Serve up the settings JSON for a GET to /settingss

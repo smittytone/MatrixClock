@@ -296,13 +296,12 @@
             // Request the current settings to extract the device's online state
             // NOTE This is called periodically via a timer (stateTimer)
             $.ajax({
-                url : agenturl + '/settings',
+                url : agenturl + '/status',
                 type: 'GET',
                 success : function(response) {
                     var j = JSON.parse(response);
-                    if ('isconnected' in j) {
-                        updateState(j['isconnected']);
-                    };
+                    if ('isconnected' in j) { updateState(j['isconnected']); };
+                    if ('force' in j) { getState(updateReadout); };
                 },
                 error : function(xhr, textStatus, error) {
                     if (error) {
