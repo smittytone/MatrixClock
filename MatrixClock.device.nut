@@ -296,6 +296,7 @@ function setBrightness(b) {
     display[1].setBrightness(b);
     display[2].setBrightness(b);
     display[3].setBrightness(b);
+    // NOTE 'setBrightness()' triggers an LED redraw
 }
 
 function clearDisplay() {
@@ -304,6 +305,17 @@ function clearDisplay() {
     display[1].clearDisplay();
     display[2].clearDisplay();
     display[3].clearDisplay();
+    // NOTE 'clearDisplay()' triggers an LED redraw
+}
+
+function setVideo(state) {
+    // ADDED IN 2.1.0
+    // Set inverse state of all four LEDs
+    display[0].setInverseVideo(state);
+    display[1].setInverseVideo(state);
+    display[2].setInverseVideo(state);
+    display[3].setInverseVideo(state);
+    // NOTE 'setInverseVideo()' triggers an LED redraw
 }
 
 function syncText() {
@@ -334,6 +346,8 @@ function setPrefs(prefsData) {
     settings.colon = prefsData.colon;
     settings.utc = prefsData.utc;
     settings.offset = prefsData.utcoffset;
+    
+    // ADDED IN 2.1.0
     settings.timer.on.hour = prefsData.timer.on.hour;
     settings.timer.on.min = prefsData.timer.on.min;
     settings.timer.off.hour = prefsData.timer.off.hour;
@@ -341,7 +355,7 @@ function setPrefs(prefsData) {
     settings.timer.isset = prefsData.timer.isset;
     isAdvanceSet = prefsData.timer.isadv;
 
-    // ADDED 2.1.0: Make use of display disable times
+    // ADDED IN 2.1.0: Make use of display disable times
     // NOTE We change settings.on, so the the local state record, settings.on,
     //      is correctly updated in the next stanza
     if (settings.timer.isset) {
@@ -351,15 +365,30 @@ function setPrefs(prefsData) {
         if (now.hour == settings.timer.on.hour && now.min < settings.timer.on.min) prefsData.on = false;
     }
 
-    // Set the display state
-    if (settings.on != prefsData.on) setLight(prefsData.on);
+    local updateBright = false;
+    local updateState = false;
 
     // Set the brightness
     if (settings.brightness != prefsData.brightness) {
         settings.brightness = prefsData.brightness;
+        updateBright = true;
+    }
 
-        // Only set the brightness now if the display is on
-        if (settings.on) setBrightness(prefsData.brightness);
+    // ADDED IN 2.1.0
+    // Set the video state: normal (false) or inverse (true)
+    if (settings.video != prefsData.video) {
+        settings.video = prefsData.video;
+        updateState = true;
+    }
+
+    // Set the display state
+    // NOTE 'setLight()' updates 'settings.on'
+    if (settings.on != prefsData.on) setLight(prefsData.on);
+
+    // Only set the brightness and state now if the display is on
+    if (settings.on) {
+        if (updateState) setVideo(settings.video);
+        if (updateBright) setBrightness(settings.brightness);
     }
 
     // Only call clockTick() if we have come here *before*
@@ -468,6 +497,14 @@ function setNightTime(data) {
     if (debug) server.log("Matrix Clock night dimmer to start at " + format("%02i", settings.timer.on.hour) + ":" + format("%02i", settings.timer.on.min) + " and end at " + format("%02i", settings.timer.off.hour) + ":" + format("%02i", settings.timer.off.min));
 }
 
+function setInverse(state) {
+    // ADDED IN 2.1.0
+    // Update the display state (inverse or normal)
+    settings.video = state;
+    setVideo(state);
+    if (debug) server.log("Setting display to " + (state ? "black on green" : "green on black")); 
+}
+
 function setDefaultPrefs() {
     // Initialise the clock's local preferences store
     settings = {};
@@ -479,10 +516,13 @@ function setDefaultPrefs() {
     settings.brightness <- 15;
     settings.utc <- false;
     settings.offset <- 12;
+    
+    // ADDED IN 2.1.0
     settings.alarms <- [];
     settings.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
                         "off" : { "hour" : 22, "min" : 30 },
                         "isset" : false };
+    settings.video <- false;
 }
 
 
@@ -692,6 +732,7 @@ agent.on("clock.set.debug", setDebug);
 //agent.on("clock.stop.alarm", stopAlarm);
 agent.on("clock.set.nightmode", setNight);
 agent.on("clock.set.nighttime", setNightTime);
+agent.on("clock.set.video", setInverse);
 
 // Next, other actions
 agent.on("clock.do.reboot", function(dummy) {

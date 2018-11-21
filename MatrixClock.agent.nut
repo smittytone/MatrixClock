@@ -55,7 +55,8 @@ function encodePrefsForUI() {
                    // Times to disable clock (eg. over night)
                    "timer"       : { "on"  : { "hour" : prefs.timer.on.hour,  "min"  : prefs.timer.on.min },
                                      "off" : { "hour" : prefs.timer.off.hour, "min" : prefs.timer.off.min },
-                                     "isset" : prefs.timer.isset }
+                                     "isset" : prefs.timer.isset },
+                   "video"       : prefs.video,
                    // Alarm list (functionality coming in 2.2.0)
                    "alarms"      : prefs.alarms };
     
@@ -115,6 +116,8 @@ function initialisePrefs() {
                      "isadv" : false };
     // Alarm list (functionality coming in 2.2.0)
     prefs.alarms <- [];
+    // Inverse video
+    prefs.video <- false;
 }
 
 function reportAPIError(func) {
@@ -168,6 +171,11 @@ if (loadedPrefs.len() != 0) {
     // ADDED IN 2.1.0: support new alarms setting
     if (!("alarms" in prefs)) {
         prefs.alarms <- [];
+    }
+
+    // ADDED IN 2.1.0: support new inverse video setting
+    if (!("video" in prefs)) {
+        prefs.video <- false;
     }
 
     // This has to go LAST
@@ -445,6 +453,20 @@ api.post("/settings", function(context) {
 
                 if (debug) server.log("UI says set night time to start at " + format("%02i", prefs.timer.on.hour) + ":" + format("%02i", prefs.timer.on.min) + " and end at " + format("%02i", prefs.timer.off.hour) + ":" + format("%02i", prefs.timer.off.min));
                 device.send("clock.set.nighttime", prefs.timer);
+            }
+
+            // ADDED IN 2.1.0
+            // Check for inverse video on/off message (value arrives as a bool)
+            // eg. { "setvideo" : true }
+            if (setting == "setvideo") {
+                if (typeof value != "bool") {
+                    error = reportAPIError("setvideo");
+                    break;
+                }
+
+                prefs.video = value;
+                if (debug) server.log("UI says turn display " + (prefs.video ? "black on green" : "green on black"));
+                device.send("clock.set.video", prefs.video);
             }
 
             // ADDED IN 2.1.0 (but not yet functional in UI)

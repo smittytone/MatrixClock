@@ -59,6 +59,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 - 2.1.0 &mdash; *In development*
     - Add an option to automatically [turn off the clock display overnight](#night-mode)
+    - Add an option to switch display between black on green and green on black
     - Update matrix LED class
     - Prep for 2.2.0
 - 2.0.0 &mdash; *1 November 2018*

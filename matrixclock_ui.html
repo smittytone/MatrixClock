@@ -82,6 +82,9 @@
                     <label class='checkarea'> Night Mode (turns the display off between the times set below)
                         <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
                     </label>
+                    <label class='checkarea'> Inverse Video Mode
+                        <input type='checkbox' name='inverse' id='inverse' value='inverse'><span class='checkmark'></span>
+                    </label>
                     &nbsp;
                     <div class='onoff-button' style='font-family:Rubik;weight:bold' align='center'>
                         <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
@@ -186,6 +189,7 @@
         $('#utc').click(setUTC);
         $('#debug').click(setDebug);
         $('#night').click(setNight);
+        $('#inverse').click(setVideo);
 
         // Buttons
         $('#resetbutton').click(reset);
@@ -225,7 +229,8 @@
             document.getElementById('utc').checked = s['world']['utc'];
             document.getElementById('debug').checked = s['debug'];
             document.getElementById('night').checked = s['timer']['isset'];
-            
+            document.getElementById('inverse').checked = s['video'];
+
             // Set the world time slider and value readout
             var u = parseInt(s['world']['offset']);
             $('#utcs').val(u);
@@ -379,13 +384,19 @@
             sendState(d);
         }
 
+        function setVideo() {
+            // Send inverse vide mode as bool: true, on; false, off
+            var d = { 'setvideo' : document.getElementById('inverse').checked };
+            sendState(d);
+        }
+        
         function sendState(data) {
             $.ajax({
                 url : agenturl + '/settings',
                 type: 'POST',
                 data: JSON.stringify(data),
-                success: function() {
-                    getState(updateReadout);
+                success: function(response) {
+                    updateReadout(response);
                 },
                 error : function(xhr, textStatus, error) {
                     if (error) {
