@@ -2,11 +2,12 @@
 // Copyright 2016-18, Tony Smith
 
 // IMPORTS
-// NOTE If you're not using Squinter or an equivalent tool,
-// cut and paste the named library's code over the following line
-#import "HT16K33MatrixCustom.class.nut"
-#import "../generic/utilities.nut"
-#import "../generic/disconnect.nut"
+// NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
+// file's code over the following lines. For Squinter users, you will need to change
+// the path to the file in each #import statement 
+#import "HT16K33MatrixCustom.class.nut"     // Source code for this file here: https://github.com/smittytone/MatrixClock
+#import "../generic/utilities.nut"          // Source code for this file here: https://github.com/smittytone/generic
+#import "../generic/disconnect.nut"         // Source code for this file here: https://github.com/smittytone/generic
 
 
 // CONSTANTS
@@ -637,7 +638,11 @@ function discHandler(event) {
 // START PROGRAM
 
 // Load in generic boot message code
-#include "../generic/bootmessage.nut"
+// NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
+// file's code over the following line. For Squinter users, you will need to change
+// the path to the file in each #import statement 
+// Source code for this file here: https://github.com/smittytone/generic
+#import "../generic/bootmessage.nut"
 
 // Load in default prefs
 setDefaultPrefs();

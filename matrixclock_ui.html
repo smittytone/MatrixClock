@@ -344,7 +344,7 @@
 
         function setBright() {
             // Send clock display brightness setting as string
-            var d = { 'setbright' : ($('#brightness').val()) };
+            var d = { 'setbright' : $('#brightness').val() };
             sendState(d);
         }
 
@@ -360,8 +360,9 @@
             // Send clock world time setting:
             //   Display world time as bool: true = yes, false = no
             //   Offset (0-24) as string
-            var d = { 'setutc' : document.getElementById('utc').checked, 
-                      'utcval' : ($('#utcs').val()) };
+            var d = { 'setutc' : { 'state'  : document.getElementById('utc').checked, 
+                                   'offset' : $('#utcs').val() }
+                    };
             sendState(d);
         }
 
@@ -372,9 +373,9 @@
             var sm = document.getElementById('dimmerstartmin').value;
             var eh = document.getElementById('dimmerendhour').value;
             var em = document.getElementById('dimmerendmin').value;
-            var d = { 'setdimmer' : true,
-                      'dimmeron' : { 'hour' : sh, 'min' : sm },
-                      'dimmeroff' : { 'hour' : eh, 'min' : em }};
+            var d = { 'setdimmer' : { 'dimmeron'  : { 'hour' : sh, 'min' : sm },
+                                      'dimmeroff' : { 'hour' : eh, 'min' : em } } 
+                    };
             sendState(d);
         }
 
