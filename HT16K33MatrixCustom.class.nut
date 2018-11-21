@@ -13,7 +13,7 @@ class HT16K33MatrixCustom {
     // Bus: I2C
     // Availibility: Device
     // Written by Tony Smith (@smittytone)
-    // Copyright 2014-17
+    // Copyright 2014-18
     // Issued under the MIT license (MIT)
 
     static VERSION = "1.3.0";
@@ -37,7 +37,7 @@ class HT16K33MatrixCustom {
         "\x06\x06",              // .
         "\x04\x08\x10\x20\x40",  // /
         "\x7c\x8a\x92\xa2\x7c",  // 0 - Ascii 48
-        "\x22\x42\xfe\x02\x02",  // 1
+        "\x22\x42\xfe\x02\x02",  // 1 - NOTE This is a custom version of this char (cf https://github.com/smittytone/HT16K33Matrix)
         "\x46\x8a\x92\x92\x62",  // 2
         "\x44\x92\x92\x92\x6c",  // 3
         "\x18\x28\x48\xfe\x08",  // 4
@@ -258,6 +258,7 @@ class HT16K33MatrixCustom {
 
     function displayChar(asciiValue = 32, offset = 0) {
         // Display a single character specified by its Ascii value
+        // NOTE This is a custom version of this function (cf https://github.com/smittytone/HT16K33Matrix)
         // Parameters:
         //   1. Character Ascii code (default: 32 [space])
         //   2. Character display offset from left
