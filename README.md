@@ -60,6 +60,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 - 2.1.0 &mdash; *In development*
     - Add an option to automatically [turn off the clock display overnight](#night-mode)
     - Add an option to switch display between black on green and green on black
+    - Improve UI layout
     - Update matrix LED class
     - Prep for 2.2.0
 - 2.0.0 &mdash; *1 November 2018*
@@ -73,14 +74,12 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
     - Add **Advanced Settings** area to UI and move Reset button into it
     - Add Debug checkbox to **Advanced Settings**
 - 1.5.0 &mdash; *7 June 2018*
-    - Update to [Bootstrap 4.1.1](https://getbootstrap.com/)
-        - Update Web UI based on Bootstrap
-        - Separate out Web UI code into own file for clarity
+    - Update Web UI based on Bootstrap
+    - Separate out Web UI code into own file for clarity
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
     - Update to [JQuery 3.3.1](https://jquery.com)
     - Prevent Ajax XHR caching
 - 1.4.0
-    - Minor changes
     - Bring dependencies up to date
 - 1.3.0
     - Add support for world time display, including web UI controls

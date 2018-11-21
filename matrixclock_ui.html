@@ -64,27 +64,30 @@
                 <div class='col-8'>
                     <!-- Main checkboxes -->
                     <h4>General Settings</h4>
-                    <label class='checkarea'> 24-Hour Mode (Switch off for AM/PM)
-                        <input type='checkbox' name='mode' id='mode' value='mode'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Apply Daylight Savings Time Automatically
-                        <input type='checkbox' name='bst' id='bst' value='bst'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Show Seconds Indicator
-                        <input type='checkbox' name='seconds' id='seconds' value='seconds'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Flash Seconds Indicator
-                        <input type='checkbox' name='flash' id='flash' value='flash'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Show World Time
-                        <input type='checkbox' name='utc' id='utc' value='utc'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Night Mode (turns the display off between the times set below)
-                        <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
-                    </label>
-                    <label class='checkarea'> Inverse Video Mode
-                        <input type='checkbox' name='inverse' id='inverse' value='inverse'><span class='checkmark'></span>
-                    </label>
+                    <div class='row'>
+                        <div class='col-6'>
+                            <label class='checkarea'> 24-Hour Mode (Switch off for AM/PM)
+                                <input type='checkbox' name='mode' id='mode' value='mode'><span class='checkmark'></span>
+                            </label>
+                            <label class='checkarea'> Show Seconds Indicator
+                                <input type='checkbox' name='seconds' id='seconds' value='seconds'><span class='checkmark'></span>
+                            </label>
+                            <label class='checkarea'> Flash Seconds Indicator
+                                <input type='checkbox' name='flash' id='flash' value='flash'><span class='checkmark'></span>
+                            </label>
+                            <label class='checkarea'> Inverse Video Mode
+                                <input type='checkbox' name='inverse' id='inverse' value='inverse'><span class='checkmark'></span>
+                            </label>     
+                        </div>
+                        <div class='col-6'>
+                            <label class='checkarea'> Show World Time
+                                <input type='checkbox' name='utc' id='utc' value='utc'><span class='checkmark'></span>
+                            </label>
+                            <label class='checkarea'> Use Night Mode<br />(Turns the display off between<br />the times set below)
+                                <input type='checkbox' name='night' id='night' value='night'><span class='checkmark'></span>
+                            </label>
+                        </div>
+                    </div>
                     &nbsp;
                     <div class='onoff-button' style='font-family:Rubik;weight:bold' align='center'>
                         <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
@@ -142,9 +145,19 @@
                     <!-- Advanced settings -->
                     <div class='advancedsettings' >
                         <h4 class='showhide'>Show Advanced Settings</h4>
-                        <div class='advanced' align='center'>
-                            <div style='color:white;font-family:Abel,sans-serif;'>
-                                <input type='checkbox' name='debug' id='debug' value='debug'> Debug Mode
+                        <div class='advanced'>
+                            <br />
+                            <div class='row'>
+                                <div class='col-3'>&nbsp;</div>
+                                <div class='col-6'>
+                                    <label class='checkarea'> Apply Daylight Savings Time Automatically
+                                        <input type='checkbox' name='bst' id='bst' value='bst'><span class='checkmark'></span>
+                                    </label>
+                                    <label class='checkarea'> Debug Mode
+                                        <input type='checkbox' name='debug' id='debug' value='debug'><span class='checkmark'></span>
+                                    </label>                
+                                </div>
+                                <div class='col-3'>&nbsp;</div>
                             </div>
                             <br />
                             <div style='font-family:Rubik; weight:bold;' align='center'>
