@@ -212,6 +212,11 @@ class HT16K33MatrixCustom {
         //   Nothing
 
         _buffer = blob(8);
+        if (_inverseVideoFlag) {
+            for (local i = 0 ; i < 8 ; i++) {
+                _buffer[i] = 0xFF;
+            }
+        }
         _writeDisplay();
     }
 
@@ -249,6 +254,12 @@ class HT16K33MatrixCustom {
 
         _buffer = blob(8);
 
+        if (_inverseVideoFlag) {
+            for (local i = 0 ; i < 8 ; i++) {
+                _buffer[i] = 0xFF;
+            }
+        }
+
         for (local i = 0 ; i < glyphMatrix.len() ; i++) {
             local a = i;
             if (center) a = i + ((8 - glyphMatrix.len()) / 2).tointeger();
@@ -266,6 +277,7 @@ class HT16K33MatrixCustom {
         //   Nothing
 
         local inputMatrix;
+
         if (asciiValue < 32) {
             // A user-definable character has been chosen
             inputMatrix = _defchars[asciiValue];
@@ -277,6 +289,12 @@ class HT16K33MatrixCustom {
         }
 
         _buffer = blob(8);
+
+        if (_inverseVideoFlag) {
+            for (local i = 0 ; i < 8 ; i++) {
+                _buffer[i] = 0xFF;
+            }
+        }
 
         for (local i = 0 ; i < inputMatrix.len() ; i++) {
             local a;
@@ -321,15 +339,21 @@ class HT16K33MatrixCustom {
                 glyph = _pcharset[character - 32];
                 
                 // Add a blank column spacer
-                glyph = glyph + "\x00";
+                glyph = glyph + (_inverseVideoFlag ? "\xFF" : "\x00");
             }
 
             foreach (column, columnValue in glyph) {
                 local cursor = column;
                 local glyphToDraw = glyph;
                 local increment = 1;
-                //local outputFrame = [0,0,0,0,0,0,0,0];
                 local outputFrame = blob(8);
+
+                if (_inverseVideoFlag) {
+                    for (local i = 0 ; i < 8 ; i++) {
+                        _buffer[i] = 0xFF;
+                    }
+                }
+       
                 for (local k = 0 ; k < 8 ; ++k) {
                     if (cursor < glyphToDraw.len()) {
                         outputFrame[k] = _flip(glyphToDraw[cursor]);
@@ -345,7 +369,7 @@ class HT16K33MatrixCustom {
                                 }
                             } else {
                                 glyphToDraw = _pcharset[line[index + increment] - 32];
-                                glyphToDraw = glyphToDraw + "\x00";
+                                glyphToDraw = glyphToDraw + (_inverseVideoFlag ? "\xFF" : "\x00");
                             }
                             increment++;
                             cursor = 1;
