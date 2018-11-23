@@ -16,6 +16,10 @@ class HT16K33MatrixCustom {
     // Copyright 2014-18
     // Issued under the MIT license (MIT)
 
+    // NOTE This is a custom version of this class: https://github.com/smittytone/HT16K33Matrix
+    //      which has been modified to meet certain needs of the MatrixClock. As some point,
+    //      this custom class will be retired
+
     static VERSION = "1.3.0";
 
     // Proportionally space character set
