@@ -39,7 +39,7 @@ The Matrix Clock device code is currently hardwired for UK usage: it adjusts to 
 
 The Matrix Clock can be controlled by accessing its agent URL:
 
-<p><img src="images/grab01.png" width="460" alt="The Matrix Clock web-based UI" /></p>
+<p><img src="images/grab01.png" width="550" alt="The Matrix Clock web-based UI" /></p>
 
 ### Night Mode ###
 
