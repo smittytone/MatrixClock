@@ -706,7 +706,7 @@ display.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
 // Set the initial brightness and display angle
 foreach (led in display) {
     led.setupCharset();
-    led.init(settings.bright, LED_ANGLE);
+    led.init(settings.brightness, LED_ANGLE);
 }
 
 // Show the ‘sync’ message then give the text no more than
