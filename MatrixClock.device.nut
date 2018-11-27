@@ -16,7 +16,7 @@ const RECONNECT_TIMEOUT = 15;
 const TICK_DURATION = 0.5;
 const TICK_TOTAL = 4;
 const HALF_TICK_TOTAL = 2;
-const INITIAL_ANGLE = 0;
+const LED_ANGLE = 0;
 const ALARM_DURATION = 2;
 const ALARM_STATE_OFF = 0;
 const ALARM_STATE_ON = 1;
@@ -128,7 +128,7 @@ function shouldShowDisplay() {
     if (isAdvanceSet) {
         // 'isAdvanceSet' is unset when the next event time (display goes on or off) is reached
         if (hours == settings.timer.on.hour && minutes >= settings.timer.on.min) isAdvanceSet = false;
-        if (hours == settings.timer.off.hour && minutes >= settings.timer.on.min) isAdvanceSet = false;
+        if (hours == settings.timer.off.hour && minutes >= settings.timer.off.min) isAdvanceSet = false;
     }
 
     // Have we crossed into the night period? If so, unset 'shouldShow'
@@ -361,8 +361,8 @@ function setPrefs(prefsData) {
     if (settings.timer.isset) {
         local now = date();
         if (now.hour > settings.timer.on.hour || now.hour < settings.timer.off.hour) prefsData.on = false;
-        if (now.hour == settings.timer.off.hour && now.min >= settings.timer.off.min) prefsData.on = false;
-        if (now.hour == settings.timer.on.hour && now.min < settings.timer.on.min) prefsData.on = false;
+        if (now.hour == settings.timer.off.hour && now.min < settings.timer.off.min) prefsData.on = false;
+        if (now.hour == settings.timer.on.hour && now.min >= settings.timer.on.min) prefsData.on = false;
     }
 
     local updateBright = false;
@@ -513,7 +513,7 @@ function setDefaultPrefs() {
     settings.bst <- true;
     settings.colon <- true;
     settings.flash <- true;
-    settings.brightness <- 15;
+    settings.brightness <- 1;
     settings.utc <- false;
     settings.offset <- 12;
     
@@ -706,7 +706,7 @@ display.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
 // Set the initial brightness and display angle
 foreach (led in display) {
     led.setupCharset();
-    led.init(15, INITIAL_ANGLE);
+    led.init(settings.bright, LED_ANGLE);
 }
 
 // Show the ‘sync’ message then give the text no more than
