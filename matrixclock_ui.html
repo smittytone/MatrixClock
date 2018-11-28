@@ -205,11 +205,11 @@
         $('#inverse').click(setVideo);
 
         // Buttons
-        $('#resetbutton').click(reset);
+        $('#resetbutton').click(doReset);
         $('#onoffbutton').click(setLight);
         $('#dimmer').click(setDimmer);
         
-        // Slider
+        // Brightness Slider
         var slider = document.getElementById('brightness');
         slider.addEventListener('mouseup', updateSlider);
         slider.addEventListener('touchend', updateSlider);
@@ -332,37 +332,37 @@
 
         function setMode() {
             // Send clock mode as bool: true = 24-hour, false = 12-hour 
-            var d = { 'setmode' : document.getElementById('mode').checked };
+            var d = {'setmode':document.getElementById('mode').checked};
             sendState(d);
         }
 
         function setBST() {
             // Send clock use BST setting as bool
-            var d = { 'setbst' : document.getElementById('bst').checked };
+            var d = {'setbst':document.getElementById('bst').checked};
             sendState(d);
         }
 
         function setColon() {
             // Send clock show colon setting as bool
-            var d = { 'setcolon' : document.getElementById('seconds').checked };
+            var d = {'setcolon':document.getElementById('seconds').checked};
             sendState(d);
         }
 
         function setFlash() {
             // Send clock flash colon setting as bool
-            var d = { 'setflash' : document.getElementById('flash').checked };
+            var d = {'setflash':document.getElementById('flash').checked};
             sendState(d);
         }
 
         function setNight() {
             // Send clock night mode setting as bool
-            var d = { 'setnight' : document.getElementById('night').checked };
+            var d = {'setnight':document.getElementById('night').checked};
             sendState(d);
         }
 
         function setBright() {
             // Send clock display brightness setting as string
-            var d = { 'setbright' : $('#brightness').val() };
+            var d = {'setbright':$('#brightness').val()};
             sendState(d);
         }
 
@@ -370,7 +370,7 @@
             // Send clock display state as bool: true = on, false = off
             displayon = !displayon;
             $('.onoff-button button').text(displayon ? 'Turn Display Off' : 'Turn Display On');
-            var d = { 'setlight' :  displayon };
+            var d = {'setlight':displayon};
             sendState(d);
         }
 
@@ -378,9 +378,8 @@
             // Send clock world time setting:
             //   Display world time as bool: true = yes, false = no
             //   Offset (0-24) as string
-            var d = { 'setutc' : { 'state'  : document.getElementById('utc').checked, 
-                                   'offset' : $('#utcs').val() }
-                    };
+            var d = {'setutc':{'state':document.getElementById('utc').checked, 
+                               'offset':$('#utcs').val()}};
             sendState(d);
         }
 
@@ -391,80 +390,52 @@
             var sm = document.getElementById('dimmerstartmin').value;
             var eh = document.getElementById('dimmerendhour').value;
             var em = document.getElementById('dimmerendmin').value;
-            var d = { 'setdimmer' : { 'dimmeron'  : { 'hour' : sh, 'min' : sm },
-                                      'dimmeroff' : { 'hour' : eh, 'min' : em } } 
-                    };
+            var d = {'setdimmer':{'dimmeron':{'hour':sh, 'min':sm },
+                                  'dimmeroff':{'hour':eh, 'min':em}}};
             sendState(d);
         }
 
         function setVideo() {
             // Send inverse vide mode as bool: true, on; false, off
-            var d = { 'setvideo' : document.getElementById('inverse').checked };
+            var d = {'setvideo':document.getElementById('inverse').checked};
             sendState(d);
         }
         
         function sendState(data) {
-            $.ajax({
-                url : agenturl + '/settings',
-                type: 'POST',
-                data: JSON.stringify(data),
-                success: function(response) {
-                    updateReadout(response);
-                },
-                error : function(xhr, textStatus, error) {
-                    if (error) {
-                        $('.clock-status span').text(error);
-                    }
-                },
-                cache: false
-            });
+            send(data, '/settings', function(response) { updateReadout(response); });
         }
 
         // The following are action functions: POST to /action
 
         function setDebug() {
             // Tell the device to enter or leave debug mode
-            $.ajax({
-                url : agenturl + '/action',
-                type: 'POST',
-                data: JSON.stringify({ 'action' : 'debug', 'state' : document.getElementById('debug').checked }),
-                error : function(xhr, textStatus, error) {
-                    if (error) {
-                        $('.clock-status span').text(error);
-                    }
-                },
-                cache: false
-            });
+            doAction({'action':'debug', 'state':document.getElementById('debug').checked});
         }
 
-        function reset() {
+        function doReset() {
             // Trigger a settings reset
-            $.ajax({
-                url : agenturl + '/action',
-                type: 'POST',
-                data: JSON.stringify({ 'action' : 'reset' }),
-                success : function(response) {
-                    // This changes the settings, so we should reacquire them immediately
-                    getState(updateReadout);
-                },
-                cache: false
-            });
+            doAction({'action':'reset'});
         }
 
-        function reboot() {
+        function doAction(action) {
             // Trigger a device restart
+            send(action, '/action', null);
+        }
+
+        function send(data, path, handler) {
             $.ajax({
-                url : agenturl + '/action',
+                url: agenturl + path,
                 type: 'POST',
-                data: JSON.stringify({ 'action' : 'reboot' }),
-                error : function(xhr, textStatus, error) {
+                data: JSON.stringify(data),
+                cache: false,
+                success: handler,
+                error: function(xhr, textStatus, error) {
                     if (error) {
                         $('.clock-status span').text(error);
                     }
-                },
-                cache: false
+                }
             });
-        }
+        }  
     </script>
 </body>
 </html>
