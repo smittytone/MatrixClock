@@ -29,6 +29,15 @@ You’ll need to visit [Electric Imp](https://impcentral.electricimp.com/login) 
 
 Visit Electric Imp’s [Getting Started Guide](https://developer.electricimp.com/gettingstarted/blinkup) to learn how to configure your imp001 to access your local WiFi network, and how to enter code into impCentral and run it on your device.
 
+The application code makes use of a number of components not all of which are included in the device and agent code listings. You can spot these external components by looking for the `#import` statements by which they are referenced. You can use a tool like [Squinter](https://smittytone.github.io/squinter/index.html) or [impt](https://developer.electricimp.com/tools/impworks/impt/) to ‘compile’ these parts into complete device and agent code, and upload it to the Electric Imp impCloud™. Alternatively, you can simply copy and paste the contents of the files names in the `#import` statements into the main code blocks, then copy and paste this code into [impCentral™](https://developer.electricimp.com/tools/impcentral/impcentralintroduction), Electric Imp’s online IDE.
+
+Not all of the required components are included in this repository: they are not specific to this application. Only the files `matrixclock_ui.html` and `HT16K33MatrixCustom.class.nut` are included here. The other components can be found in these repositories:
+
+- [utilities.nut](https://github.com/smittytone/generic)
+- [disconnect.nut](https://github.com/smittytone/generic)
+- [bootmessage.nut](https://github.com/smittytone/generic)
+- [HT16K33Matrix.class.nut](https://github.com/smittytone/HT16K33Matrix)
+
 ## Usage ##
 
 ### UK/US Usage ###
