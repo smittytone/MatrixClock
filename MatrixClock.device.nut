@@ -5,7 +5,7 @@
 // NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
 // file's code over the following lines. For Squinter users, you will need to change
 // the path to the file in each #import statement 
-#import "HT16K33MatrixCustom.class.2.nut"   // Source code for this file here: https://github.com/smittytone/MatrixClock
+#import "HT16K33MatrixCustom.class.nut"     // Source code for this file here: https://github.com/smittytone/MatrixClock
 #import "../generic/utilities.nut"          // Source code for this file here: https://github.com/smittytone/generic
 #import "../generic/disconnect.nut"         // Source code for this file here: https://github.com/smittytone/generic
 
