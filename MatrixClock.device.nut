@@ -464,7 +464,11 @@ function setLight(value) {
 
 function setDebug(state) {
     // Enable or disble debugging messaging in response to a message from the UI via the agent
-    debug = state;
+    if (debug != state) {
+        foreach (led in display) led.setDebug(state, true);
+        debug = state;
+    }
+    
     server.log("Setting device-side debug messages " + (state ? "on" : "off"));
 }
 
