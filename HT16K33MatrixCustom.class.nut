@@ -1,5 +1,5 @@
 // IMPORTS
-// NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
+// NOTE If you are not using Squinter or an equivalent tool, cut and paste the named 
 // file's code over the following line. For Squinter users, you will need to change
 // the path to the file in the #import statement
 #import "../HT16K33Matrix/HT16K33Matrix.class.nut"     // Source code for this file here: https://github.com/smittytone/HT16K33Matrix
@@ -13,7 +13,7 @@ class HT16K33MatrixCustom extends HT16K33Matrix {
     static VERSION = "1.4.0";
     
     function setupCharset() {
-        // Modify certain characters in the default character set
+        // Modify certain characters ('0') in the default character set
         // NOTE This is not present in the base class
         _pcharset[17] = "\x22\x42\xfe\x02\x02";
     }
@@ -34,26 +34,27 @@ class HT16K33MatrixCustom extends HT16K33Matrix {
             try {
                 inputMatrix = _defchars[asciiValue];
             } catch (err) {
+                // Undefined user-def char selected, so just display a ?
                 inputMatrix = _pcharset[63];
             }
         } else {
-            // A standard character has been chosen
+            // A standard character has been chosen - if out of range, select ?
             asciiValue = asciiValue - 32;
             if (asciiValue < 0 || asciiValue > _alphaCount) asciiValue = 63;
             inputMatrix = _pcharset[asciiValue];
         }
 
+        // Clear the LED buffer
         _buffer = blob(8);
 
+        // But if we're in inverse video mode, set all the pixels on
         if (_inverseVideoFlag) {
-            for (local i = 0 ; i < 8 ; i++) {
-                _buffer[i] = 0xFF;
-            }
+            for (local i = 0 ; i < 8 ; i++) _buffer[i] = 0xFF;
         }
 
+        // Set the buffer to the input matrix values
         for (local i = 0 ; i < inputMatrix.len() ; i++) {
             local a = i + offset;
-            
             if (a < 8) {
                 _buffer[a] = _inverseVideoFlag ? _flip(~inputMatrix[i]) : _flip(inputMatrix[i]);
             } else {
