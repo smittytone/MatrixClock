@@ -355,6 +355,9 @@ function setPrefs(prefsData) {
     settings.timer.isset = prefsData.timer.isset;
     isAdvanceSet = prefsData.timer.isadv;
 
+    // ADDED IN 2.2.0
+    settings.alarms = prefsData.alarms;
+
     // ADDED IN 2.1.0: Make use of display disable times
     // NOTE We change settings.on, so the the local state record, settings.on,
     //      is correctly updated in the next stanza
@@ -610,7 +613,7 @@ function setAlarm(newAlarm) {
                 if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " updated: repeat " + (alarm.repeat ? "on" : "off"));
                 
                 // Made a change so update the agent's master list
-                agent.send("update.alarms", alarms);
+                agent.send("update.alarms", settings.alarms);
                 return;
             }
         }
@@ -623,17 +626,22 @@ function setAlarm(newAlarm) {
     newAlarm.offhour <- -1;
     settings.alarms.append(newAlarm);
     sortAlarms();
-    if (debug) server.log("Alarm " + alarms.len() + " added. Time: " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min));
-    agent.send("update.alarms", alarms);
+    if (debug) server.log("Alarm " + settings.alarms.len() + " added. Time: " + format("%02i", newAlarm.hour) + ":" + format("%02i", newAlarm.min));
+    agent.send("update.alarms", settings.alarms);
 }
 
 function clearAlarm(index) {
-    if (!(index > alarms.len() - 1)) {
-        local alarm = settings.alarm[index];
-        settings.alarms.remove(index);
-        if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
-        agent.send("update.alarms", alarms);
+    // Remove the alarm from the array; it's at index 'index'
+    // Check 'index' is valid first
+    if (index < 0 || index > settings.alarms.len() - 1) {
+        if (debug) server.error("Bad alarm index: " + index);
+        return;
     }
+    
+    local alarm = settings.alarms[index];
+    settings.alarms.remove(index);
+    if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
+    agent.send("update.alarms", settings.alarms);
 }
 
 function stopAlarm(ignored) {
@@ -734,9 +742,9 @@ agent.on("clock.set.flash", setFlash);
 agent.on("clock.set.colon", setColon);
 agent.on("clock.set.light", setLight);
 agent.on("clock.set.debug", setDebug);
-//agent.on("clock.set.alarm", setAlarm);
-//agent.on("clock.clear.alarm", clearAlarm);
-//agent.on("clock.stop.alarm", stopAlarm);
+agent.on("clock.set.alarm", setAlarm);
+agent.on("clock.clear.alarm", clearAlarm);
+agent.on("clock.stop.alarm", stopAlarm);
 agent.on("clock.set.nightmode", setNight);
 agent.on("clock.set.nighttime", setNightTime);
 agent.on("clock.set.video", setInverse);

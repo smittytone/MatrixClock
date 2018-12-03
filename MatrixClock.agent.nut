@@ -13,19 +13,23 @@
 
 // CONSTANTS
 const MAX_ALARMS = 8;
-// If you are NOT using Squinter or a similar tool, replace the following #import statement
-// with the contents of the named file (matrixclock_ui.html)
-// Source code for this file here: https://github.com/smittytone/MatrixClock
+// If you are NOT using Squinter or a similar tool, replace the following #import statements
+// with the contents of the named files (matrixclock_ui.html and delete.nut)
+// Source code for these files here: https://github.com/smittytone/MatrixClock
+#import "delete_img.nut"
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
 ";
+
 
 // MAIN VARIABLES
 local prefs = null;
 local savedResponse = null;
 local api = null;
+local savedContext = null;
 local debug = false;
 local stateChange = false;
+
 
 // CLOCK FUNCTIONS
 // NOTE These primarily centre around device settings:
@@ -60,7 +64,7 @@ function encodePrefsForUI() {
                    // Alarm list (functionality coming in 2.2.0)
                    "alarms"      : prefs.alarms };
     
-    return http.jsonencode(data, { "compact" : true });
+    return http.jsonencode(data, {"compact" : true});
 }
 
 function encodePrefsForWatch() {
@@ -71,7 +75,7 @@ function encodePrefsForWatch() {
                    "world"       : { "utc" : prefs.utc },
                    "on"          : prefs.on,
                    "isconnected" : device.isconnected() };
-    return http.jsonencode(data, { "compact" : true });
+    return http.jsonencode(data, {"compact" : true});
 }
 
 function resetPrefs() {
@@ -195,7 +199,14 @@ device.on("display.state", function(state) {
     stateChange = true;
     prefs.on = state.on;
     prefs.timer.isadv = state.advance;
-    if (server.save(prefs) > 0) server.error("Could not save settings");
+    if (server.save(prefs) > 0) server.error("Could not save settings (display.state)");
+});
+
+// ADDED IN 2.2.0
+device.on("update.alarms", function(alarms) {
+    prefs.alarms = alarms;
+    stateChange = true;
+    if (server.save(prefs) > 0) server.error("Could not save settings (update.alarms)");
 });
 
 // Set up the control and data API
@@ -469,11 +480,11 @@ api.post("/settings", function(context) {
                 device.send("clock.set.video", prefs.video);
             }
 
-            // ADDED IN 2.1.0 (but not yet functional in UI)
+            // ADDED IN 2.1.0, UI FUNCTIONAL IN 2.2.0
             // Check for alarm update message (value arrives as a table)
             // eg. { "setalarm" : { "action" : "<type>",
             //                      "hour" : 7, "min" : 0, "repeat" : true } }
-            if (setting == "setalarm") {
+            if (setting == "alarm") {
                 if (typeof value != "table") {
                     error = reportAPIError("setalarm");
                     break;
@@ -481,7 +492,7 @@ api.post("/settings", function(context) {
 
                 if ("action" in value) {
                     if (value.action == "add") {
-                        if (alarms.len() == MAX_ALARMS) {
+                        if (prefs.alarms.len() == MAX_ALARMS) {
                             error = reportAPIError("setalarm") + ": Maximum number of alarms exceeded";
                             break;
                         }
@@ -517,8 +528,9 @@ api.post("/settings", function(context) {
                             alarm.repeat <- value.repeat;
                         }
 
-                        if (debug) server.log("UI says set alarm for " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " (Repeat: " + (alarm.repeat ? "yes" : "no") + ")");
+                        if (debug) server.log("UI says set alarm for " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " (repeat: " + (alarm.repeat ? "yes" : "no") + ")");
                         device.send("clock.set.alarm", alarm);
+                        prefs.alarms.append(alarm);
                     } else if (value.action == "delete") {
                         if ("index" in value) {
                             try {
@@ -531,6 +543,7 @@ api.post("/settings", function(context) {
                             
                             if (debug) server.log("UI says delete alarm at index " + value.index);
                             device.send("clock.clear.alarm", value.index);
+                            prefs.alarms.remove(value.index);
                         } else {
                             error = reportAPIError("setalarm.delete");
                             break;
@@ -611,14 +624,26 @@ api.post("/action", function(context) {
     }
 });
 
+
 // ADDED IN 2.1.0
 // Serve the clock status for a GET to /status
 api.get("/status", function(context) {
-    local r = { "isconnected" : device.isconnected() };
+    local r = {"isconnected" : device.isconnected()};
     if (stateChange) r.force <- true;
     stateChange = false;
-    context.send(200, http.jsonencode(r, { "compact" : true }));
+    context.send(200, http.jsonencode(r, {"compact" : true}));
 });
+
+
+// ADDED IN 2.2.0
+// Any call to the endpoint /images is sent the correct PNG data
+api.get("/images/([^/]*)", function(context) {
+    // Determine which image has been requested and send the appropriate
+    // stored data back to the requesting web browser
+    context.setHeader("Content-Type", "image/png");
+    context.send(200, DELETE_PNG);
+});
+
 
 // GET at /controller/info returns Controller app UUID
 api.get("/controller/info", function(context) {

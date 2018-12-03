@@ -124,7 +124,7 @@
                                 <input type='text' class='form-control' id='dimmerstarthour' min='0' max='22' style='width:60px;color:CornflowerBlue' placeholder='22'>
                             </div>
                             <div class='col-4' align='left'>
-                                    <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='00'>
+                                <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='00'>
                             </div>
                         </div>
                         <div class='form-group row'>
@@ -140,6 +140,22 @@
                         <div class='update-button' align='center' style='font-family:Rubik; weight:bold;'>
                             <button type='submit' class='btn btn-success' id='dimmer'>Set Night Mode Times</button>
                         </div>
+                    </div>
+                    <hr>
+                    <!-- Alarms UI -->
+                    <div>
+                        <h4>Alarms</h4>
+                            <p class='alarm-list text-center'><span></span></p>
+                            <div align='center'>
+                                <p>Add an Alarm (24-hour clock)</p>
+                                <div class='form-inline justify-content-center'>
+                                    <label for='enter-hour' style='color:white'>Hour : </label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:60px;color:black;' placeholder='15' />&nbsp; 
+                                    <label for='enter-min' style='color:white'>Minute : </label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:60px;color:black;' placeholder='00' />&nbsp;
+                                    <label for='repeat' class='col-form-label' style='color:white'>Repeat: </label>&nbsp;<input type='checkbox' class='form-check-input ' name='repeat' id='repeat' value=''>
+                                </div>
+                                <br />
+                                <button class='btn btn-success' type='submit' id='setalarm' style='width:200px'>Set Alarm</button>
+                            </div>
                     </div>
                     <hr>
                     <!-- Advanced settings -->
@@ -203,6 +219,7 @@
         $('#debug').click(setDebug);
         $('#night').click(setNight);
         $('#inverse').click(setVideo);
+        $('#setalarm').click(setAlarm);
 
         // Buttons
         $('#resetbutton').click(doReset);
@@ -273,8 +290,47 @@
             
             // Set the clock state line
             updateState(s['isconnected']);
+
+            // Build the list of alarms
+            showAlarms(s['alarms']);
         }
 
+        function resetAlarmFields(field) {
+            if (field & 1 > 0) $('#enter-hour').val($('#enter-hour').attr('placeholder'));
+            if (field & 2 > 0) $('#enter-min').val($('#enter-min').attr('placeholder'));
+        }
+
+        function showAlarms(alarms) {
+            // Take the array of alarms sent by the clock and generate a list to present
+            if (alarms.length == 0) {
+                // No alarms so just show a simple message
+                $('.alarm-list span').text('No alarms set');
+            } else {
+                // Build an HTML table to show the alarms
+                // NOTE the device will already have ordered these, so the sequene of alarms in the 'alarms' array
+                //      will match the stored sequence held by the device and the agent
+                let s = '<table width=""100%%"" class=""table table-striped table-sm"">';
+                s = s + '<tr><th>&nbsp;</th><th>Time (hour:minute)</th><th>Repeat?</th></th><th>Actions</th></tr>';
+                for (var i = 0 ; i < alarms.length ; i++) {
+                    let alarm = alarms[i];
+
+                    // Pad out the minutes if necessary
+                    let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
+                    
+                    s = s + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" id=""deletealarm' + i.toString() + '""></td></tr>';
+                }
+
+                s = s + '</table>';
+                $('.alarm-list span').html(s);
+                
+                // Set each delete button shown to point to the same target function
+                for (var i = 0 ; i < alarms.length ; i++) {
+                    let s = 'deletealarm' + i.toString();
+                    document.getElementById(s).onclick = deleteAlarm;
+                }
+            }
+        }
+        
         function updateState(s) {
             // Update the clock status readout
             $('.clock-status span').text('This Matrix Clock is ' + (s ? 'online' : 'offline'));
@@ -390,7 +446,7 @@
             var sm = document.getElementById('dimmerstartmin').value;
             var eh = document.getElementById('dimmerendhour').value;
             var em = document.getElementById('dimmerendmin').value;
-            var d = {'setdimmer':{'dimmeron':{'hour':sh, 'min':sm },
+            var d = {'setdimmer':{'dimmeron':{'hour':sh, 'min':sm},
                                   'dimmeroff':{'hour':eh, 'min':em}}};
             sendState(d);
         }
@@ -400,7 +456,36 @@
             var d = {'setvideo':document.getElementById('inverse').checked};
             sendState(d);
         }
-        
+
+        function setAlarm(e) {
+            // Set an alarm, using the data entered into the UI
+            e.preventDefault();
+            let h = document.getElementById('enter-hour').value;
+            let m = document.getElementById('enter-min').value;
+            var d = document.getElementById('repeat').checked;
+
+            if (h < 0 || h > 23) {
+                resetAlarmFields(1);
+                return;
+            }
+            
+            if (m < 0 || m > 59) {
+                resetAlarmFields(2);
+                return;
+            }
+            
+            let alarmData = {'action':'add', 'hour':h, 'min':m, 'repeat':d};
+            sendState({'alarm':alarmData});
+        }
+
+        function deleteAlarm() {
+            // Delete an alarm based on its index within the array used to generate the table.
+            // Each button's id is set to 'deleteAlarm' plus the array index as a string
+            let s = this.id.substring(11);
+            let alarmData = {'action':'delete', 'index':s};
+            sendState({'alarm':alarmData});
+        }
+
         function sendState(data) {
             send(data, '/settings', function(response) { updateReadout(response); });
         }
