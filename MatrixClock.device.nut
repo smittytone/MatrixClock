@@ -48,6 +48,7 @@ local isConnecting = false;
 local isPM = false;
 local isAdvanceSet = false;
 local tickFlag = true;
+local alarmFlag = false;
 local debug = false;
 
 // Disconnected/connected animation
@@ -96,6 +97,10 @@ function clockTick() {
     // Update the tick counter and flag
     tickCount = tickCount == TICK_TOTAL ? 0 : tickCount + 1;
     tickFlag = tickCount < HALF_TICK_TOTAL ? true : false;
+
+    // ADDED IN 2.2.0
+    // Check for Alarms
+    checkAlarms();
 
     // ADDED IN 2.1.0
     // Should the display be enabled or not?
@@ -247,6 +252,21 @@ function displayTime() {
         if (!settings.flash || (settings.flash && tickFlag)) drawColon();
     }
 
+    // ADDED IN 2.2.0
+    // Check for alarms
+    if (alarmState == ALARM_STATE_ON) {
+        if (tickFlag != alarmFlag) {
+            setVideo(tickFlag);
+            alarmFlag = tickFlag;
+        }
+    }
+
+    if (alarmState == ALARM_STATE_DONE) {
+        setVideo(settings.video);
+        alarmState = ALARM_STATE_OFF;
+        alarmFlag = false;
+    }
+
     // Draw the display
     updateDisplay();
 }
@@ -288,6 +308,13 @@ function powerDown() {
     display[2].powerDown();
     imp.sleep(0.25);
     display[3].powerDown();
+}
+
+function displayFlash(f) {
+    display[0].setDisplayFlash(f);
+    display[1].setDisplayFlash(f);
+    display[2].setDisplayFlash(f);
+    display[3].setDisplayFlash(f);
 }
 
 function setBrightness(b) {
