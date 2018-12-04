@@ -96,7 +96,7 @@
                     <!-- Display brightness slider -->
                     <div>
                         <p>Clock Brightness</p>
-                        <input type='range' class='slider' name='brightness' id='brightness' value='15' min='0' max='15'>
+                        <input type='range' class='slider' name='brightness' id='brightness' value='16' min='1' max='16'>
                         <table width='100%%'><tr><td width='50%%' align='left'><small>Low</small></td><td width='50%%' align='right'><small>High</small></td></tr></table>
                         <p class='brightness-status' align='right'>Brightness: <span></span></p>
                     </div>
@@ -273,7 +273,7 @@
             displayon = s['on'];
             
             // Set the brightness slider and value readout
-            var b = parseInt(s['bright']);
+            var b = parseInt(s['bright']) + 1;
             $('.brightness-status span').text(b);
             $('#brightness').val(b);
 
@@ -418,7 +418,8 @@
 
         function setBright() {
             // Send clock display brightness setting as string
-            var d = {'setbright':$('#brightness').val()};
+            // NOTE UI uses 1-16; app uses 0-15
+            var d = {'setbright':$('#brightness').val() - 1};
             sendState(d);
         }
 
