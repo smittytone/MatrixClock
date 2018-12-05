@@ -48,7 +48,6 @@ local isConnecting = false;
 local isPM = false;
 local isAdvanceSet = false;
 local tickFlag = true;
-local alarmFlag = false;
 local debug = false;
 
 // Disconnected/connected animation
@@ -57,6 +56,7 @@ local cc = 0;
 
 // Alarms
 local alarmState = 0;
+local alarmFlashFlag = false;
 
 
 // TIME AND DISPLAY CONTROL FUNCTIONS
@@ -97,6 +97,7 @@ function clockTick() {
     // Update the tick counter and flag
     tickCount = tickCount == TICK_TOTAL ? 0 : tickCount + 1;
     tickFlag = tickCount < HALF_TICK_TOTAL ? true : false;
+    alarmFlashFlag = !alarmFlashFlag;
 
     // ADDED IN 2.2.0
     // Check for Alarms
@@ -254,17 +255,11 @@ function displayTime() {
 
     // ADDED IN 2.2.0
     // Check for alarms
-    if (alarmState == ALARM_STATE_ON) {
-        if (tickFlag != alarmFlag) {
-            setVideo(tickFlag);
-            alarmFlag = tickFlag;
-        }
-    }
+    if (alarmState == ALARM_STATE_ON) setVideo(alarmTick);
 
     if (alarmState == ALARM_STATE_DONE) {
         setVideo(settings.video);
         alarmState = ALARM_STATE_OFF;
-        alarmFlag = false;
     }
 
     // Draw the display

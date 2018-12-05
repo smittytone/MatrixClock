@@ -9,19 +9,20 @@
     <link rel='apple-touch-icon' href='https://smittytone.github.io/images/ati-matrix.png'>
     <link rel='shortcut icon' href='https://smittytone.github.io/images/ico-matrix.ico' />
     <style>
-        .center { margin-left: auto; margin-right: auto; margin-bottom: auto; margin-top: auto; }
-        .error-message {color: white}
-        .tabborder {width: 20%%}
-        .tabcontent {width: 60%%}
-        .uicontent {border: 2px solid #33cc00}
-        .container {padding: 20px}
-        .btn-success {background-color: #33cc00}
-        .showhide { -webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none;
-                    -moz-user-select: none; -ms-user-select: none; user-select: none; cursor: pointer }
-        .slider { -webkit-appearance: none; width: 100%%; height: 25px; background: #000000 outline: none;}
-        .slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 25px; height: 25px;
-                                        border-radius: 50%%; background: #33cc00; cursor: pointer;}
-        .slider::-moz-range-thumb { width: 25px; height: 25px; border-radius: 50%%;  background: #33cc00; cursor: pointer;}
+        .uicontent {border: 2px solid #33cc00;}
+        .container {padding: 20px;}
+        .center {margin-left: auto; margin-right: auto; margin-bottom: auto; margin-top: auto;}
+        .error-message {color: white;}
+        .colophon {font-family: Rubik;}
+        .tabborder {width: 20%%;}
+        .tabcontent {width: 60%%;}
+        .btn-success {background-color: #33cc00;}
+        .showhide {-webkit-touch-callout: none; -webkit-user-select: none; -khtml-user-select: none;
+                   -moz-user-select: none; -ms-user-select: none; user-select: none; cursor: pointer;}
+        .slider {-webkit-appearance: none; width: 100%%; height: 25px; background: #000000 outline: none;}
+        .slider::-webkit-slider-thumb {-webkit-appearance: none; appearance: none; width: 25px; height: 25px;
+                                       border-radius: 50%%; background: #33cc00; cursor: pointer;}
+        .slider::-moz-range-thumb {width: 25px; height: 25px; border-radius: 50%%;  background: #33cc00; cursor: pointer;}
         .checkarea {display: block; position: relative; padding-left: 35px; margin-bottom: 12px;
                     cursor: pointer; font-size: 1em; color: white; font-family: Questrial;
                     -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
@@ -31,20 +32,19 @@
         .checkmark:after {content: ''; position: absolute; display: none;}
         .checkarea input:checked ~ .checkmark:after {display: block;}
         .checkarea .checkmark:after {left: 9px; top: 5px; width: 8px; height: 15px; border: solid white; border-width: 0px 3px 3px 0px;
-                                    -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);}
+                                     -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);}
         body {background-color: #333333;}
         p {color: white; font-family: Questrial; font-size: 1em;}
-        .colophon {font-family: Rubik;}
         h2 {color: #33cc00; font-family: Monofett; font-size: 4em;}
         h4 {color: white; font-family: Questrial;}
         td {color: white; font-family: Questrial;}
         hr {border-color: #33cc00;}
 
         @media only screen and (max-width: 640px) {
-        .container {padding: 5px}
-        .uicontent {border: 0px}
-        .col-2 {max-width: 0%%; flex: 0 0 0%%}
-        .col-8 {max-width: 100%%; flex: 0 0 100%%}
+            .container {padding: 5px}
+            .uicontent {border: 0px}
+            .col-2 {max-width: 0%%; flex: 0 0 0%%}
+            .col-8 {max-width: 100%%; flex: 0 0 100%%}
         }
     </style>
 </head>
@@ -248,56 +248,55 @@
         });
 
         // Functions
-        function updateReadout(jsondata) {
-            var s = JSON.parse(jsondata);
+        function updateReadout(j) {
+            var d = JSON.parse(j);
 
             // Set the settings checkboxes
-            document.getElementById('mode').checked = s['mode'];
-            document.getElementById('bst').checked = s['bst'];
-            document.getElementById('seconds').checked = s['colon'];
-            document.getElementById('flash').checked = s['flash'];
-            document.getElementById('utc').checked = s['world']['utc'];
-            document.getElementById('debug').checked = s['debug'];
-            document.getElementById('night').checked = s['timer']['isset'];
-            document.getElementById('inverse').checked = s['video'];
+            document.getElementById('mode').checked = d['mode'];
+            document.getElementById('bst').checked = d['bst'];
+            document.getElementById('seconds').checked = d['colon'];
+            document.getElementById('flash').checked = d['flash'];
+            document.getElementById('utc').checked = d['world']['utc'];
+            document.getElementById('debug').checked = d['debug'];
+            document.getElementById('night').checked = d['timer']['isset'];
+            document.getElementById('inverse').checked = d['video'];
 
             // Set the world time slider and value readout
-            var u = parseInt(s['world']['offset']);
+            var u = parseInt(d['world']['offset']);
             $('#utcs').val(u);
-            // Setting (0-24) is displayed as (-12 to +12)
-            $('.utc-status span').text(u - 12);
-            $('.utc-head span').text(s['world']['utc'] ? 'Enabled' : 'Disabled');
+            $('.utc-status span').text(u - 12);    // Setting (0-24) is displayed as (-12 to +12)
+            $('.utc-head span').text(d['world']['utc'] ? 'Enabled' : 'Disabled');
 
             // Set the on/off button text
-            $('#onoffbutton').text(s['on'] ? 'Turn Display Off' : 'Turn Display On');
-            displayon = s['on'];
+            $('#onoffbutton').text(d['on'] ? 'Turn Display Off' : 'Turn Display On');
+            displayon = d['on'];
             
             // Set the brightness slider and value readout
-            var b = parseInt(s['bright']) + 1;
+            var b = parseInt(d['bright']) + 1;
             $('.brightness-status span').text(b);
             $('#brightness').val(b);
 
             // Set the nighttime dimmer times
-            var u = parseInt(s['timer']['on']['hour']);
+            u = parseInt(d['timer']['on']['hour']);
             $('#dimmerstarthour').val(u);
-            u = parseInt(s['timer']['on']['min']);
+            u = parseInt(d['timer']['on']['min']);
             $('#dimmerstartmin').val(u);
-            u = parseInt(s['timer']['off']['hour']);
+            u = parseInt(d['timer']['off']['hour']);
             $('#dimmerendhour').val(u);
-            u = parseInt(s['timer']['off']['min']);
+            u = parseInt(d['timer']['off']['min']);
             $('#dimmerendmin').val(u);
-            $('.night-mode-head span').text(s['timer']['isset'] ? 'Enabled' : 'Disabled');
+            $('.night-mode-head span').text(d['timer']['isset'] ? 'Enabled' : 'Disabled');
             
             // Set the clock state line
-            updateState(s['isconnected']);
+            updateState(d['isconnected']);
 
             // Build the list of alarms
-            showAlarms(s['alarms']);
+            showAlarms(d['alarms']);
         }
 
-        function resetAlarmFields(field) {
-            if (field & 1 > 0) $('#enter-hour').val($('#enter-hour').attr('placeholder'));
-            if (field & 2 > 0) $('#enter-min').val($('#enter-min').attr('placeholder'));
+        function resetAlarmFields(f) {
+            if (f & 1 > 0) $('#enter-hour').val($('#enter-hour').attr('placeholder'));
+            if (f & 2 > 0) $('#enter-min').val($('#enter-min').attr('placeholder'));
         }
 
         function showAlarms(alarms) {
@@ -309,24 +308,24 @@
                 // Build an HTML table to show the alarms
                 // NOTE the device will already have ordered these, so the sequene of alarms in the 'alarms' array
                 //      will match the stored sequence held by the device and the agent
-                let s = '<table width=""100%%"" class=""table table-striped table-sm"">';
-                s = s + '<tr><th>&nbsp;</th><th>Time (hour:minute)</th><th>Repeat?</th></th><th>Actions</th></tr>';
+                var h = '<table width=""100%%"" class=""table table-striped table-sm"">';
+                h = h + '<tr><th>&nbsp;</th><th>Time (hour:minute)</th><th>Repeat?</th></th><th>Actions</th></tr>';
                 for (var i = 0 ; i < alarms.length ; i++) {
                     let alarm = alarms[i];
 
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
                     
-                    s = s + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" id=""deletealarm' + i.toString() + '""></td></tr>';
+                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" id=""deletealarm' + i.toString() + '""></td></tr>';
                 }
 
-                s = s + '</table>';
-                $('.alarm-list span').html(s);
+                h = h + '</table>';
+                $('.alarm-list span').html(h);
                 
                 // Set each delete button shown to point to the same target function
-                for (var i = 0 ; i < alarms.length ; i++) {
-                    let s = 'deletealarm' + i.toString();
-                    document.getElementById(s).onclick = deleteAlarm;
+                for (var j = 0 ; j < alarms.length ; j++) {
+                    var i = 'deletealarm' + j.toString();
+                    document.getElementById(i).onclick = deleteAlarm;
                 }
             }
         }
@@ -347,20 +346,16 @@
             setUTC();
         }
 
-        function getState(callback) {
+        function getState(c) {
             // Request the current data
             $.ajax({
                 url : agenturl + '/settings',
                 type: 'GET',
-                success : function(response) {
-                    if (callback) {
-                        callback(response);
-                    }
+                success : function(r) {
+                    if (c) c(r);
                 },
-                error : function(xhr, textStatus, error) {
-                    if (error) {
-                        $('.clock-status span').text(error);
-                    }
+                error : function(xhr, sta, err) {
+                    if (err) $('.clock-status span').text(err);
                 },
                 cache: false
             });
@@ -372,15 +367,13 @@
             $.ajax({
                 url : agenturl + '/status',
                 type: 'GET',
-                success : function(response) {
-                    var j = JSON.parse(response);
+                success : function(r) {
+                    var j = JSON.parse(r);
                     if ('isconnected' in j) { updateState(j['isconnected']); };
                     if ('force' in j) { getState(updateReadout); };
                 },
-                error : function(xhr, textStatus, error) {
-                    if (error) {
-                        $('.clock-status span').text(error);
-                    }
+                error : function(xhr, sta, err) {
+                    if (err) $('.clock-status span').text(err);
                 },
                 cache: false
             });
@@ -515,10 +508,8 @@
                 data: JSON.stringify(data),
                 cache: false,
                 success: handler,
-                error: function(xhr, textStatus, error) {
-                    if (error) {
-                        $('.clock-status span').text(error);
-                    }
+                error: function(xhr, sta, err) {
+                    if (err) $('.clock-status span').text(err);
                 }
             });
         }  
