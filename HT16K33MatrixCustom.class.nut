@@ -19,14 +19,8 @@ class HT16K33MatrixCustom extends HT16K33Matrix {
     }
  
     function displayChar(asciiValue = 32, offset = 0) {
-        // Display a single character specified by its Ascii value
-        // NOTE This is a custom version of this function (cf https://github.com/smittytone/HT16K33Matrix)
-        // Parameters:
-        //   1. Character Ascii code (default: 32 [space])
-        //   2. Character display offset from left
-        // Returns: 
-        //   Nothing
-
+        // This is an overridden version of this function (cf https://github.com/smittytone/HT16K33Matrix) 
+        // which does not update the display at the end
         local inputMatrix;
 
         if (asciiValue < 32) {
