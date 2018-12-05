@@ -14,9 +14,10 @@
 // CONSTANTS
 const MAX_ALARMS = 8;
 // If you are NOT using Squinter or a similar tool, replace the following #import statements
-// with the contents of the named files (matrixclock_ui.html and delete.nut)
+// with the contents of the named files (matrixclock_ui.html, silence_img.nut and delete_img.nut)
 // Source code for these files here: https://github.com/smittytone/MatrixClock
 #import "delete_img.nut"
+#import "silence_img.nut"
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
 ";
@@ -548,6 +549,22 @@ api.post("/settings", function(context) {
                             error = reportAPIError("setalarm.delete");
                             break;
                         }
+                    } else if (value.action == "silence") {
+                        if ("index" in value) {
+                            try {
+                                // Check that index value can be converted to an integer
+                                value.index = value.index.tointeger();
+                            } catch (err) {
+                                error = reportAPIError("setalarm.silence.index");
+                                break;
+                            }
+                            
+                            if (debug) server.log("UI says silence alarm at index " + value.index);
+                            device.send("clock.stop.alarm", value.index);
+                        } else {
+                            error = reportAPIError("setalarm.delete");
+                            break;
+                        }
                     } else {
                         error = reportAPIError("setalarm.action");
                         break;
@@ -640,8 +657,11 @@ api.get("/status", function(context) {
 api.get("/images/([^/]*)", function(context) {
     // Determine which image has been requested and send the appropriate
     // stored data back to the requesting web browser
+    local path = context.path;
+    local name = path[path.len() - 1];
+    local image = name == "delete.png" ? DELETE_PNG : SILENCE_PNG;
     context.setHeader("Content-Type", "image/png");
-    context.send(200, DELETE_PNG);
+    context.send(200, image);
 });
 
 

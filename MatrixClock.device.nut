@@ -255,7 +255,7 @@ function displayTime() {
 
     // ADDED IN 2.2.0
     // Check for alarms
-    if (alarmState == ALARM_STATE_ON) setVideo(alarmTick);
+    if (alarmState == ALARM_STATE_ON) setVideo(alarmFlashFlag);
 
     if (alarmState == ALARM_STATE_DONE) {
         setVideo(settings.video);
@@ -596,7 +596,7 @@ function checkAlarms() {
                 // Alarm is only done if it's not on repeart
                 flag = true;
                 settings.alarms.remove(i);
-                if (debug) server.log("Alarm deleted");
+                if (debug) server.log("Alarm " + i + " deleted");
             } else {
                 i++;
             }
@@ -642,6 +642,7 @@ function setAlarm(newAlarm) {
     }
 
     // Add the new alarm to the list
+    newAlarm.state <- ALARM_STATE_OFF;
     newAlarm.on <- false;
     newAlarm.done <- false;
     newAlarm.offmins <- -1;
@@ -661,21 +662,27 @@ function clearAlarm(index) {
     }
     
     local alarm = settings.alarms[index];
+    if (alarmState == ALARM_STATE_ON && "on" in alarm && alarm.on) alarmState = ALARM_STATE_DONE;
     settings.alarms.remove(index);
     if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
     agent.send("update.alarms", settings.alarms);
 }
 
-function stopAlarm(ignored) {
+function stopAlarm(index) {
     // Run through each alarm that's on and mark it done
-    if (settings.alarms.len() > 0) {
-        foreach (alarm in settings.alarms) {
-            if ("on" in alarm) {
-                alarm.done = true;
-                alarmState = ALARM_STATE_DONE;
-            }
-        }
+    // Check 'index' is valid first
+    if (index < 0 || index > settings.alarms.len() - 1) {
+        if (debug) server.error("Bad alarm index: " + index);
+        return;
     }
+    
+    local alarm = settings.alarms[index];
+    if (alarmState == ALARM_STATE_ON && "on" in alarm && alarm.on) {
+        alarmState = ALARM_STATE_DONE;
+        if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " silenced at " + format("%02i", hours) + ":" + format("%02i", minutes));
+        if (!alarm.repeat) alarm.done = true;
+    }
+    agent.send("update.alarms", settings.alarms);
 }
 
 

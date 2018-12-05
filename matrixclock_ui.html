@@ -316,7 +316,7 @@
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
                     
-                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" id=""deletealarm' + i.toString() + '""></td></tr>';
+                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" width=""20"" alt=""Delete alarm"" id=""deletealarm' + i.toString() + '"">&nbsp;&nbsp;<input type=""image"" src=""' + agenturl + '/images/silence.png"" width=""20"" alt=""Silence alarm"" id=""silencealarm' + i.toString() + '""></td></tr>';
                 }
 
                 h = h + '</table>';
@@ -326,6 +326,11 @@
                 for (var j = 0 ; j < alarms.length ; j++) {
                     var i = 'deletealarm' + j.toString();
                     document.getElementById(i).onclick = deleteAlarm;
+                }
+
+                for (var j = 0 ; j < alarms.length ; j++) {
+                    var i = 'silencealarm' + j.toString();
+                    document.getElementById(i).onclick = silenceAlarm;
                 }
             }
         }
@@ -477,6 +482,14 @@
             // Each button's id is set to 'deleteAlarm' plus the array index as a string
             let s = this.id.substring(11);
             let alarmData = {'action':'delete', 'index':s};
+            sendState({'alarm':alarmData});
+        }
+        
+        function silenceAlarm() {
+            // Silence an alarm based on its index within the array used to generate the table.
+            // Each button's id is set to 'silenceAlarm' plus the array index as a string
+            let s = this.id.substring(12);
+            let alarmData = {'action':'silence', 'index':s};
             sendState({'alarm':alarmData});
         }
 
