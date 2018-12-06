@@ -13,7 +13,7 @@
         .container {padding: 20px;}
         .center {margin-left: auto; margin-right: auto; margin-bottom: auto; margin-top: auto;}
         .error-message {color: white;}
-        .colophon {font-family: Rubik;}
+        .colophon {font-family: Rubik, sans-serif;}
         .tabborder {width: 20%%;}
         .tabcontent {width: 60%%;}
         .btn-success {background-color: #33cc00;}
@@ -24,7 +24,7 @@
                                        border-radius: 50%%; background: #33cc00; cursor: pointer;}
         .slider::-moz-range-thumb {width: 25px; height: 25px; border-radius: 50%%;  background: #33cc00; cursor: pointer;}
         .checkarea {display: block; position: relative; padding-left: 35px; margin-bottom: 12px;
-                    cursor: pointer; font-size: 1em; color: white; font-family: Questrial;
+                    cursor: pointer; font-size: 1em; color: white; font-family: Questrial, sans-serif;
                     -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;}
         .checkarea input {position: absolute; opacity: 0; cursor: pointer;}
         .checkmark {position: absolute; top: 0; left: 0; height: 24px; width: 24px; background-color: #33cc00;}
@@ -34,10 +34,10 @@
         .checkarea .checkmark:after {left: 9px; top: 5px; width: 8px; height: 15px; border: solid white; border-width: 0px 3px 3px 0px;
                                      -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);}
         body {background-color: #333333;}
-        p {color: white; font-family: Questrial; font-size: 1em;}
-        h2 {color: #33cc00; font-family: Monofett; font-size: 4em;}
-        h4 {color: white; font-family: Questrial;}
-        td {color: white; font-family: Questrial;}
+        p {color: white; font-family: Questrial, sans-serif; font-size: 1em;}
+        h2 {color: #33cc00; font-family: Monofett, sans-serif; font-size: 4em;}
+        h4 {color: white; font-family: Questrial, sans-serif;}
+        td {color: white; font-family: Questrial, sans-serif;}
         hr {border-color: #33cc00;}
 
         @media only screen and (max-width: 640px) {
@@ -309,14 +309,14 @@
                 // NOTE the device will already have ordered these, so the sequene of alarms in the 'alarms' array
                 //      will match the stored sequence held by the device and the agent
                 var h = '<table width=""100%%"" class=""table table-striped table-sm"">';
-                h = h + '<tr><th>&nbsp;</th><th>Time (hour:minute)</th><th>Repeat?</th></th><th>Actions</th></tr>';
+                h = h + '<tr><th>&nbsp;</th><th>Time (hour:minute)</th><th>Repeat?</th></th><th>Delete</th><th>Silence</th></tr>';
                 for (var i = 0 ; i < alarms.length ; i++) {
                     let alarm = alarms[i];
 
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
                     
-                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""50%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""20%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" width=""20"" alt=""Delete alarm"" id=""deletealarm' + i.toString() + '"">&nbsp;&nbsp;<input type=""image"" src=""' + agenturl + '/images/silence.png"" width=""20"" alt=""Silence alarm"" id=""silencealarm' + i.toString() + '""></td></tr>';
+                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" width=""20"" id=""deletealarm' + i.toString() + '""></td><td width=""15%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/silence.png"" width=""20"" id=""silencealarm' + i.toString() + '""></td></tr>';
                 }
 
                 h = h + '</table>';
