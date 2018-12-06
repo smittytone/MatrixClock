@@ -33,6 +33,8 @@
         .checkarea input:checked ~ .checkmark:after {display: block;}
         .checkarea .checkmark:after {left: 9px; top: 5px; width: 8px; height: 15px; border: solid white; border-width: 0px 3px 3px 0px;
                                      -webkit-transform: rotate(45deg); -ms-transform: rotate(45deg); transform: rotate(45deg);}
+        .tablebutton {border: 0; font-size: 1rem; text-align: center; background-color:#333333; border-radius: 10px;}
+        .tablebutton:hover {background-color: rgba(51, 204, 0, 0.8);}
         body {background-color: #333333;}
         p {color: white; font-family: Questrial, sans-serif; font-size: 1em;}
         h2 {color: #33cc00; font-family: Monofett, sans-serif; font-size: 4em;}
@@ -97,7 +99,7 @@
                     <div>
                         <p>Clock Brightness</p>
                         <input type='range' class='slider' name='brightness' id='brightness' value='16' min='1' max='16'>
-                        <table width='100%%'><tr><td width='50%%' align='left'><small>Low</small></td><td width='50%%' align='right'><small>High</small></td></tr></table>
+                        <table width='100%%'><tr><td width='50%%' align='left'><small>🔅</small></td><td width='50%%' align='right'><small>🔆</small></td></tr></table>
                         <p class='brightness-status' align='right'>Brightness: <span></span></p>
                     </div>
                     <hr>
@@ -316,7 +318,7 @@
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
                     
-                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/delete.png"" width=""20"" id=""deletealarm' + i.toString() + '""></td><td width=""15%%"" align=""center""><input type=""image"" src=""' + agenturl + '/images/silence.png"" width=""20"" id=""silencealarm' + i.toString() + '""></td></tr>';
+                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""deletealarm' + i.toString() + '"">⛔️</button></td><td width=""15%%"" align=""center""><button class=""tablebutton btn-sm"" type=""button"" id=""silencealarm' + i.toString() + '"">🔕</button></td></tr>';
                 }
 
                 h = h + '</table>';

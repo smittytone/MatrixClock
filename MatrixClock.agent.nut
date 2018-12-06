@@ -16,8 +16,8 @@ const MAX_ALARMS = 8;
 // If you are NOT using Squinter or a similar tool, replace the following #import statements
 // with the contents of the named files (matrixclock_ui.html, silence_img.nut and delete_img.nut)
 // Source code for these files here: https://github.com/smittytone/MatrixClock
-#import "delete_img.nut"
-#import "silence_img.nut"
+//#import "delete_img.nut"
+//#import "silence_img.nut"
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
 ";
