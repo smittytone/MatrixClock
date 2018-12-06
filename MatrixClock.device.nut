@@ -12,15 +12,15 @@
 
 // CONSTANTS
 const DISCONNECT_TIMEOUT = 60;
-const RECONNECT_TIMEOUT = 15;
-const TICK_DURATION = 0.5;
-const TICK_TOTAL = 4;
-const HALF_TICK_TOTAL = 2;
-const LED_ANGLE = 0;
-const ALARM_DURATION = 2;
-const ALARM_STATE_OFF = 0;
-const ALARM_STATE_ON = 1;
-const ALARM_STATE_DONE = 2;
+const RECONNECT_TIMEOUT  = 15;
+const TICK_DURATION      = 0.5;
+const TICK_TOTAL         = 4;
+const HALF_TICK_TOTAL    = 2;
+const LED_ANGLE          = 0;
+const ALARM_DURATION     = 2;
+const ALARM_STATE_OFF    = 0;               // Alarm silent, ie. off
+const ALARM_STATE_ON     = 1;               // Alarm triggered, ie. on
+const ALARM_STATE_DONE   = 2;               // Alarm completed, can be deleted
 
 
 // GOLBAL VARIABLES
@@ -29,7 +29,6 @@ local display = null;
 local tickTimer = null;
 local syncTimer = null;
 local settings = null;
-local alarms = [];
 
 // Numeric values
 local seconds = 0;
@@ -55,7 +54,7 @@ local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
 
 // Alarms
-local alarmState = 0;
+local alarmFlashState = ALARM_STATE_OFF;
 local alarmFlashFlag = false;
 
 
@@ -255,11 +254,14 @@ function displayTime() {
 
     // ADDED IN 2.2.0
     // Check for alarms
-    if (alarmState == ALARM_STATE_ON) setVideo(alarmFlashFlag);
-
-    if (alarmState == ALARM_STATE_DONE) {
+    if (alarmFlashState == ALARM_STATE_ON) {
+        // The display should flash, so set it according to the current 'alarmFlashFlag' state
+        setVideo(alarmFlashFlag);
+    } else if (alarmFlashState == ALARM_STATE_DONE) {
+        // The flash has been turned off, so reset the display and update the state
+        // variable so that this operation doesn't happen over and over again
         setVideo(settings.video);
-        alarmState = ALARM_STATE_OFF;
+        alarmFlashState = ALARM_STATE_OFF;
     }
 
     // Draw the display
@@ -558,15 +560,19 @@ function setDefaultPrefs() {
 // ADDED IN 2.1.0
 // ALARM FUNCTONS
 function checkAlarms() {
-    // Do we need to display an alarm screen flash? **** EXPERIMENTAL ****
+    // Do we need to display an alarm screen flash?
     if (settings.alarms.len() > 0) {
         foreach (alarm in settings.alarms) {
             // Check if it's time to turn an alarm on
             if (alarm.hour == hours && alarm.min == minutes) {
-                if (!alarm.on && !alarm.done) {
+                if (alarm.state == ALARM_STATE_OFF) {
                     // The alarm is not on, but should be, so turn it on now
-                    if (debug) server.log("Alarm triggered at " + format("%02i", hours) + ":" + format("%02i", minutes));
-                    alarmState = ALARM_STATE_ON;
+                    alarm.state = ALARM_STATE_ON;
+
+                    // Set the 'show alarm flash' flag
+                    alarmFlashState = ALARM_STATE_ON;
+
+                    // Set the time at which the alarm should be silenced automatically
                     alarm.offmins = alarm.min + ALARM_DURATION;
                     alarm.offhour = alarm.hour
                     if (alarm.offmins > 59) {
@@ -575,15 +581,19 @@ function checkAlarms() {
                         if (alarm.offhour > 23) alarm.offhour = 24 - alarm.offhour;
                     }
 
-                    alarm.on = true;
+                    if (debug) server.log("Alarm triggered at " + format("%02i", hours) + ":" + format("%02i", minutes));
                 }
             }
 
             // Check if it's time to turn an alarm off
             if (alarm.offhour == hours && alarm.offmins == minutes) {
-                alarmState = ALARM_STATE_DONE;
+                // Set the 'show alarm flash' flag to end flashing
+                alarmFlashState = ALARM_STATE_DONE;
+                
+                // If the alarm is not a repeater, mark it for deletion
+                alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
+
                 if (debug) server.log("Alarm stopped at " + format("%02i", hours) + ":" + format("%02i", minutes));
-                if (!alarm.repeat) alarm.done = true;
             }
         }
 
@@ -592,18 +602,42 @@ function checkAlarms() {
         local flag = false;
         while (i < settings.alarms.len()) {
             local alarm = settings.alarms[i];
-            if (alarm.done == true) {
-                // Alarm is only done if it's not on repeart
-                flag = true;
+            if (alarm.state == ALARM_STATE_DONE) {
+                // Alarm is only done if it's not on repeat, so remove
+                // it and flag that we have made one or more deletions
                 settings.alarms.remove(i);
-                if (debug) server.log("Alarm " + i + " deleted");
+                flag = true;
+                if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
             } else {
                 i++;
             }
         }
 
-        // We have made changes, so inform the agent
-        if (flag) agent.send("update.alarms", alarms);
+        // If we have made changes, inform the agent
+        if (flag) agent.send("update.alarms", settings.alarms);
+
+        // Make sure the alarm isn't flashing when it doesn't need to
+        if (settings.alarms.len() > 0) {
+            flag = false;
+            
+            foreach (alarm in settings.alarms) {
+                // Flag if at least one alarm is on
+                if (alarm.state == ALARM_STATE_ON) {
+                    flag = true;
+                    break;
+                }
+            }
+            
+            // If no alarms are on, if necessary, mark the display flashing to be disabled
+            if (!flag && alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
+        } else {
+            // All existing alarms were deleted above, so if necessary, mark
+            // the display flashing to be disabled ( see displayTime() )
+            if (alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
+        }
+    } else {
+        // No alarms, so make sure no flash occurs
+        if (alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
     }
 }
 
@@ -630,12 +664,14 @@ function setAlarm(newAlarm) {
         foreach (alarm in settings.alarms) {
             if (alarm.hour == newAlarm.hour && alarm.min == newAlarm.min) {
                 // Alarm matches an existing one - are we setting the repeat value?
-                if (alarm.repeat == newAlarm.repeat) return;
-                alarm.repeat = newAlarm.repeat;
-                if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " updated: repeat " + (alarm.repeat ? "on" : "off"));
                 
-                // Made a change so update the agent's master list
+                // No change necessary, so bail
+                if (alarm.repeat == newAlarm.repeat) return;
+
+                // Otherwise, make the change and update the agent
+                alarm.repeat = newAlarm.repeat;
                 agent.send("update.alarms", settings.alarms);
+                if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " updated: repeat " + (alarm.repeat ? "on" : "off"));
                 return;
             }
         }
@@ -643,46 +679,42 @@ function setAlarm(newAlarm) {
 
     // Add the new alarm to the list
     newAlarm.state <- ALARM_STATE_OFF;
-    newAlarm.on <- false;
-    newAlarm.done <- false;
     newAlarm.offmins <- -1;
     newAlarm.offhour <- -1;
     settings.alarms.append(newAlarm);
     sortAlarms();
     if (debug) server.log("Alarm " + settings.alarms.len() + " added. Time: " + format("%02i", newAlarm.hour) + ":" + format("%02i", newAlarm.min));
+
+    // Update the agent's list
     agent.send("update.alarms", settings.alarms);
 }
 
 function clearAlarm(index) {
     // Remove the alarm from the array; it's at index 'index'
-    // Check 'index' is valid first
+    // First, check that the value of 'index' is valid
     if (index < 0 || index > settings.alarms.len() - 1) {
-        if (debug) server.error("Bad alarm index: " + index);
+        if (debug) server.error("clearAlarm() bad alarm index: " + index);
         return;
     }
     
+    // Set the alarm's state to DONE so that it removed by the alarm handler, checkAlarms()
     local alarm = settings.alarms[index];
-    if (alarmState == ALARM_STATE_ON && "on" in alarm && alarm.on) alarmState = ALARM_STATE_DONE;
-    settings.alarms.remove(index);
-    if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
-    agent.send("update.alarms", settings.alarms);
+    alarm.state = ALARM_STATE_DONE;
 }
 
 function stopAlarm(index) {
-    // Run through each alarm that's on and mark it done
-    // Check 'index' is valid first
+    // Silence the alarm from the array; it's at index 'index'
+    // First, check that the value of 'index' is valid
     if (index < 0 || index > settings.alarms.len() - 1) {
-        if (debug) server.error("Bad alarm index: " + index);
+        if (debug) server.error("stopAlarm() bad alarm index: " + index);
         return;
     }
     
+    // Set the alarm's state so that it is either removed by the alarm handler, 
+    // checkAlarms(), or causes checkAlarms() to stop the flash
     local alarm = settings.alarms[index];
-    if (alarmState == ALARM_STATE_ON && "on" in alarm && alarm.on) {
-        alarmState = ALARM_STATE_DONE;
-        if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " silenced at " + format("%02i", hours) + ":" + format("%02i", minutes));
-        if (!alarm.repeat) alarm.done = true;
-    }
-    agent.send("update.alarms", settings.alarms);
+    alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
+    if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " silenced at " + format("%02i", hours) + ":" + format("%02i", minutes));
 }
 
 
