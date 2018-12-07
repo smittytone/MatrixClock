@@ -404,47 +404,40 @@
 
         function setMode() {
             // Send clock mode as bool: true = 24-hour, false = 12-hour 
-            var d = {'setmode':document.getElementById('mode').checked};
-            sendState(d);
+            sendState({'setmode':document.getElementById('mode').checked});
         }
 
         function setBST() {
             // Send clock use BST setting as bool
-            var d = {'setbst':document.getElementById('bst').checked};
-            sendState(d);
+            sendState({'setbst':document.getElementById('bst').checked});
         }
 
         function setColon() {
             // Send clock show colon setting as bool
-            var d = {'setcolon':document.getElementById('seconds').checked};
-            sendState(d);
+            sendState({'setcolon':document.getElementById('seconds').checked});
         }
 
         function setFlash() {
             // Send clock flash colon setting as bool
-            var d = {'setflash':document.getElementById('flash').checked};
-            sendState(d);
+            sendState({'setflash':document.getElementById('flash').checked});
         }
 
         function setNight() {
             // Send clock night mode setting as bool
-            var d = {'setnight':document.getElementById('night').checked};
-            sendState(d);
+            sendState({'setnight':document.getElementById('night').checked});
         }
 
         function setBright() {
             // Send clock display brightness setting as string
             // NOTE UI uses 1-16; app uses 0-15
-            var d = {'setbright':$('#brightness').val() - 1};
-            sendState(d);
+            sendState({'setbright':$('#brightness').val() - 1});
         }
 
         function setLight() {
             // Send clock display state as bool: true = on, false = off
             displayon = !displayon;
             $('.onoff-button button').text(displayon ? 'Turn Display Off' : 'Turn Display On');
-            var d = {'setlight':displayon};
-            sendState(d);
+            sendState({'setlight':displayon});
         }
 
         function setUTC() {
