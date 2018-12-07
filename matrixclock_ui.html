@@ -91,8 +91,8 @@
                         </div>
                     </div>
                     &nbsp;
-                    <div class='onoff-button' style='font-family:Rubik;weight:bold' align='center'>
-                        <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
+                    <div align='center'>
+                        <button class='btn btn-success' type='submit' id='onoffbutton'  style='width:200px;font-family:Rubik;'>Turn Display Off</button>
                     </div>
                     &nbsp;
                     <hr />
@@ -124,35 +124,39 @@
                     <!-- Night mode time text fields -->
                     <div>
                         <h4 class='night-mode-head'>Night Mode (<span>Disabled</span>)</h4>
-                        <div class='form-group row'>
+                        <div class='form-row'>
                             <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>&nbsp;</label>
-                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Hour</label>
-                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Min</label>
-                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>&nbsp;</label>
+                            <label for='colFormLabel' class='col-1 col-form-label' align='left' style='color:white'>Hour</label>
+                            <label for='colFormLabel' class='col-1 col-form-label' align='left' style='color:white'>Min</label>
+                            <label for='colFormLabel' class='col-4 col-form-label' align='left' style='color:white'>&nbsp;</label>
                         </div>
-                        <div class='form-group row'>
-                            <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode Start Time</label>
-                            <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerstarthour' min='0' max='22' style='width:50px;color:CornflowerBlue' placeholder='22'>
+                        <div class='form-row'>
+                            <div class='col-6' align='right'>
+                                <label class='col-form-label' style='color:white'>Night&nbsp;Mode&nbsp;Start&nbsp;Time</label>
                             </div>
-                            <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:50px;color:CornflowerBlue' placeholder='00'>
+                            <div class='col-1' align='left'>
+                                <input type='text' class='form-control form-control-sm' id='dimmerstarthour' min='0' max='22' style='color:black' placeholder='23'>
                             </div>
-                            <div class='col-2' align='left'>&nbsp;</div>
+                            <div class='col-1' align='left'>
+                                <input type='text' class='form-control form-control-sm' id='dimmerstartmin' min='0' max='59' style='color:black' placeholder='00'>
+                            </div>
+                            <div class='col-4' align='left'>&nbsp;</div>
                         </div>
-                        <div class='form-group row'>
-                            <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode End Time</label>
-                            <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerendhour' min='1' max='23' style='width:50px;color:CornflowerBlue' placeholder='23'>
+                        <div class='form-row'>
+                            <div class='col-6' align='right'>
+                                <label class='col-6 col-form-label' style='color:white'>Night&nbsp;Mode&nbsp;End&nbsp;Time</label>
                             </div>
-                            <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerendmin' min='0' max='59' style='width:50px;color:CornflowerBlue' placeholder='59'>
+                            <div class='col-1' align='left'>
+                                <input type='text' class='form-control form-control-sm' id='dimmerendhour' min='1' max='23' style='color:black' placeholder='7'>
                             </div>
-                            <div class='col-2' align='left'>&nbsp;</div>
+                            <div class='col-1' align='left'>
+                                <input type='text' class='form-control form-control-sm' id='dimmerendmin' min='0' max='59' style='color:black' placeholder='00'>
+                            </div>
+                            <div class='col-4' align='left'>&nbsp;</div>
                         </div>
-                        <p class='text-center'><small>Please set the on and off times in the 24-hour clock format</small></p>
-                        <div class='update-button' align='center' style='font-family:Rubik; weight:bold;'>
-                            <button type='submit' class='btn btn-success' id='dimmer'>Set Night Mode Times</button>
+                        <p style='font-size: 0.8em;line-height: 3em;' align='center'><i>Please set the on and off times in the 24-hour clock format</i></p>
+                        <div align='center'>
+                            <button type='submit' class='btn btn-success' id='dimmer' style='width:200px;font-family:Rubik;'>Set Night Mode Times</button>
                         </div>
                     </div>
                     <hr />
@@ -161,14 +165,13 @@
                         <h4>Alarms</h4>
                         <p class='alarm-list text-center'><span></span></p>
                         <div align='center'>
-                            <p>Add an Alarm (24-hour clock)</p>
                             <div class='form-inline justify-content-center'>
-                                <label for='enter-hour' style='color:white'>Hour:</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp; 
-                                <label for='enter-min' style='color:white'>Minute:</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:50px;color:black;' placeholder='00' />&nbsp;
-                                <label for='repeat' class='col-form-label' style='color:white'>Repeat:</label>&nbsp;<input type='checkbox' class='form-check-input' name='repeat' id='repeat' value=''>
+                                <label for='enter-hour' style='color:white'>Add an Alarm: Hour</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp; 
+                                <label for='enter-min' style='color:white'>Minute</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:50px;color:black;' placeholder='00' />&nbsp;
+                                <label for='repeat' class='col-form-label' style='color:white'>Repeat?</label>&nbsp;<input type='checkbox' class='form-check-input' name='repeat' id='repeat' value=''>
                             </div>
-                            <br />
-                            <button class='btn btn-success' type='submit' id='setalarm' style='width:200px'>Set Alarm</button>
+                            <p style='font-size: 0.8em;line-height: 3em;' align='center'><i>Please set the alarm times in the 24-hour clock format</i></p>
+                            <button type='submit' class='btn btn-success' id='setalarm' style='width:200px;font-family:Rubik;'>Set Alarm</button>
                         </div>
                     </div>
                     <hr />
@@ -190,8 +193,8 @@
                                 <div class='col-3'>&nbsp;</div>
                             </div>
                             <br />
-                            <div style='font-family:Rubik; weight:bold;' align='center'>
-                                <button type='submit' class='btn btn-danger' id='resetbutton' style=' width:200px'>Reset Matrix Clock</button>
+                            <div align='center'>
+                                <button type='submit' class='btn btn-danger' id='resetbutton' style=' width:200px;font-family:Rubik;'>Reset Matrix Clock</button>
                             </div>
                             <br />
                         </div>
@@ -221,6 +224,9 @@
         // Set images
         $('.biconlow span').html('<img src=""' + agenturl + '/images/low.png' + '"" width=""20"" />');
         $('.biconhih span').html('<img src=""' + agenturl + '/images/high.png' + '"" width=""20"" />');
+        
+        resetDimmerFields(15);
+        resetAlarmFields(3);
 
         // Get initial readings
         getState(updateReadout);
@@ -315,6 +321,13 @@
         function resetAlarmFields(f) {
             if (f & 1 > 0) $('#enter-hour').val($('#enter-hour').attr('placeholder'));
             if (f & 2 > 0) $('#enter-min').val($('#enter-min').attr('placeholder'));
+        }
+
+        function resetDimmerFields(f) {
+            if (f & 1 > 0) $('#dimmerstarthour').val($('#dimmerstarthour').attr('placeholder'));
+            if (f & 2 > 0) $('#dimmerstartmin').val($('#dimmerstartmin').attr('placeholder'));
+            if (f & 4 > 0) $('#dimmerendhour').val($('#dimmerendhour').attr('placeholder'));
+            if (f & 8 > 0) $('#dimmerendmin').val($('#dimmerendmin').attr('placeholder'));
         }
 
         function showAlarms(alarms) {
@@ -454,6 +467,27 @@
             var sm = document.getElementById('dimmerstartmin').value;
             var eh = document.getElementById('dimmerendhour').value;
             var em = document.getElementById('dimmerendmin').value;
+
+            if (sh < 0 || sh > 23) {
+                resetDimmerFields(1);
+                return;
+            }
+            
+            if (sm < 0 || sm > 59) {
+                resetDimmerFields(2);
+                return;
+            }
+
+            if (eh < 0 || eh > 23) {
+                resetDimmerFields(4);
+                return;
+            }
+            
+            if (em < 0 || em > 59) {
+                resetDimmerFields(8);
+                return;
+            }
+            
             sendState({'setdimmer':{'dimmeron':{'hour':sh, 'min':sm},
                                     'dimmeroff':{'hour':eh, 'min':em}}});
         }
