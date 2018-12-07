@@ -364,23 +364,22 @@
         }
 
         function updateUTC() {
-            var u = $('#utcs').val();
-            $('.utc-status span').text(u - 12);
+            $('.utc-status span').text($('#utcs').val() - 12);
             setUTC();
         }
 
         function getState(c) {
             // Request the current data
             $.ajax({
-                url : agenturl + '/settings',
+                url: agenturl + '/settings',
                 type: 'GET',
-                success : function(r) {
+                cache: false,
+                success: function(r) {
                     if (c) c(r);
                 },
-                error : function(xhr, sta, err) {
+                error: function(xhr, sta, err) {
                     if (err) $('.clock-status span').text(err);
-                },
-                cache: false
+                }
             });
         }
 
@@ -388,17 +387,17 @@
             // Request the current settings to extract the device's online state
             // NOTE This is called periodically via a timer (stateTimer)
             $.ajax({
-                url : agenturl + '/status',
+                url: agenturl + '/status',
                 type: 'GET',
-                success : function(r) {
+                cache: false,
+                success: function(r) {
                     var j = JSON.parse(r);
                     if ('isconnected' in j) { updateState(j['isconnected']); };
                     if ('force' in j) { getState(updateReadout); };
                 },
-                error : function(xhr, sta, err) {
+                error: function(xhr, sta, err) {
                     if (err) $('.clock-status span').text(err);
-                },
-                cache: false
+                }
             });
         }
 
@@ -444,9 +443,8 @@
             // Send clock world time setting:
             //   Display world time as bool: true = yes, false = no
             //   Offset (0-24) as string
-            var d = {'setutc':{'state':document.getElementById('utc').checked, 
-                               'offset':$('#utcs').val()}};
-            sendState(d);
+            sendState({'setutc':{'state':document.getElementById('utc').checked, 
+                                 'offset':$('#utcs').val()}});
         }
 
         function setDimmer(e){
@@ -456,15 +454,13 @@
             var sm = document.getElementById('dimmerstartmin').value;
             var eh = document.getElementById('dimmerendhour').value;
             var em = document.getElementById('dimmerendmin').value;
-            var d = {'setdimmer':{'dimmeron':{'hour':sh, 'min':sm},
-                                  'dimmeroff':{'hour':eh, 'min':em}}};
-            sendState(d);
+            sendState({'setdimmer':{'dimmeron':{'hour':sh, 'min':sm},
+                                    'dimmeroff':{'hour':eh, 'min':em}}});
         }
 
         function setVideo() {
             // Send inverse vide mode as bool: true, on; false, off
-            var d = {'setvideo':document.getElementById('inverse').checked};
-            sendState(d);
+            sendState({'setvideo':document.getElementById('inverse').checked});
         }
 
         function setAlarm(e) {
@@ -484,24 +480,21 @@
                 return;
             }
             
-            let alarmData = {'action':'add', 'hour':h, 'min':m, 'repeat':d};
-            sendState({'alarm':alarmData});
+            sendState({'alarm':{'action':'add', 'hour':h, 'min':m, 'repeat':d}});
         }
 
         function deleteAlarm() {
             // Delete an alarm based on its index within the array used to generate the table.
             // Each button's id is set to 'deleteAlarm' plus the array index as a string
             let s = this.id.substring(11);
-            let alarmData = {'action':'delete', 'index':s};
-            sendState({'alarm':alarmData});
+            sendState({'alarm':{'action':'delete', 'index':s}});
         }
         
         function silenceAlarm() {
             // Silence an alarm based on its index within the array used to generate the table.
             // Each button's id is set to 'silenceAlarm' plus the array index as a string
             let s = this.id.substring(12);
-            let alarmData = {'action':'silence', 'index':s};
-            sendState({'alarm':alarmData});
+            sendState({'alarm':{'action':'silence', 'index':s}});
         }
 
         function sendState(data) {
