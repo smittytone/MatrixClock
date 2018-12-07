@@ -95,71 +95,83 @@
                         <button class='btn btn-success' type='submit' id='onoffbutton' style='width:200px'>Turn Display Off</button>
                     </div>
                     &nbsp;
+                    <hr />
                     <!-- Display brightness slider -->
                     <div>
-                        <p>Clock Brightness</p>
+                        <h4>Clock Brightness</h4>
                         <input type='range' class='slider' name='brightness' id='brightness' value='16' min='1' max='16'>
-                        <table width='100%%'><tr><td width='50%%' align='left'><small>Low</small></td><td width='50%%' align='right'><small>High</small></td></tr></table>
-                        <p class='brightness-status' align='right'>Brightness: <span></span></p>
+                        <table width='100%%'><tr>
+                            <td width='20%%' align='left'><div class='biconlow'><span></span></div></td>
+                            <td width='60%%' align='center'><div class='brightness-status'>Brightness: <span></span></div></td>
+                            <td width='20%%' align='right'><div class='biconhih'><span></span></td>
+                        </tr></table>
                     </div>
-                    <hr>
+                    <hr />
                     <!-- World time slider -->
                     <div>
-                        <h4 class='utc-head'>World Time <span>Disabled</span></h4>
+                        <h4 class='utc-head'>World Time (<span>Disabled</span>)</h4>
                         <div class='utc-slider'>
                             <input type='range' class='slider' name='utcs' id='utcs' value='0' min='0' max='24'>
-                            <table width='100%%'><tr><td width='30%%' align='left'>-12</td><td width='40%%' align='center'>0</td><td width='30%%' align='right'>+12</td></tr></table>
-                            <p class='utc-status' align='right'>Offset from local time: <span></span> hours</p>
-                            <p style='font-size: 0.8em;'><i>When world time is displayed, daylight saving is not enabled</i></p>
+                            <table width='100%%'><tr>
+                                <td width='20%%' align='left'>-12</td>
+                                <td width='60%%' align='center'><div class='utc-status'>Offset from local time: <span></span> hours</div></td>
+                                <td width='20%%' align='right'>+12</td>
+                            </tr></table>
+                            <p style='font-size: 0.8em;' align='center'><i>When world time is displayed, daylight saving is not enabled</i></p>
                         </div>
                     </div>
-                    <hr>
+                    <hr />
                     <!-- Night mode time text fields -->
                     <div>
-                        <h4 class='night-mode-head'>Night Mode <span>Disabled</span></h4>
+                        <h4 class='night-mode-head'>Night Mode (<span>Disabled</span>)</h4>
                         <div class='form-group row'>
                             <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>&nbsp;</label>
                             <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Hour</label>
-                            <label for='colFormLabel' class='col-4 col-form-label' align='left' style='color:white'>Min</label>
+                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>Min</label>
+                            <label for='colFormLabel' class='col-2 col-form-label' align='left' style='color:white'>&nbsp;</label>
+                        </div>
+                        <div class='form-group row'>
                             <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode Start Time</label>
                             <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerstarthour' min='0' max='22' style='width:60px;color:CornflowerBlue' placeholder='22'>
+                                <input type='text' class='form-control' id='dimmerstarthour' min='0' max='22' style='width:50px;color:CornflowerBlue' placeholder='22'>
                             </div>
-                            <div class='col-4' align='left'>
-                                <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='00'>
+                            <div class='col-2' align='left'>
+                                <input type='text' class='form-control' id='dimmerstartmin' min='0' max='59' style='width:50px;color:CornflowerBlue' placeholder='00'>
                             </div>
+                            <div class='col-2' align='left'>&nbsp;</div>
                         </div>
                         <div class='form-group row'>
                             <label for='colFormLabel' class='col-6 col-form-label' align='right' style='color:white'>Night Mode End Time</label>
                             <div class='col-2' align='left'>
-                                <input type='text' class='form-control' id='dimmerendhour' min='1' max='23' style='width:60px;color:CornflowerBlue' placeholder='23'>
+                                <input type='text' class='form-control' id='dimmerendhour' min='1' max='23' style='width:50px;color:CornflowerBlue' placeholder='23'>
                             </div>
-                            <div class='col-4' align='left'>
-                                <input type='text' class='form-control' id='dimmerendmin' min='0' max='59' style='width:60px;color:CornflowerBlue' placeholder='59'>
+                            <div class='col-2' align='left'>
+                                <input type='text' class='form-control' id='dimmerendmin' min='0' max='59' style='width:50px;color:CornflowerBlue' placeholder='59'>
                             </div>
+                            <div class='col-2' align='left'>&nbsp;</div>
                         </div>
                         <p class='text-center'><small>Please set the on and off times in the 24-hour clock format</small></p>
                         <div class='update-button' align='center' style='font-family:Rubik; weight:bold;'>
                             <button type='submit' class='btn btn-success' id='dimmer'>Set Night Mode Times</button>
                         </div>
                     </div>
-                    <hr>
+                    <hr />
                     <!-- Alarms UI -->
                     <div>
                         <h4>Alarms</h4>
-                            <p class='alarm-list text-center'><span></span></p>
-                            <div align='center'>
-                                <p>Add an Alarm (24-hour clock)</p>
-                                <div class='form-inline justify-content-center'>
-                                    <label for='enter-hour' style='color:white'>Hour : </label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:60px;color:black;' placeholder='15' />&nbsp; 
-                                    <label for='enter-min' style='color:white'>Minute : </label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:60px;color:black;' placeholder='00' />&nbsp;
-                                    <label for='repeat' class='col-form-label' style='color:white'>Repeat: </label>&nbsp;<input type='checkbox' class='form-check-input ' name='repeat' id='repeat' value=''>
-                                </div>
-                                <br />
-                                <button class='btn btn-success' type='submit' id='setalarm' style='width:200px'>Set Alarm</button>
+                        <p class='alarm-list text-center'><span></span></p>
+                        <div align='center'>
+                            <p>Add an Alarm (24-hour clock)</p>
+                            <div class='form-inline justify-content-center'>
+                                <label for='enter-hour' style='color:white'>Hour:</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp; 
+                                <label for='enter-min' style='color:white'>Minute:</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:50px;color:black;' placeholder='00' />&nbsp;
+                                <label for='repeat' class='col-form-label' style='color:white'>Repeat:</label>&nbsp;<input type='checkbox' class='form-check-input' name='repeat' id='repeat' value=''>
                             </div>
+                            <br />
+                            <button class='btn btn-success' type='submit' id='setalarm' style='width:200px'>Set Alarm</button>
+                        </div>
                     </div>
-                    <hr>
+                    <hr />
                     <!-- Advanced settings -->
                     <div class='advancedsettings' >
                         <h4 class='showhide'>Show Advanced Settings</h4>
@@ -200,11 +212,15 @@
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <script>
         $('.advanced').hide();
-        
+
         // Variables
         var agenturl = '%s';
         var displayon = true;
         var stateflag = false;
+        
+        // Set images
+        $('.biconlow span').html('<img src=""' + agenturl + '/images/low.png' + '"" width=""20"" />');
+        $('.biconhih span').html('<img src=""' + agenturl + '/images/high.png' + '"" width=""20"" />');
 
         // Get initial readings
         getState(updateReadout);
@@ -318,7 +334,7 @@
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
                     
-                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""deletealarm' + i.toString() + '"">⛔️</button></td><td width=""15%%"" align=""center""><button class=""tablebutton btn-sm"" type=""button"" id=""silencealarm' + i.toString() + '"">🔕</button></td></tr>';
+                    h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""deletealarm' + i.toString() + '""><img src=""' + agenturl + '/images/delete.png"" width=""20"" /></button></td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""silencealarm' + i.toString() + '""><img src=""' + agenturl + '/images/silence.png"" width=""20"" /></button></td></tr>';
                 }
 
                 h = h + '</table>';

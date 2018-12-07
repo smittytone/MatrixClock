@@ -16,8 +16,10 @@ const MAX_ALARMS = 8;
 // If you are NOT using Squinter or a similar tool, replace the following #import statements
 // with the contents of the named files (matrixclock_ui.html, silence_img.nut and delete_img.nut)
 // Source code for these files here: https://github.com/smittytone/MatrixClock
-//#import "delete_img.nut"
-//#import "silence_img.nut"
+#import "img_delete.nut"
+#import "img_silence.nut"
+#import "img_low.nut"
+#import "img_high.nut"
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
 ";
@@ -659,7 +661,11 @@ api.get("/images/([^/]*)", function(context) {
     // stored data back to the requesting web browser
     local path = context.path;
     local name = path[path.len() - 1];
-    local image = name == "delete.png" ? DELETE_PNG : SILENCE_PNG;
+    local image = DELETE_PNG;
+    if (name == "low.png") image = LOW_PNG;
+    if (name == "high.png") image = HIGH_PNG;
+    if (name == "silence.png") image = SILENCE_PNG;
+    
     context.setHeader("Content-Type", "image/png");
     context.send(200, image);
 });
