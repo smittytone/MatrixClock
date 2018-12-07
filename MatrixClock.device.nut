@@ -588,7 +588,7 @@ function checkAlarms() {
             // Check if it's time to turn an alarm off
             if (alarm.offhour == hours && alarm.offmins == minutes) {
                 // Set the 'show alarm flash' flag to end flashing
-                alarmFlashState = ALARM_STATE_DONE;
+                if (alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
                 
                 // If the alarm is not a repeater, mark it for deletion
                 alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
