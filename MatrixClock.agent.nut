@@ -330,7 +330,6 @@ api.post("/settings", function(context) {
                 device.send("clock.set.bst", prefs.bst);
             }
 
-
             // Check for a set brightness message (value arrives as a string)
             // eg. { "setbright" : 10 }
             if (setting == "setbright") {
@@ -384,7 +383,6 @@ api.post("/settings", function(context) {
             // Check for use dimmer time message (value arrives as a bool)
             // eg. { "setnight" : true }
             if (setting == "setnight") {
-                
                 if (typeof value != "bool") {
                     error = reportAPIError("setnight");
                     break;
@@ -592,7 +590,7 @@ api.post("/settings", function(context) {
         }
     } catch (err) {
         server.error(err);
-        context.send(400, "Bad data posted");
+        context.send(400, "Bad data posted: " + context.req.rawbody);
         return;
     }
 
