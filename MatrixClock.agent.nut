@@ -2,7 +2,7 @@
 // Copyright 2016-19, Tony Smith
 
 // IMPORTS
-#require "Rocky.class.nut:2.0.1"
+#require "Rocky.class.nut:2.0.2"
 
 // If you are NOT using Squinter or a similar tool, comment out the following line...
 #import "~/Dropbox/Programming/Imp/Codes/matrixclock.nut"
@@ -663,7 +663,6 @@ api.get("/images/([^/]*)", function(context) {
     if (name == "low.png") image = LOW_PNG;
     if (name == "high.png") image = HIGH_PNG;
     if (name == "silence.png") image = SILENCE_PNG;
-    
     context.setHeader("Content-Type", "image/png");
     context.send(200, image);
 });
