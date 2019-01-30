@@ -1,5 +1,5 @@
 // Matrix Clock
-// Copyright 2016-18, Tony Smith
+// Copyright 2016-19, Tony Smith
 
 // IMPORTS
 // NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 

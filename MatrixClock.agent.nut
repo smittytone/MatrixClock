@@ -1,5 +1,5 @@
 // Matrix Clock
-// Copyright 2016-18, Tony Smith
+// Copyright 2016-19, Tony Smith
 
 // IMPORTS
 #require "Rocky.class.nut:2.0.1"
