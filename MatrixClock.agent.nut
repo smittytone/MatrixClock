@@ -20,6 +20,7 @@ const MAX_ALARMS = 8;
 #import "img_silence.nut"
 #import "img_low.nut"
 #import "img_high.nut"
+#import "img_logo.nut"
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
 ";
@@ -249,7 +250,8 @@ api.onUnauthorized(function(context) {
 
 // Serve the web UI for a GET at the agent root
 api.get("/", function(context) {
-    context.send(200, format(HTML_STRING, http.agenturl()));
+    local url = http.agenturl();
+    context.send(200, format(HTML_STRING, url, url));
 });
 
 // Serve up the settings JSON for a GET to /settings
@@ -663,7 +665,16 @@ api.get("/images/([^/]*)", function(context) {
     if (name == "low.png") image = LOW_PNG;
     if (name == "high.png") image = HIGH_PNG;
     if (name == "silence.png") image = SILENCE_PNG;
-    context.setHeader("Content-Type", "image/png");
+    if (name == "logo.svg") image = LOGO_SVG;
+    server.log(name);
+    // Set the correct conent-type for the image
+    if (name.slice(name.len() - 3) == "svg") {
+        context.setHeader("Content-Type", "image/svg+xml");
+        server.log(image.len());
+    } else {
+        context.setHeader("Content-Type", "image/png");
+    }
+
     context.send(200, image);
 });
 
