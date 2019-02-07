@@ -133,6 +133,19 @@ function reportAPIError(func) {
     return ("Mis-formed parameter sent (" + func +")");
 }
 
+function debugAPI(context, next) {
+    // Display a UI API activity report
+    if (prefs.debug) {
+        server.log("API received a request at " + time());
+        server.log("  VERB: " + context.req.method.toupper());
+        server.log("  PATH: " + context.req.path.tolower());
+        if (context.req.rawbody.len() > 0) server.log("  BODY: " + context.req.rawbody.tolower());
+    }
+    
+    // Invoke the next middleware
+    next();
+}
+
 
 // PROGRAM START
 
@@ -215,6 +228,7 @@ device.on("update.alarms", function(alarms) {
 
 // Set up the control and data API
 api = Rocky();
+api.use(debugAPI);
 
 // Set up UI access security
 api.authorize(function(context) {
@@ -666,11 +680,10 @@ api.get("/images/([^/]*)", function(context) {
     if (name == "high.png") image = HIGH_PNG;
     if (name == "silence.png") image = SILENCE_PNG;
     if (name == "logo.svg") image = LOGO_SVG;
-    server.log(name);
+    
     // Set the correct conent-type for the image
     if (name.slice(name.len() - 3) == "svg") {
         context.setHeader("Content-Type", "image/svg+xml");
-        server.log(image.len());
     } else {
         context.setHeader("Content-Type", "image/png");
     }
