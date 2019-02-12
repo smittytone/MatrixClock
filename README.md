@@ -68,6 +68,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 - 2.2.2 &mdash; *Unreleased*
     - Add API debugging
+    - Remove redundant agent-side server.save() result checks
 - 2.2.1 &mdash; *30 January 2019*
     - Refresh UI logo
 - 2.2.0 &mdash; *19 December 2018*

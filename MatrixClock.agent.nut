@@ -216,14 +216,14 @@ device.on("display.state", function(state) {
     stateChange = true;
     prefs.on = state.on;
     prefs.timer.isadv = state.advance;
-    if (server.save(prefs) > 0) server.error("Could not save settings (display.state)");
+    server.save(prefs);
 });
 
 // ADDED IN 2.2.0
 device.on("update.alarms", function(alarms) {
     prefs.alarms = alarms;
     stateChange = true;
-    if (server.save(prefs) > 0) server.error("Could not save settings (update.alarms)");
+    server.save(prefs);
 });
 
 // Set up the control and data API
@@ -602,7 +602,7 @@ api.post("/settings", function(context) {
             context.send(200, r);
 
             // Save the settings changes
-            if (server.save(prefs) > 0) server.error("Could not save settings");
+            server.save(prefs);
         }
     } catch (err) {
         server.error(err);
@@ -624,7 +624,7 @@ api.post("/action", function(context) {
                 resetPrefs();
                 device.send("clock.set.prefs", prefs);
                 if (debug) server.log("Clock settings reset");
-                if (server.save(prefs) != 0) server.error("Could not save Matrix Clock settings after reset");
+                server.save(prefs);
             }
 
             if (data.action == "debug") {
@@ -639,7 +639,7 @@ api.post("/action", function(context) {
 
                 device.send("clock.set.debug", debug);
                 server.log("Setting agent debugging " + (debug ? "on" : "off"));
-                if (server.save(prefs) != 0) server.error("Could not save Matrix Clock settings after debug switch");
+                server.save(prefs);
             }
 
             if (data.action == "reboot") {
