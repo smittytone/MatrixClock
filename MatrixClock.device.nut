@@ -1,29 +1,28 @@
 // Matrix Clock
 // Copyright 2016-19, Tony Smith
 
-// IMPORTS
+// ********** IMPORTS **********
 // NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
-// file's code over the following lines. For Squinter users, you will need to change
-// the path to the file in each #import statement 
+//      file's code over the following lines. For Squinter users, you will need to change
+//      the path to the file in each #import statement 
 #import "HT16K33MatrixCustom.class.nut"     // Source code for this file here: https://github.com/smittytone/MatrixClock
 #import "../generic/utilities.nut"          // Source code for this file here: https://github.com/smittytone/generic
 #import "../generic/disconnect.nut"         // Source code for this file here: https://github.com/smittytone/generic
 
 
-// CONSTANTS
+// ********** CONSTANTS **********
 const DISCONNECT_TIMEOUT = 60;
 const RECONNECT_TIMEOUT  = 15;
 const TICK_DURATION      = 0.5;
 const TICK_TOTAL         = 4;
 const HALF_TICK_TOTAL    = 2;
-const LED_ANGLE          = 0;
 const ALARM_DURATION     = 2;
 const ALARM_STATE_OFF    = 0;               // Alarm silent, ie. off
 const ALARM_STATE_ON     = 1;               // Alarm triggered, ie. on
 const ALARM_STATE_DONE   = 2;               // Alarm completed, can be deleted
+const LED_ANGLE          = 0;
 
-
-// GOLBAL VARIABLES
+// ********** GLOBAL VARIABLES **********
 // Objects
 local display = null;
 local tickTimer = null;
@@ -49,16 +48,16 @@ local isAdvanceSet = false;
 local tickFlag = true;
 local debug = false;
 
-// Disconnected/connected animation
-local ca = [0,7,1,7,1,6,0,6];
-local cc = 0;
-
 // Alarms
 local alarmFlashState = ALARM_STATE_OFF;
 local alarmFlashFlag = false;
 
+// Disconnected/connected animation
+local ca = [0,7,1,7,1,6,0,6];
+local cc = 0;
 
-// TIME AND DISPLAY CONTROL FUNCTIONS
+
+// ********** TIME AND DISPLAY CONTROL FUNCTIONS **********
 function clockTick() {
     // This is the main clock loop
     // Queue the function to run again in tickDuration seconds
@@ -76,8 +75,8 @@ function clockTick() {
 
     // Update the value of 'hours' to reflect displayed time
     if (settings.utc) {
-        // If UTC is set, add the international time offset
-        hours = hours + settings.offset - 12;
+        // If UTC is set, add the international time offset (0 - 24, converted here to -12 to + 12)
+        hours = hours + settings.utcoffset - 12;
         if (hours > 24) {
             hours = hours - 24;
         } else if (hours < 0) {
@@ -351,7 +350,7 @@ function syncText() {
 }
 
 
-// PREFERENCES FUNCTIONS
+// ********** PREFERENCES FUNCTIONS **********
 function setPrefs(prefsData) {
     // Log receipt of prefs data
     if (debug) server.log("Received preferences from agent");
@@ -369,7 +368,7 @@ function setPrefs(prefsData) {
     settings.flash = prefsData.flash;
     settings.colon = prefsData.colon;
     settings.utc = prefsData.utc;
-    settings.offset = prefsData.utcoffset;
+    settings.utcoffset = prefsData.utcoffset;
     
     // ADDED IN 2.1.0
     settings.timer.on.hour = prefsData.timer.on.hour;
@@ -380,7 +379,11 @@ function setPrefs(prefsData) {
     isAdvanceSet = prefsData.timer.isadv;
 
     // ADDED IN 2.2.0
-    settings.alarms = prefsData.alarms;
+    // Clear and reset the local list of alarms
+    if (settings.alarms != null) settings.alarms = [];
+    if (prefsData.alarms.len() > 0) {
+        foreach (alarm in prefsData.alarms) setAlarm(alarm);
+    }
 
     // ADDED IN 2.1.0: Make use of display disable times
     // NOTE We change settings.on, so the the local state record, settings.on,
@@ -439,12 +442,11 @@ function setBST(value) {
 
 function setUTC(value) {
     // This function is called when the app sets or unsets UTC
+    if ("offset" in value) settings.utcoffset = value.offset;
     if ("state" in value) {
         settings.utc = value.state;
         if (debug) server.log("Setting UTC " + (value.state ? "on" : "off"));
     }
-
-    if ("offset" in value) settings.offset = value.offset;
 }
 
 function setBright(value) {
@@ -499,35 +501,6 @@ function setDebug(state) {
     server.log("Setting device-side debug messages " + (state ? "on" : "off"));
 }
 
-function setNight(value) {
-    // ADDED IN 2.1.0
-    // This function is called when the app enables or disables night mode
-    // 'value' is passed in from the agent as a bool
-
-    // Just set the preference because it will be applied almost immediately
-    // via the 'clockTick()' loop
-    settings.timer.isset = value;     
-
-    // Disable the timer advance setting as it's only relevant if night mode is
-    // on AND it has been triggered since night mode was enabled
-    isAdvanceSet = false;
-
-    if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
-}
-
-function setNightTime(data) {
-    // ADDED IN 2.1.0
-    // Record the times at which the display may turn on and off
-    // NOTE The display will not actually change at these times unless
-    //      'settings.timer.isset' is set, ie. we're in night mode
-    settings.timer.on.hour = data.on.hour;
-    settings.timer.on.min = data.on.min;
-    settings.timer.off.hour = data.off.hour;
-    settings.timer.off.min = data.off.min;
-    
-    if (debug) server.log("Matrix Clock night dimmer to start at " + format("%02i", settings.timer.on.hour) + ":" + format("%02i", settings.timer.on.min) + " and end at " + format("%02i", settings.timer.off.hour) + ":" + format("%02i", settings.timer.off.min));
-}
-
 function setInverse(state) {
     // ADDED IN 2.1.0
     // Update the display state (inverse or normal)
@@ -546,7 +519,7 @@ function setDefaultPrefs() {
     settings.flash <- true;
     settings.brightness <- 1;
     settings.utc <- false;
-    settings.offset <- 12;
+    settings.utcoffset <- 12;
     
     // ADDED IN 2.1.0
     settings.alarms <- [];
@@ -556,10 +529,9 @@ function setDefaultPrefs() {
     settings.video <- false;
 }
 
-
-// ADDED IN 2.1.0
-// ALARM FUNCTONS
+// ********** ALARM FUNCTONS **********
 function checkAlarms() {
+    // ADDED IN 2.1.0
     // Do we need to display an alarm screen flash?
     if (settings.alarms.len() > 0) {
         foreach (alarm in settings.alarms) {
@@ -574,7 +546,7 @@ function checkAlarms() {
 
                     // Set the time at which the alarm should be silenced automatically
                     alarm.offmins = alarm.min + ALARM_DURATION;
-                    alarm.offhour = alarm.hour
+                    alarm.offhour = alarm.hour;
                     if (alarm.offmins > 59) {
                         alarm.offmins = 60 - alarm.offmins;
                         alarm.offhour++;
@@ -605,8 +577,8 @@ function checkAlarms() {
             if (alarm.state == ALARM_STATE_DONE) {
                 // Alarm is only done if it's not on repeat, so remove
                 // it and flag that we have made one or more deletions
-                settings.alarms.remove(i);
                 flag = true;
+                settings.alarms.remove(i);
                 if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " removed");
             } else {
                 i++;
@@ -641,8 +613,10 @@ function checkAlarms() {
     }
 }
 
-// Sort the alarms into incidence order
+
 function sortAlarms() {
+    // ADDED IN 2.1.0
+    // Sort the alarms into incidence order
     settings.alarms.sort(function(a, b) {
         // Match the hour first
         if (a.hour > b.hour) return 1;
@@ -658,19 +632,22 @@ function sortAlarms() {
 }
 
 function setAlarm(newAlarm) {
+    // ADDED IN 2.1.0
+    // Add a new alarm to the list
     if (settings.alarms.len() > 0) {
         // We have some alarms set, so check that the new one is not
         // already on the list
         foreach (alarm in settings.alarms) {
             if (alarm.hour == newAlarm.hour && alarm.min == newAlarm.min) {
-                // Alarm matches an existing one - are we setting the repeat value?
-                
-                // No change necessary, so bail
+                // Alarm matches an existing one - are we setting the repeat value? If so, bail
                 if (alarm.repeat == newAlarm.repeat) return;
 
                 // Otherwise, make the change and update the agent
                 alarm.repeat = newAlarm.repeat;
+                
+                // Update the agent's list
                 agent.send("update.alarms", settings.alarms);
+
                 if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " updated: repeat " + (alarm.repeat ? "on" : "off"));
                 return;
             }
@@ -690,38 +667,76 @@ function setAlarm(newAlarm) {
 }
 
 function clearAlarm(index) {
+    // ADDED IN 2.1.0
     // Remove the alarm from the array; it's at index 'index'
-    // First, check that the value of 'index' is valid
-    if (index < 0 || index > settings.alarms.len() - 1) {
-        if (debug) server.error("clearAlarm() bad alarm index: " + index);
-        return;
-    }
+    if (alarms.len() > 0) {
+        // First, check that the value of 'index' is valid
+        if (index < 0 || index > settings.alarms.len() - 1) {
+            if (debug) server.error("clearAlarm() bad alarm index: " + index);
+            return;
+        }
     
-    // Set the alarm's state to DONE so that it removed by the alarm handler, checkAlarms()
-    local alarm = settings.alarms[index];
-    alarm.state = ALARM_STATE_DONE;
+        // Set the alarm's state to DONE so that it removed by the alarm handler, checkAlarms()
+        local alarm = settings.alarms[index];
+        if (alarm.state == ALARM_STATE_ON) stopAlarm(index);
+        alarm.state = ALARM_STATE_DONE;
+    }
 }
 
 function stopAlarm(index) {
+    // ADDED IN 2.1.0
     // Silence the alarm from the array; it's at index 'index'
-    // First, check that the value of 'index' is valid
-    if (index < 0 || index > settings.alarms.len() - 1) {
-        if (debug) server.error("stopAlarm() bad alarm index: " + index);
-        return;
-    }
+    if (alarms.len() > 0) {
+        // First, check that the value of 'index' is valid
+        if (index < 0 || index > settings.alarms.len() - 1) {
+            if (debug) server.error("stopAlarm() bad alarm index: " + index);
+            return;
+        }
     
     // Set the alarm's state so that it is either removed by the alarm handler, 
     // checkAlarms(), or causes checkAlarms() to stop the flash
     local alarm = settings.alarms[index];
     alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
     if (debug) server.log("Alarm at " + format("%02i", alarm.hour) + ":" + format("%02i", alarm.min) + " silenced at " + format("%02i", hours) + ":" + format("%02i", minutes));
+    }
 }
 
 
-// OFFLINE OPERATION FUNCTIONS
+// ********** NIGHT MODE FUNCTIONS **********
+function setNight(value) {
+    // ADDED IN 2.1.0
+    // This function is called when the app enables or disables night mode
+    // 'value' is passed in from the agent as a bool
+
+    // Just set the preference because it will be applied almost immediately
+    // via the 'clockTick()' loop
+    settings.timer.isset = value;     
+
+    // Disable the timer advance setting as it's only relevant if night mode is
+    // on AND it has been triggered since night mode was enabled
+    isAdvanceSet = false;
+
+    if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
+}
+
+function setNightTime(data) {
+    // ADDED IN 2.1.0
+    // Record the times at which the display may turn on and off
+    // NOTE The display will not actually change at these times unless
+    //      'settings.timer.isset' is set, ie. we're in night mode
+    settings.timer.on.hour = data.on.hour;
+    settings.timer.on.min = data.on.min;
+    settings.timer.off.hour = data.off.hour;
+    settings.timer.off.min = data.off.min;
+    
+    if (debug) server.log("Night mode to start at " + format("%02i", settings.timer.on.hour) + ":" + format("%02i", settings.timer.on.min) + " and end at " + format("%02i", settings.timer.off.hour) + ":" + format("%02i", settings.timer.off.min));
+}
+
+
+// ********** OFFLINE OPERATION FUNCTIONS **********
 function discHandler(event) {
     // Called if the server connection is broken or re-established
-    if ("message" in event) server.log("Connection Manager: " + event.message);
+    if ("message" in event && debug) server.log("Connection Manager: " + event.message);
 
     if ("type" in event) {
         if (event.type == "disconnected") {
@@ -748,7 +763,7 @@ function discHandler(event) {
 }
 
 
-// START PROGRAM
+// ********** START OF PROGRAM **********
 
 // Load in generic boot message code
 // NOTE If you're not using Squinter or an equivalent tool, cut and paste the named 
