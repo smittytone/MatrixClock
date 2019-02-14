@@ -67,6 +67,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 ## Release Notes ##
 
 - 2.2.2 &mdash; *Unreleased*
+    - Sync device and agent code with [Clock](https://github.com/smittytone/Clock)
     - Add API debugging
     - Remove redundant agent-side server.save() result checks
 - 2.2.1 &mdash; *30 January 2019*
