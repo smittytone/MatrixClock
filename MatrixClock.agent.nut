@@ -11,17 +11,17 @@
 // NOTE You can ignore the section above if you are NOT including Apple Watch support
 //      (see https://github.com/smittytone/Controller)
 
-// If you are NOT using Squinter or a similar tool, replace the following #import statements
-// with the contents of the named files: img_low.nut, img_high.nut, silence_img.nut, delete_img.nut
-// and clock_ui.html. Source code for these files is here: https://github.com/smittytone/MatrixClock
-#import "img_delete.nut"
-#import "img_silence.nut"
-#import "img_low.nut"
-#import "img_high.nut"
-#import "img_logo.nut"
+// If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
+// with the contents of the named file(s):
+#import "img_delete.nut"            // Source: https://github.com/smittytone/MatrixClock
+#import "img_silence.nut"           // Source: https://github.com/smittytone/MatrixClock
+#import "img_low.nut"               // Source: https://github.com/smittytone/MatrixClock
+#import "img_high.nut"              // Source: https://github.com/smittytone/MatrixClock
+#import "img_logo.nut"              // Source: https://github.com/smittytone/MatrixClock
 const HTML_STRING = @"
 #import "matrixclock_ui.html"       
-";
+";                                  // Source: https://github.com/smittytone/MatrixClock
+
 
 // ********** CONSTANTS **********
 const MAX_ALARMS = 8;
@@ -129,10 +129,8 @@ function reportAPIError(func) {
 function debugAPI(context, next) {
     // Display a UI API activity report
     if (prefs.debug) {
-        server.log("API received a request at " + time());
-        server.log("  VERB: " + context.req.method.toupper());
-        server.log("  PATH: " + context.req.path.tolower());
-        if (context.req.rawbody.len() > 0) server.log("  BODY: " + context.req.rawbody.tolower());
+        server.log("API received a request at " + time() + ": " + context.req.method.toupper() + " @ " + context.req.path.tolower());
+        if (context.req.rawbody.len() > 0) server.log("Request body: " + context.req.rawbody.tolower());
     }
     
     // Invoke the next middleware
