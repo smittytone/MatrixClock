@@ -559,6 +559,10 @@ function checkAlarms() {
 
             // Check if it's time to turn an alarm off
             if (alarm.offhour == hours && alarm.offmins == minutes) {
+                // Zap the offtimes to prevent repeated triggers of this stanza
+                alarm.offhour = 99;
+                alarm.offmins = 99;
+
                 // Set the 'show alarm flash' flag to end flashing
                 if (alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
                 
@@ -656,8 +660,8 @@ function setAlarm(newAlarm) {
 
     // Add the new alarm to the list
     newAlarm.state <- ALARM_STATE_OFF;
-    newAlarm.offmins <- -1;
-    newAlarm.offhour <- -1;
+    newAlarm.offmins <- 99;
+    newAlarm.offhour <- 99;
     settings.alarms.append(newAlarm);
     sortAlarms();
     if (debug) server.log("Alarm " + settings.alarms.len() + " added. Time: " + format("%02i", newAlarm.hour) + ":" + format("%02i", newAlarm.min));
