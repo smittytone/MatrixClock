@@ -12,8 +12,8 @@
 //      (see https://github.com/smittytone/Controller)
 
 // If you are NOT using Squinter or a similar tool, replace the following #import statements
-// with the contents of the named files (matrixclock_ui.html, silence_img.nut and delete_img.nut)
-// Source code for these files here: https://github.com/smittytone/MatrixClock
+// with the contents of the named files: img_low.nut, img_high.nut, silence_img.nut, delete_img.nut
+// and clock_ui.html. Source code for these files is here: https://github.com/smittytone/MatrixClock
 #import "img_delete.nut"
 #import "img_silence.nut"
 #import "img_low.nut"
