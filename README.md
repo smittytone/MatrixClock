@@ -66,10 +66,10 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.2 &mdash; *Unreleased*
+- 2.2.2 &mdash; *18 February 2019*
     - Sync device and agent code with [Clock](https://github.com/smittytone/Clock)
     - Add API debugging
-    - Remove redundant agent-side server.save() result checks
+    - Remove redundant agent-side **server.save()** result checks
 - 2.2.1 &mdash; *30 January 2019*
     - Refresh UI logo
 - 2.2.0 &mdash; *19 December 2018*
@@ -88,8 +88,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
     - Improved settings handling
     - Improved web UI code
 - 1.6.0 &mdash; *11 September 2018*
-    - Add **Advanced Settings** area to UI and move Reset button into it
-    - Add Debug checkbox to **Advanced Settings**
+    - Add **Advanced Settings** area to UI; move Reset button into it; add Debug checkbox
 - 1.5.0 &mdash; *7 June 2018*
     - Update Web UI based on Bootstrap
     - Separate out Web UI code into own file for clarity
