@@ -15,6 +15,7 @@
 // with the contents of the named file(s):
 #import "img_delete.nut"            // Source: https://github.com/smittytone/MatrixClock
 #import "img_silence.nut"           // Source: https://github.com/smittytone/MatrixClock
+#import "img_mid.nut"               // Source: https://github.com/smittytone/MatrixClock
 #import "img_low.nut"               // Source: https://github.com/smittytone/MatrixClock
 #import "img_high.nut"              // Source: https://github.com/smittytone/MatrixClock
 #import "img_logo.nut"              // Source: https://github.com/smittytone/MatrixClock
@@ -672,6 +673,7 @@ api.get("/images/([^/]*)", function(context) {
     local name = path[path.len() - 1];
     local image = DELETE_PNG;
     if (name == "low.png") image = LOW_PNG;
+    if (name == "mid.png") image = MID_PNG;
     if (name == "high.png") image = HIGH_PNG;
     if (name == "silence.png") image = SILENCE_PNG;
     if (name == "logo.svg") image = LOGO_SVG;

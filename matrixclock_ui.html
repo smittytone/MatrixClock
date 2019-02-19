@@ -102,10 +102,11 @@
                         <h4 align='center'>Clock Brightness</h4>
                         <input type='range' class='slider' name='brightness' id='brightness' value='16' min='1' max='16'>
                         <table width='100%%'><tr>
-                            <td width='20%%' align='left'><div class='biconlow'><span></span></div></td>
-                            <td width='60%%' align='center'><div class='brightness-status'>Brightness: <span></span></div></td>
-                            <td width='20%%' align='right'><div class='biconhih'><span></span></div></td>
+                            <td width='30%%' align='left'><div class='biconlow'><span></span></div></td>
+                            <td width='40%%' align='center'><div class='biconmid'><span></span></div></td>
+                            <td width='30%%' align='right'><div class='biconhigh'><span></span></div></td>
                         </tr></table>
+                        <p class='brightness-status text-center'>Brightness: <span></span></p>
                     </div>
                     <hr />
                     <!-- World time slider -->
@@ -227,7 +228,8 @@
         
         // Set images
         $('.biconlow span').html('<img src=""' + agenturl + '/images/low.png' + '"" width=""20"" />');
-        $('.biconhih span').html('<img src=""' + agenturl + '/images/high.png' + '"" width=""20"" />');
+        $('.biconmid span').html('<img src=""' + agenturl + '/images/mid.png' + '"" width=""20"" />');
+        $('.biconhigh span').html('<img src=""' + agenturl + '/images/high.png' + '"" width=""20"" />');
         
         resetDimmerFields(15);
         resetAlarmFields(3);
