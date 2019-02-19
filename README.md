@@ -1,4 +1,4 @@
-# MatrixClock 2.2.2 #
+# MatrixClock 2.2.3 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -66,6 +66,8 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
+- 2.2.3 &mdash; *Unreleased*
+    - Update dependencies: HT16K33MatrixCustom/HT16K33Matrix 2.0.0
 - 2.2.2 &mdash; *18 February 2019*
     - Sync device and agent code with [Clock](https://github.com/smittytone/Clock)
     - Add API debugging
@@ -79,7 +81,6 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
     - Add an option to switch display between black on green and green on black
     - Improve UI layout
     - Update matrix LED class
-    - Prep for 2.2.0
 - 2.0.0 &mdash; *1 November 2018*
     - Update dependencies
     - Restructure API to use JSON

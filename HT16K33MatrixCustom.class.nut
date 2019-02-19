@@ -10,7 +10,7 @@ class HT16K33MatrixCustom extends HT16K33Matrix {
     // It extends this class: https://github.com/smittytone/HT16K33Matrix
     // to modify certain functions to meet the needs of this device
 
-    static VERSION = "1.4.0";
+    static VERSION = "2.0.0";
     
     function setupCharset() {
         // Modify certain characters ('0') in the default character set
