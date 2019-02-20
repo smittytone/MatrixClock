@@ -67,13 +67,14 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 ## Release Notes ##
 
 - 2.2.3 &mdash; *Unreleased*
+    - Add low, mid and high brightness icons to the web UI
     - Update dependencies: HT16K33MatrixCustom/HT16K33Matrix 2.0.0
 - 2.2.2 &mdash; *18 February 2019*
     - Sync device and agent code with [Clock](https://github.com/smittytone/Clock)
     - Add API debugging
     - Remove redundant agent-side **server.save()** result checks
 - 2.2.1 &mdash; *30 January 2019*
-    - Refresh UI logo
+    - Refresh web UI logo
 - 2.2.0 &mdash; *19 December 2018*
     - Add visual alarms
 - 2.1.0 &mdash; *3 December 2018*
