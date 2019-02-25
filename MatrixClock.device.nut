@@ -7,6 +7,7 @@
 #import "HT16K33MatrixCustom.class.nut"     // Source code: https://github.com/smittytone/MatrixClock
 #import "../generic/utilities.nut"          // Source code: https://github.com/smittytone/generic
 #import "../generic/disconnect.nut"         // Source code: https://github.com/smittytone/generic
+#import "../generic/crashReporter.nut"      // Source code: https://github.com/smittytone/generic
 
 
 // ********** CONSTANTS **********
@@ -20,6 +21,7 @@ const ALARM_STATE_OFF    = 0;               // Alarm silent, ie. off
 const ALARM_STATE_ON     = 1;               // Alarm triggered, ie. on
 const ALARM_STATE_DONE   = 2;               // Alarm completed, can be deleted
 const LED_ANGLE          = 0;
+
 
 // ********** GLOBAL VARIABLES **********
 // Objects
@@ -772,6 +774,9 @@ function discHandler(event) {
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
 #import "../generic/bootmessage.nut"        // Source code: https://github.com/smittytone/generic
+
+// Set up the crash reporter
+crashReporter.init();
 
 // Load in default prefs
 setDefaultPrefs();
