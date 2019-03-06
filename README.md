@@ -66,7 +66,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.3 &mdash; *Unreleased*
+- 2.2.3 &mdash; *6 March 2019*
     - Add low, mid and high brightness icons to the web UI
     - Update dependencies: HT16K33MatrixCustom/HT16K33Matrix 2.0.0
 - 2.2.2 &mdash; *18 February 2019*
