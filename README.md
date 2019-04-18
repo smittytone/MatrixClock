@@ -1,4 +1,4 @@
-# MatrixClock 2.2.3 #
+# MatrixClock 2.2.4 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -56,7 +56,7 @@ Version 2.1.0 introduces a new option: night mode. Using night mode, which is en
 
 When you enable night mode in the UI, the clock turns off the display automatically at a time you specify. It then turns on the display at a subsequent time. You set these times &mdash; respectively, night start and end &mdash; in the UI using 24-hour clock values. The default values are: start 22:30, end 07:00.
 
-You can still turn the clock display on (or off) during unlit (or lit) periods using the UIs ‘Turn Display On/Off’ button. 
+You can still turn the clock display on (or off) during unlit (or lit) periods using the UIs ‘Turn Display On/Off’ button.
 
 ## Casing ##
 
@@ -66,6 +66,8 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
+- 2.2.4 &mdash; *18 April 2019*
+    - Update JQuery to 3.4.0
 - 2.2.3 &mdash; *6 March 2019*
     - Add low, mid and high brightness icons to the web UI
     - Update dependencies: HT16K33MatrixCustom/HT16K33Matrix 2.0.0

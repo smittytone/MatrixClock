@@ -80,7 +80,7 @@
                             </label>
                             <label class='checkarea'> Inverse Video Mode
                                 <input type='checkbox' name='inverse' id='inverse' value='inverse'><span class='checkmark'></span>
-                            </label>     
+                            </label>
                         </div>
                         <div class='col-6'>
                             <label class='checkarea'> Show World Time
@@ -171,7 +171,7 @@
                         <p class='alarm-list text-center'><span></span></p>
                         <div align='center'>
                             <div class='form-inline justify-content-center'>
-                                <label for='enter-hour' style='color:white'>Add an Alarm: Hour</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp; 
+                                <label for='enter-hour' style='color:white'>Add an Alarm: Hour</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp;
                                 <label for='enter-min' style='color:white'>Minute</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:50px;color:black;' placeholder='00' />&nbsp;
                                 <label for='repeat' class='col-form-label' style='color:white'>Repeat?</label>&nbsp;<input type='checkbox' class='form-check-input' name='repeat' id='repeat' value=''>
                             </div>
@@ -193,7 +193,7 @@
                                     </label>
                                     <label class='checkarea'> Debug Mode
                                         <input type='checkbox' name='debug' id='debug' value='debug'><span class='checkmark'></span>
-                                    </label>                
+                                    </label>
                                 </div>
                                 <div class='col-3'>&nbsp;</div>
                             </div>
@@ -217,7 +217,7 @@
         </div>
     </div>
 
-    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js'></script>
     <script>
         $('.advanced').hide();
 
@@ -225,12 +225,12 @@
         var agenturl = '%s';
         var displayon = true;
         var stateflag = false;
-        
+
         // Set images
         $('.biconlow span').html('<img src=""' + agenturl + '/images/low.png' + '"" width=""20"" />');
         $('.biconmid span').html('<img src=""' + agenturl + '/images/mid.png' + '"" width=""20"" />');
         $('.biconhigh span').html('<img src=""' + agenturl + '/images/high.png' + '"" width=""20"" />');
-        
+
         resetDimmerFields(15);
         resetAlarmFields(3);
 
@@ -255,7 +255,7 @@
         $('#resetbutton').click(doReset);
         $('#onoffbutton').click(setLight);
         $('#dimmer').click(setDimmer);
-        
+
         // Brightness Slider
         var slider = document.getElementById('brightness');
         slider.addEventListener('mouseup', updateSlider);
@@ -300,7 +300,7 @@
             // Set the on/off button text
             $('#onoffbutton').text(d['on'] ? 'Turn Display Off' : 'Turn Display On');
             displayon = d['on'];
-            
+
             // Set the brightness slider and value readout
             var b = parseInt(d['bright']) + 1;
             $('.brightness-status span').text(b);
@@ -316,7 +316,7 @@
             u = parseInt(d['timer']['off']['min']);
             $('#dimmerendmin').val(u);
             $('.night-mode-head span').text(d['timer']['isset'] ? 'Enabled' : 'Disabled');
-            
+
             // Set the clock state line
             updateState(d['isconnected']);
 
@@ -352,13 +352,13 @@
 
                     // Pad out the minutes if necessary
                     let m = (alarm.min < 10 ? '0' : '') + alarm.min.toString();
-                    
+
                     h = h + '<tr><td width=""10%%"" align=""center"">' + (i + 1).toString() + '</td><td width=""40%%"" align=""center"">' + alarm.hour + ':' + m + '</td><td width=""20%%"" align=""center"">' + (alarm.repeat ? 'Yes' : 'No') + '</td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""deletealarm' + i.toString() + '""><img src=""' + agenturl + '/images/delete.png"" width=""20"" /></button></td><td width=""15%%"" align=""center""><button class=""tablebutton"" type=""button"" id=""silencealarm' + i.toString() + '""><img src=""' + agenturl + '/images/silence.png"" width=""20"" /></button></td></tr>';
                 }
 
                 h = h + '</table>';
                 $('.alarm-list span').html(h);
-                
+
                 // Set each delete button shown to point to the same target function
                 for (var j = 0 ; j < alarms.length ; j++) {
                     var i = 'deletealarm' + j.toString();
@@ -371,7 +371,7 @@
                 }
             }
         }
-        
+
         function updateState(s) {
             // Update the clock status readout
             $('.clock-status span').text('This Matrix Clock is ' + (s ? 'online' : 'offline'));
@@ -421,7 +421,7 @@
         }
 
         function setMode() {
-            // Send clock mode as bool: true = 24-hour, false = 12-hour 
+            // Send clock mode as bool: true = 24-hour, false = 12-hour
             sendState({'setmode':document.getElementById('mode').checked});
         }
 
@@ -462,7 +462,7 @@
             // Send clock world time setting:
             //   Display world time as bool: true = yes, false = no
             //   Offset (0-24) as string
-            sendState({'setutc':{'state':document.getElementById('utc').checked, 
+            sendState({'setutc':{'state':document.getElementById('utc').checked,
                                  'offset':$('#utcs').val()}});
         }
 
@@ -478,7 +478,7 @@
                 resetDimmerFields(1);
                 return;
             }
-            
+
             if (sm < 0 || sm > 59) {
                 resetDimmerFields(2);
                 return;
@@ -488,12 +488,12 @@
                 resetDimmerFields(4);
                 return;
             }
-            
+
             if (em < 0 || em > 59) {
                 resetDimmerFields(8);
                 return;
             }
-            
+
             sendState({'setdimmer':{'dimmeron':{'hour':sh, 'min':sm},
                                     'dimmeroff':{'hour':eh, 'min':em}}});
         }
@@ -514,12 +514,12 @@
                 resetAlarmFields(1);
                 return;
             }
-            
+
             if (m < 0 || m > 59) {
                 resetAlarmFields(2);
                 return;
             }
-            
+
             sendState({'alarm':{'action':'add', 'hour':h, 'min':m, 'repeat':d}});
         }
 
@@ -529,7 +529,7 @@
             let s = this.id.substring(11);
             sendState({'alarm':{'action':'delete', 'index':s}});
         }
-        
+
         function silenceAlarm() {
             // Silence an alarm based on its index within the array used to generate the table.
             // Each button's id is set to 'silenceAlarm' plus the array index as a string
@@ -569,7 +569,7 @@
                     if (err) $('.clock-status span').text(err);
                 }
             });
-        }  
+        }
     </script>
 </body>
 </html>
