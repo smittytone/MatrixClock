@@ -61,7 +61,7 @@ local cc = 0;
 // ********** TIME AND DISPLAY CONTROL FUNCTIONS **********
 function clockTick() {
     // This is the main clock loop
-    // Queue the function to run again in tickDuration seconds
+    // Queue the function to run again in TICK_DURATION seconds
     tickTimer = imp.wakeup(TICK_DURATION, clockTick);
 
     // Get the current time from the imp's RTC
@@ -127,7 +127,7 @@ function shouldShowDisplay() {
     // Assume we will enable the display
     local shouldShow = true;
 
-    // Should we disable the advance? Only if it's set and we've hit the start or end end 
+    // Should we disable the advance? Only if it's set and we've hit the start or end end
     // of the night period
     // NOTE 'isAdvanceSet' is ONLY set if 'settings.timer.isset' is TRUE
     if (isAdvanceSet) {
@@ -142,10 +142,10 @@ function shouldShowDisplay() {
     local end = settings.timer.off.hour * 60 + settings.timer.off.min;
     local now = hours * 60 + minutes;
     local delta = end - start;
-    
+
     // End and start times are identical
     if (delta == 0) return !isAdvanceSet;
-    
+
     if (delta > 0) {
         if (now >= start && now < end) shouldShow = false;
     } else {
@@ -173,7 +173,7 @@ function setDisplay(state) {
 
 function displayTime() {
     // The main function for updating the display
-    
+
     // Set the digit counters a and b
     local a = hours;
     local b = 0;
@@ -355,7 +355,7 @@ function syncText() {
 function setPrefs(prefsData) {
     // Log receipt of prefs data
     if (debug) server.log("Received preferences from agent");
-    
+
     // Cancel the 'Sync' display timer if it has yet to fire
     if (syncTimer) imp.cancelwakeup(syncTimer);
     syncTimer = null;
@@ -370,7 +370,7 @@ function setPrefs(prefsData) {
     settings.colon = prefsData.colon;
     settings.utc = prefsData.utc;
     settings.utcoffset = prefsData.utcoffset;
-    
+
     // ADDED IN 2.1.0
     settings.timer.on.hour = prefsData.timer.on.hour;
     settings.timer.on.min = prefsData.timer.on.min;
@@ -456,7 +456,7 @@ function setBright(value) {
     if (value < 0 || value > 15 || value == settings.brightness) return;
     if (debug) server.log("Setting display brightness " + value);
     settings.brightness = value;
-    
+
     // Tell the display(s) to change their brightness
     setBrightness(value);
 }
@@ -479,7 +479,7 @@ function setLight(value) {
     // This function is called when the app turns the clock display on or off
     // 'value' is passed in from the agent as a bool
     if (debug) server.log("Setting light " + (value ? "on" : "off"));
-    
+
     // ADDED IN 2.1.0
     if (settings.timer.isset) {
         // If we're in night mode, we treat this as an advance of the timer
@@ -488,7 +488,7 @@ function setLight(value) {
     } else {
         // We're not in night mode, so just turn the light off
         settings.on = value;
-        setDisplay(value);        
+        setDisplay(value);
     }
 }
 
@@ -498,7 +498,7 @@ function setDebug(state) {
         foreach (led in display) led.setDebug(state, true);
         debug = state;
     }
-    
+
     server.log("Setting device-side debug messages " + (state ? "on" : "off"));
 }
 
@@ -507,7 +507,7 @@ function setInverse(state) {
     // Update the display state (inverse or normal)
     settings.video = state;
     setVideo(state);
-    if (debug) server.log("Setting display to " + (state ? "black on green" : "green on black")); 
+    if (debug) server.log("Setting display to " + (state ? "black on green" : "green on black"));
 }
 
 function setDefaultPrefs() {
@@ -521,10 +521,10 @@ function setDefaultPrefs() {
     settings.brightness <- 1;
     settings.utc <- false;
     settings.utcoffset <- 12;
-    
+
     // ADDED IN 2.1.0
     settings.alarms <- [];
-    settings.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+    settings.timer <- { "on"  : { "hour" : 7,  "min" : 00 },
                         "off" : { "hour" : 22, "min" : 30 },
                         "isset" : false };
     settings.video <- false;
@@ -566,7 +566,7 @@ function checkAlarms() {
 
                 // Set the 'show alarm flash' flag to end flashing
                 if (alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
-                
+
                 // If the alarm is not a repeater, mark it for deletion
                 alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
 
@@ -596,7 +596,7 @@ function checkAlarms() {
         // Make sure the alarm isn't flashing when it doesn't need to
         if (settings.alarms.len() > 0) {
             flag = false;
-            
+
             foreach (alarm in settings.alarms) {
                 // Flag if at least one alarm is on
                 if (alarm.state == ALARM_STATE_ON) {
@@ -604,7 +604,7 @@ function checkAlarms() {
                     break;
                 }
             }
-            
+
             // If no alarms are on, if necessary, mark the display flashing to be disabled
             if (!flag && alarmFlashState != ALARM_STATE_OFF) alarmFlashState = ALARM_STATE_DONE;
         } else {
@@ -649,7 +649,7 @@ function setAlarm(newAlarm) {
 
                 // Otherwise, make the change and update the agent
                 alarm.repeat = newAlarm.repeat;
-                
+
                 // Update the agent's list
                 agent.send("update.alarms", settings.alarms);
 
@@ -680,7 +680,7 @@ function clearAlarm(index) {
             if (debug) server.error("clearAlarm() bad alarm index: " + index);
             return;
         }
-    
+
         // Set the alarm's state to DONE so that it removed by the alarm handler, checkAlarms()
         local alarm = settings.alarms[index];
         if (alarm.state == ALARM_STATE_ON) stopAlarm(index);
@@ -697,8 +697,8 @@ function stopAlarm(index) {
             if (debug) server.error("stopAlarm() bad alarm index: " + index);
             return;
         }
-    
-    // Set the alarm's state so that it is either removed by the alarm handler, 
+
+    // Set the alarm's state so that it is either removed by the alarm handler,
     // checkAlarms(), or causes checkAlarms() to stop the flash
     local alarm = settings.alarms[index];
     alarm.state = alarm.repeat ? ALARM_STATE_OFF : ALARM_STATE_DONE;
@@ -715,7 +715,7 @@ function setNight(value) {
 
     // Just set the preference because it will be applied almost immediately
     // via the 'clockTick()' loop
-    settings.timer.isset = value;     
+    settings.timer.isset = value;
 
     // Disable the timer advance setting as it's only relevant if night mode is
     // on AND it has been triggered since night mode was enabled
@@ -733,7 +733,7 @@ function setNightTime(data) {
     settings.timer.on.min = data.on.min;
     settings.timer.off.hour = data.off.hour;
     settings.timer.off.min = data.off.min;
-    
+
     if (debug) server.log("Night mode to start at " + format("%02i", settings.timer.on.hour) + ":" + format("%02i", settings.timer.on.min) + " and end at " + format("%02i", settings.timer.off.hour) + ":" + format("%02i", settings.timer.off.min));
 }
 
@@ -757,10 +757,10 @@ function discHandler(event) {
             agent.send("clock.get.prefs", 1);
             isDisconnected = false;
             isConnecting = false;
-            
+
             if (disTime != 0) {
                 local delta = event.ts - disTime;
-                if (debug) server.log("Connection Manager: disconnection duration " + delta + " seconds");
+                if (debug) server.log("Connection Manager: Disconnection duration " + delta + " seconds");
                 disTime = 0;
             }
         }
