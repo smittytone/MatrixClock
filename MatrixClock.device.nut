@@ -836,6 +836,19 @@ agent.on("clock.do.reboot", function(dummy) {
     imp.reset();
 });
 
+// impOS Polite Deployment
+server.onshutdown(function(reason) {
+    // Trigger the crash reporter
+    local reasons = ["new Squirrel", "impOS Update", "other"];
+    agent.send("crash.reporter.relay.debug.error", "Polite Deployment triggered -- reason " + reasons[reason]);
+    server.flush(10);
+
+    // Trigger the update itself
+    imp.wakeup(10, function() {
+        server.restart();
+    });
+});
+
 // Get preferences from server
 // NOTE no longer need this here as it's handled via DisconnectManager
 // agent.send("clock.get.prefs", true);
