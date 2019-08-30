@@ -68,6 +68,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 - 2.2.5 &mdash; *unreleased*
     - Support polite deployments
+    - Update Jquery to 3.4.1, Boostrap to 4.3.1, Simpleslack to 1.0.1, Bootmessage to 2.2.2
 - 2.2.4 &mdash; *18 April 2019*
     - Update JQuery to 3.4.0
 - 2.2.3 &mdash; *6 March 2019*
