@@ -15,15 +15,16 @@
 #import "img_high.nut"                      // Source: https://github.com/smittytone/MatrixClock
 #import "img_logo.nut"                      // Source: https://github.com/smittytone/MatrixClock
 const HTML_STRING = @"
-#import "matrixclock_ui.html"       
+#import "matrixclock_ui.html"
 ";                                          // Source: https://github.com/smittytone/MatrixClock
 
 // If you are NOT using Squinter or a similar tool, comment out the following line...
 #import "~/Dropbox/Programming/Imp/Codes/matrixclock.nut"
 // ...and uncomment and fill in this line:
 // const APP_CODE = "YOUR_APP_UUID";
-// NOTE You can ignore the section above if you are NOT including Apple Watch support
-//      (see https://github.com/smittytone/Controller)
+// NOTE #1 You can ignore the section above if you are NOT including Apple Watch support
+//         (see https://github.com/smittytone/Controller)
+// NOTE #2 The above file is also used to configure CrashReporter (see https://github.com/smittytone/generic)
 
 
 // ********** CONSTANTS **********
@@ -60,7 +61,7 @@ function encodePrefsForUI() {
                    "on"          : prefs.on,
                    "debug"       : prefs.debug,
                    "isconnected" : device.isconnected(),
-                   // ADDED IN 2.1.0: 
+                   // ADDED IN 2.1.0:
                    // Times to disable clock (eg. over night)
                    "timer"       : { "on"  : { "hour" : prefs.timer.on.hour,  "min"  : prefs.timer.on.min },
                                      "off" : { "hour" : prefs.timer.off.hour, "min" : prefs.timer.off.min },
@@ -69,7 +70,7 @@ function encodePrefsForUI() {
                    // Alarm list (functionality coming in 2.2.0)
                    "alarms"      : prefs.alarms
                 };
-    
+
     return http.jsonencode(data, {"compact" : true});
 }
 
@@ -112,14 +113,14 @@ function initialisePrefs() {
 
     // ADDED IN 2.1.0
     // Times to temporarily disable clock display (eg. over night)
-    prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+    prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 },
                      "off" : { "hour" : 22, "min" : 30 },
                      "isset" : false,
                      "isadv" : false };
-    
+
     // ADDED IN 2.2.0
     prefs.alarms <- [];
-    
+
     // Inverse video
     prefs.video <- false;
 }
@@ -135,7 +136,7 @@ function debugAPI(context, next) {
         server.log("API received a request at " + time() + ": " + context.req.method.toupper() + " @ " + context.req.path.tolower());
         if (context.req.rawbody.len() > 0) server.log("Request body: " + context.req.rawbody.tolower());
     }
-    
+
     // Invoke the next middleware
     next();
 }
@@ -152,7 +153,7 @@ if (savedPrefs.len() != 0) {
         // Table is NOT empty so set 'prefs' to the loaded table
     // The existing table, if there is one, will be garbage-collected
     prefs = savedPrefs;
-    
+
     // Handle prefs added post-release
     if (!("debug" in prefs)) {
         prefs.debug <- false;
@@ -162,14 +163,14 @@ if (savedPrefs.len() != 0) {
     // ADDED IN 2.1.0
     // Times to temporarily disable clock display (eg. over night)
     if (!("timer" in prefs)) {
-        prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 }, 
+        prefs.timer <- { "on"  : { "hour" : 7,  "min" : 00 },
                          "off" : { "hour" : 22, "min" : 30 },
                          "isset" : false,
                          "isadv" : false };
         server.save(prefs);
     } else {
         local doSave = false;
-        
+
         if (!("isset" in prefs.timer)) {
             prefs.timer.isset <- false;
             doSave = true;
@@ -277,7 +278,7 @@ api.post("/settings", function(context) {
         if (prefs.debug) server.log(context.req.rawbody);
         local data = http.jsondecode(context.req.rawbody);
         local error = null;
-        
+
         foreach (setting, value in data) {
             // Check for a mode-set message (value arrives as a bool)
             // eg. { "setmode" : true }
@@ -359,7 +360,7 @@ api.post("/settings", function(context) {
                 if (prefs.debug) server.log(format("UI says set display brightness to %i", prefs.brightness));
                 device.send("clock.set.brightness", prefs.brightness);
             }
-    
+
             // Check for set world time message (value arrives as a table)
             // eg. { "setutc" : { "state" : true, "utcval" : -12 } }
             if (setting == "setutc") {
@@ -513,7 +514,7 @@ api.post("/settings", function(context) {
                         }
 
                         local alarm = {};
-                        
+
                         if ("hour" in value) {
                             try {
                                 // Check that hour value can be converted to an integer
@@ -523,7 +524,7 @@ api.post("/settings", function(context) {
                                 break;
                             }
                         }
-                        
+
                         if ("min" in value) {
                             try {
                                 // Check that minute value can be converted to an integer
@@ -555,7 +556,7 @@ api.post("/settings", function(context) {
                                 error = reportAPIError("setalarm.delete.index");
                                 break;
                             }
-                            
+
                             if (prefs.debug) server.log("UI says delete alarm at index " + value.index);
                             device.send("clock.clear.alarm", value.index);
                             prefs.alarms.remove(value.index);
@@ -572,7 +573,7 @@ api.post("/settings", function(context) {
                                 error = reportAPIError("setalarm.silence.index");
                                 break;
                             }
-                            
+
                             if (prefs.debug) server.log("UI says silence alarm at index " + value.index);
                             device.send("clock.stop.alarm", value.index);
                         } else {
@@ -589,7 +590,7 @@ api.post("/settings", function(context) {
                 }
             }
         }
-        
+
         if (error != null) {
             context.send(400, error);
             if (prefs.debug) server.error(error);
@@ -679,7 +680,7 @@ api.get("/images/([^/]*)", function(context) {
     if (name == "high.png") image = HIGH_PNG;
     if (name == "silence.png") image = SILENCE_PNG;
     if (name == "logo.svg") image = LOGO_SVG;
-    
+
     // Set the correct conent-type for the image
     if (name.slice(name.len() - 3) == "svg") {
         context.setHeader("Content-Type", "image/svg+xml");
