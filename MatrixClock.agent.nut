@@ -133,7 +133,7 @@ function reportAPIError(func) {
 function debugAPI(context, next) {
     // Display a UI API activity report
     if (prefs.debug) {
-        server.log("API received a request at " + time() + ": " + context.req.method.toupper() + " @ " + context.req.path.tolower());
+        server.log("API received a " + context.req.method.toupper() + " request at " + time() + " from " + context.getHeader("x-forwarded-for") + " targetting path " + context.req.path.tolower());
         if (context.req.rawbody.len() > 0) server.log("Request body: " + context.req.rawbody.tolower());
     }
 
