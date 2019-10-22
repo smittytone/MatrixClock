@@ -674,7 +674,7 @@ function setAlarm(newAlarm) {
 function clearAlarm(index) {
     // ADDED IN 2.1.0
     // Remove the alarm from the array; it's at index 'index'
-    if (alarms.len() > 0) {
+    if (settings.alarms.len() > 0) {
         // First, check that the value of 'index' is valid
         if (index < 0 || index > settings.alarms.len() - 1) {
             if (debug) server.error("clearAlarm() bad alarm index: " + index);
@@ -691,7 +691,7 @@ function clearAlarm(index) {
 function stopAlarm(index) {
     // ADDED IN 2.1.0
     // Silence the alarm from the array; it's at index 'index'
-    if (alarms.len() > 0) {
+    if (settings.alarms.len() > 0) {
         // First, check that the value of 'index' is valid
         if (index < 0 || index > settings.alarms.len() - 1) {
             if (debug) server.error("stopAlarm() bad alarm index: " + index);

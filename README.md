@@ -1,4 +1,4 @@
-# MatrixClock 2.2.5 #
+# MatrixClock 2.2.6 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -66,6 +66,9 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
+- 2.2.6 &mdash; *22 October 2019*
+    - Fix incorrectly named variables in *clearAlarm()* and *stopAlarm()*.
+    - Alarm table CSS fixes and minor changes.
 - 2.2.5 &mdash; *5 September 2019*
     - Support polite deployments
     - Update Jquery to 3.4.1, Boostrap to 4.3.1, Simpleslack to 1.0.1, Bootmessage to 2.2.2
