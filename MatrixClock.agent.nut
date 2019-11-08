@@ -628,16 +628,9 @@ api.post("/action", function(context) {
 
             if (data.action == "debug") {
                 // A DEBUG message sent
-                if (data.state == true) {
-                    debug = true;
-                    prefs.debug = true;
-                } else {
-                    debug = false;
-                    prefs.debug = false;
-                }
-
-                device.send("clock.set.debug", debug);
-                server.log("Setting agent debugging " + (debug ? "on" : "off"));
+                prefs.debug = (data.state == true);
+                device.send("clock.set.debug", prefs.debug);
+                server.log("Setting agent debugging " + (prefs.debug ? "on" : "off"));
                 server.save(prefs);
             }
 
