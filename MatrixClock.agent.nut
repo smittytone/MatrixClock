@@ -2,7 +2,7 @@
 // Copyright 2016-19, Tony Smith
 
 // ********** IMPORTS **********
-#require "Rocky.class.nut:2.0.2"
+#require "Rocky.agent.lib.nut:3.0.0"
 
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
@@ -227,7 +227,7 @@ device.on("update.alarms", function(alarms) {
 });
 
 // Set up the web UI and data API
-api = Rocky();
+api = Rocky.init();
 api.use(debugAPI);
 
 // Set up UI access security: HTTPS only

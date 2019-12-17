@@ -1,4 +1,4 @@
-# MatrixClock 2.2.6 #
+# MatrixClock 2.2.7 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -66,40 +66,42 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.6 &mdash; *22 October 2019*
+- 2.2.7 *Unreleased*
+    - Support Rocky 3.0.0.
+- 2.2.6 *22 October 2019*
     - Fix incorrectly named variables in *clearAlarm()* and *stopAlarm()*.
     - Alarm table CSS fixes and minor changes.
-- 2.2.5 &mdash; *5 September 2019*
+- 2.2.5 *5 September 2019*
     - Support polite deployments
     - Update Jquery to 3.4.1, Boostrap to 4.3.1, Simpleslack to 1.0.1, Bootmessage to 2.2.2
-- 2.2.4 &mdash; *18 April 2019*
+- 2.2.4 *18 April 2019*
     - Update JQuery to 3.4.0
-- 2.2.3 &mdash; *6 March 2019*
+- 2.2.3 *6 March 2019*
     - Add low, mid and high brightness icons to the web UI
     - Update dependencies: HT16K33MatrixCustom/HT16K33Matrix 2.0.0
-- 2.2.2 &mdash; *18 February 2019*
+- 2.2.2 *18 February 2019*
     - Sync device and agent code with [Clock](https://github.com/smittytone/Clock)
     - Add API debugging
     - Remove redundant agent-side **server.save()** result checks
-- 2.2.1 &mdash; *30 January 2019*
+- 2.2.1 *30 January 2019*
     - Refresh web UI logo
-- 2.2.0 &mdash; *19 December 2018*
+- 2.2.0 *19 December 2018*
     - Add visual alarms
-- 2.1.0 &mdash; *3 December 2018*
+- 2.1.0 *3 December 2018*
     - Add an option to automatically [turn off the clock display overnight](#night-mode)
     - Add an option to switch display between black on green and green on black
     - Improve UI layout
     - Update matrix LED class
-- 2.0.0 &mdash; *1 November 2018*
+- 2.0.0 *1 November 2018*
     - Update dependencies
     - Restructure API to use JSON
     - Improved [Apple Watch Controller](https://github.com/smittytone/Controller) support
     - Improved error handling
     - Improved settings handling
     - Improved web UI code
-- 1.6.0 &mdash; *11 September 2018*
+- 1.6.0 *11 September 2018*
     - Add **Advanced Settings** area to UI; move Reset button into it; add Debug checkbox
-- 1.5.0 &mdash; *7 June 2018*
+- 1.5.0 *7 June 2018*
     - Update Web UI based on Bootstrap
     - Separate out Web UI code into own file for clarity
     - Use [DisconnectionManager](https://github.com/smittytone/generic/blob/master/disconnect.nut)
