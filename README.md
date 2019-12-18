@@ -66,7 +66,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.7 *Unreleased*
+- 2.2.7 *18 December 2019*
     - Support Rocky 3.0.0.
 - 2.2.6 *22 October 2019*
     - Fix incorrectly named variables in *clearAlarm()* and *stopAlarm()*.
