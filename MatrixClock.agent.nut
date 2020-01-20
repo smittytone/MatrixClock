@@ -19,7 +19,7 @@ const HTML_STRING = @"
 ";                                          // Source: https://github.com/smittytone/MatrixClock
 
 // If you are NOT using Squinter or a similar tool, comment out the following line...
-#import "~/Dropbox/Programming/Imp/Codes/matrixclock.nut"
+#import "~/OneDrive/Programming/MatrixClock/matrixclock.nut"
 // ...and uncomment and fill in this line:
 // const APP_CODE = "YOUR_APP_UUID";
 // NOTE #1 You can ignore the section above if you are NOT including Apple Watch support
