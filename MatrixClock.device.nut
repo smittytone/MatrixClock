@@ -792,10 +792,26 @@ hardware.i2c89.configure(CLOCK_SPEED_400_KHZ);
 
 // Set up the clock display: 0-3 (L-R)
 display = [];
-display.append(HT16K33MatrixCustom(hardware.i2c89, 0x70));
-display.append(HT16K33MatrixCustom(hardware.i2c89, 0x71));
-display.append(HT16K33MatrixCustom(hardware.i2c89, 0x74));
-display.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
+
+// FROM 2.2.8
+// Get the I2C devices (only displays on the bus)
+local i2cs = [];
+for (local i = 2 ; i < 256 ; i += 2) {
+    if (hardware.i2c89.read(i, "", 1) != null) i2cs.append(i >> 1);
+}
+
+if (i2cs.len() < 4) {
+    // Backup if something goes wrong
+    display.append(HT16K33MatrixCustom(hardware.i2c89, 0x70));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, 0x71));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, 0x74));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, 0x75));
+} else {
+    display.append(HT16K33MatrixCustom(hardware.i2c89, i2cs[0]));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, i2cs[1]));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, i2cs[2]));
+    display.append(HT16K33MatrixCustom(hardware.i2c89, i2cs[3]));
+}
 
 // Set the initial brightness and display angle
 foreach (led in display) {
