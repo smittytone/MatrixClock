@@ -15,7 +15,19 @@ class HT16K33MatrixCustom extends HT16K33Matrix {
     function setupCharset() {
         // Modify certain characters ('0') in the default character set
         // NOTE This is not present in the base class
-        _pcharset[17] = "\x22\x42\xfe\x02\x02";
+        // _pcharset[17] = "\x22\x42\xfe\x02\x02";
+
+        _pcharset[16] = "\x3C\x42\x42\x42\x3C";
+        _pcharset[17] = "\x22\x42\x7E\x02\x02";
+        _pcharset[18] = "\x26\x4A\x4A\x4A\x32";
+        _pcharset[19] = "\x24\x42\x52\x52\x2C";
+        _pcharset[20] = "\x0C\x14\x24\x7E\x04";
+        _pcharset[21] = "\x74\x52\x52\x52\x4C";
+        _pcharset[22] = "\x3C\x52\x52\x52\x0C";
+        _pcharset[23] = "\x40\x46\x48\x50\x60";
+        _pcharset[24] = "\x2C\x52\x52\x52\x2C";
+        _pcharset[25] = "\x30\x4A\x4A\x4A\x3C";
+
     }
 
     function displayChar(asciiValue = 32, offset = 0) {
