@@ -240,7 +240,16 @@ function displayTime() {
 
     // AM or PM?
     // Plot a 2x2 square in the bottom right corner of the display
-    if (!settings.mode && isPM) display[3].plot(7, 7, 1).plot(7, 6, 1).plot(6, 7, 1).plot(6, 6, 1);
+    if (!settings.mode) {
+        local ledBuffer = display[3].getIcon();
+        if (isPM) {
+            ledBuffer[6] = 0x1E;
+            ledBuffer[7] = 0x18;
+        } else {
+            ledBuffer[6] = 0x16;
+            ledBuffer[7] = 0x1E;
+        }
+    }
 
     // UTC
     // Plot a 2x2 square in the top right corner of the display
