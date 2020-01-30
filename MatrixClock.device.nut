@@ -239,21 +239,19 @@ function displayTime() {
     }
 
     // AM or PM?
-    // Plot a 2x2 square in the bottom right corner of the display
+    // Plot a 2x2 square in the bottom right corner of the display for AM,
+    // or a 2x2 square in the top right corner of the display for PM
     if (!settings.mode) {
-        local ledBuffer = display[3].getIcon();
         if (isPM) {
-            ledBuffer[6] = 0x1E;
-            ledBuffer[7] = 0x18;
+            display[3].plot(7, 7, 1).plot(7, 6, 1).plot(6, 7, 1).plot(6, 6, 1);
         } else {
-            ledBuffer[6] = 0x16;
-            ledBuffer[7] = 0x1E;
+            display[3].plot(7, 1, 1).plot(7, 2, 1).plot(6, 1, 1).plot(6, 2, 1);
         }
     }
 
     // UTC
-    // Plot a 2x2 square in the top right corner of the display
-    if (settings.utc) display[3].plot(7, 1, 1).plot(7, 0, 1).plot(6, 1, 1).plot(6, 0, 1);
+    // Plot a 2x2 square in the botton left corner of the display
+    if (settings.utc) display[0].plot(0, 1, 1).plot(0, 0, 1).plot(1, 1, 1).plot(1, 0, 1);
 
     // Check whether the colon should appear
     if (settings.colon) {
