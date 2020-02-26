@@ -1,6 +1,10 @@
 // Matrix Clock
 // Copyright 2016-20, Tony Smith
 
+// ******** EARLY RUN CODE *********
+server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
+
+
 // ********** IMPORTS **********
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
