@@ -66,7 +66,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.8 *Unreleased*
+- 2.2.8 *26 February 2020*
     - Support HT16K33Matrix 3.0.0, Bootstrap 4.4.1.
     - Discover displays on the I2C bus and use the detected addresses.
         - Deals with alternatively wired hardware, provided the display’s LED are addressed in left-to-right ascending order.
