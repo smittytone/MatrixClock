@@ -6,14 +6,14 @@
 
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
-#import "../generic/simpleslack.nut"        // Source code: https://github.com/smittytone/generic
-#import "../generic/crashReporter.nut"      // Source code: https://github.com/smittytone/generic
-#import "img_delete.nut"                    // Source: https://github.com/smittytone/MatrixClock
-#import "img_silence.nut"                   // Source: https://github.com/smittytone/MatrixClock
-#import "img_mid.nut"                       // Source: https://github.com/smittytone/MatrixClock
-#import "img_low.nut"                       // Source: https://github.com/smittytone/MatrixClock
-#import "img_high.nut"                      // Source: https://github.com/smittytone/MatrixClock
-#import "img_logo.nut"                      // Source: https://github.com/smittytone/MatrixClock
+#import "../generic-squirrel/simpleslack.nut"       // Source code: https://github.com/smittytone/generic-squirrel
+#import "../generic-squirrel/crashReporter.nut"     // Source code: https://github.com/smittytone/generic-squirrel
+#import "img_delete.nut"                            // Source: https://github.com/smittytone/MatrixClock
+#import "img_silence.nut"                           // Source: https://github.com/smittytone/MatrixClock
+#import "img_mid.nut"                               // Source: https://github.com/smittytone/MatrixClock
+#import "img_low.nut"                               // Source: https://github.com/smittytone/MatrixClock
+#import "img_high.nut"                              // Source: https://github.com/smittytone/MatrixClock
+#import "img_logo.nut"                              // Source: https://github.com/smittytone/MatrixClock
 const HTML_STRING = @"
 #import "matrixclock_ui.html"
 ";                                          // Source: https://github.com/smittytone/MatrixClock

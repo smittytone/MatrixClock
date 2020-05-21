@@ -1,4 +1,4 @@
-# MatrixClock 2.2.8 #
+# MatrixClock 2.2.9 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -66,6 +66,10 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
+- 2.2.9 *21 May 2020*
+    - Update JQuery to 3.5.x.
+    - update Bootstrap to 4.5.x.
+    - Update included repo names.
 - 2.2.8 *26 February 2020*
     - Support HT16K33Matrix 3.0.0, Bootstrap 4.4.1.
     - Discover displays on the I2C bus and use the detected addresses.

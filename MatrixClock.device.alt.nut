@@ -5,9 +5,9 @@
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
 #import "HT16K33MatrixCustom.class.nut"     // Source code: https://github.com/smittytone/MatrixClock
-#import "../generic/utilities.nut"          // Source code: https://github.com/smittytone/generic
-#import "../generic/disconnect.nut"         // Source code: https://github.com/smittytone/generic
-#import "../generic/crashReporter.nut"      // Source code: https://github.com/smittytone/generic
+#import "../generic-squirrel/utilities.nut"          // Source code: https://github.com/smittytone/generic-squirrel
+#import "../generic-squirrel/disconnect.nut"         // Source code: https://github.com/smittytone/generic-squirrel
+#import "../generic-squirrel/crashReporter.nut"      // Source code: https://github.com/smittytone/generic-squirrel
 
 
 // ********** CONSTANTS **********
@@ -773,7 +773,7 @@ function discHandler(event) {
 // Load in generic boot message code
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
-#import "../generic/bootmessage.nut"        // Source code: https://github.com/smittytone/generic
+#import "../generic-squirrel/bootmessage.nut"        // Source code: https://github.com/smittytone/generic-squirrel
 
 // Set up the crash reporter
 crashReporter.init();

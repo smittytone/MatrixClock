@@ -2,7 +2,7 @@
 // NOTE If you are not using Squinter or an equivalent tool, cut and paste the named
 // file's code over the following line. For Squinter users, you will need to change
 // the path to the file in the #import statement
-#import "../HT16K33Matrix/HT16K33Matrix.class.nut"     // Source: https://github.com/smittytone/HT16K33Matrix
+#import "../HT16K33Matrix-Squirrel/HT16K33Matrix.class.nut"     // Source: https://github.com/smittytone/HT16K33Matrix-Squirrel
 
 class HT16K33MatrixCustom extends HT16K33Matrix {
 
