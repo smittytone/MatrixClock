@@ -1,4 +1,4 @@
-# MatrixClock 2.2.9 #
+# MatrixClock 2.2.10 #
 
 An [Electric Imp](https://electricimp.com/) imp001-based digital clock using four [Adafruit 8x8 LED matrix displays](http://www.adafruit.com/products/1854) based on the Holtek HT16K33 controller, embedded in a custom laser-cut acrylic case.
 
@@ -66,6 +66,8 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
+- 2.2.10 *06 August 2020*
+    - CSS improvements fo web UI.
 - 2.2.9 *21 May 2020*
     - Update JQuery to 3.5.x.
     - update Bootstrap to 4.5.x.
@@ -130,4 +132,4 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 The design and software for Matrix Clock are made available under the [MIT Licence](./LICENSE).
 
-Copyright &copy; 2016-2020, Tony Smith
+Copyright &copy; 2020, Tony Smith
