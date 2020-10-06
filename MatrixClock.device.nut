@@ -388,7 +388,7 @@ function setPrefs(prefsData) {
     settings.timer.off.hour = prefsData.timer.off.hour;
     settings.timer.off.min = prefsData.timer.off.min;
     settings.timer.isset = prefsData.timer.isset;
-    isAdvanceSet = prefsData.timer.isadv;
+    //isAdvanceSet = prefsData.timer.isadv;
 
     // ADDED IN 2.2.0
     // Clear and reset the local list of alarms
