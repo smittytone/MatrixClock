@@ -1,7 +1,12 @@
-// Matrix Clock
-// Copyright 2016-20, Tony Smith
+/*
+ * Matrix Clock
+ * Copyright 2020, Tony Smith
+ */
 
-// ********** IMPORTS **********
+
+/*
+ * IMPORTS
+ */
 #require "Rocky.agent.lib.nut:3.0.0"
 
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
@@ -27,20 +32,26 @@ const HTML_STRING = @"
 // NOTE #2 The above file is also used to configure CrashReporter (see https://github.com/smittytone/generic)
 
 
-// ********** CONSTANTS **********
+/*
+ * CONSTANTS
+ */
 const MAX_ALARMS = 8;
 
 
-// ********** MAIN VARIABLES **********
+/*
+ * MAIN VARIABLES
+ */
 local prefs = null;
 local api = null;
 local stateChange = false;
 
 
-// ********** FUNCTIONS **********
-// NOTE These primarily centre around device settings:
-//      sending them to the newly booted device, sending them to
-//      controllers, eg. Apple Watch and the web UI
+/*
+ * FUNCTIONS
+ * NOTE These primarily centre around device settings:
+ *      sending them to the newly booted device, sending them to
+ *      controllers, eg. Apple Watch and the web UI
+ */
 
 function sendPrefsToDevice(ignore) {
     // The Matrix Clock has requested the current settings data, so send it as a table
@@ -93,7 +104,7 @@ function resetPrefs() {
 	// Reset 'prefs' values to the defaults
 	initialisePrefs();
 
-    // Resave the prefs
+    // Re-save the prefs
     server.save(prefs);
 }
 
@@ -142,7 +153,9 @@ function debugAPI(context, next) {
 }
 
 
-// ********** RUNTIME START **********
+/*
+ * RUNTIME START
+ */
 
 // Initialize the clock's preferences - we will read in saved values, if any, next
 initialisePrefs();
@@ -606,11 +619,7 @@ api.post("/settings", function(context) {
     } catch (err) {
         server.error(err);
         context.send(400, "Bad data posted: " + context.req.rawbody);
-        return;
     }
-
-    // Just in case, but we should never hit this
-    context.send(200, "OK");
 });
 
 api.post("/action", function(context) {
@@ -622,16 +631,16 @@ api.post("/action", function(context) {
                 // A RESET message sent to restore factory settings
                 resetPrefs();
                 device.send("clock.set.prefs", prefs);
-                if (prefs.debug) server.log("Clock settings reset");
                 server.save(prefs);
+                if (prefs.debug) server.log("Clock settings reset");
             }
 
             if (data.action == "debug") {
                 // A DEBUG message sent
                 prefs.debug = (data.state == true);
                 device.send("clock.set.debug", prefs.debug);
-                server.log("Setting agent debugging " + (prefs.debug ? "on" : "off"));
                 server.save(prefs);
+                server.log("Setting agent debugging " + (prefs.debug ? "on" : "off"));
             }
 
             if (data.action == "reboot") {
@@ -645,7 +654,6 @@ api.post("/action", function(context) {
     } catch (err) {
         context.send(400, "Bad data posted");
         server.error(err);
-        return;
     }
 });
 
@@ -674,7 +682,7 @@ api.get("/images/([^/]*)", function(context) {
     if (name == "silence.png") image = SILENCE_PNG;
     if (name == "logo.svg") image = LOGO_SVG;
 
-    // Set the correct conent-type for the image
+    // Set the correct content-type for the image
     if (name.slice(name.len() - 3) == "svg") {
         context.setHeader("Content-Type", "image/svg+xml");
     } else {

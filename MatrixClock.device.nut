@@ -1,11 +1,18 @@
-// Matrix Clock
-// Copyright 2016-20, Tony Smith
+/*
+ * Matrix Clock
+ * Copyright 2020, Tony Smith
+ */
 
-// ******** EARLY RUN CODE *********
+
+/*
+ * EARLY RUN CODE
+ */
 server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
 
 
-// ********** IMPORTS **********
+/*
+ * IMPORTS
+ */
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)
 // with the contents of the named file(s):
 #import "HT16K33MatrixCustom.class.nut"             // Source code: https://github.com/smittytone/MatrixClock
@@ -14,7 +21,9 @@ server.setsendtimeoutpolicy(RETURN_ON_ERROR, WAIT_TIL_SENT, 10);
 #import "../generic-squirrel/crashReporter.nut"     // Source code: https://github.com/smittytone/generic-squirrel
 
 
-// ********** CONSTANTS **********
+/*
+ * CONSTANTS
+ */
 const DISCONNECT_TIMEOUT = 60;
 const RECONNECT_TIMEOUT  = 15;
 const TICK_DURATION      = 0.5;
@@ -27,7 +36,9 @@ const ALARM_STATE_DONE   = 2;               // Alarm completed, can be deleted
 const LED_ANGLE          = 0;
 
 
-// ********** GLOBAL VARIABLES **********
+/*
+ * GLOBAL VARIABLES
+ */
 // Objects
 local display = null;
 local tickTimer = null;
@@ -62,7 +73,9 @@ local ca = [0,7,1,7,1,6,0,6];
 local cc = 0;
 
 
-// ********** TIME AND DISPLAY CONTROL FUNCTIONS **********
+/*
+ * TIME AND DISPLAY CONTROL FUNCTIONS
+ */
 function clockTick() {
     // This is the main clock loop
     // Queue the function to run again in TICK_DURATION seconds
@@ -81,11 +94,11 @@ function clockTick() {
     // Update the value of 'hours' to reflect displayed time
     if (settings.utc) {
         // If UTC is set, add the international time offset (0 - 24, converted here to -12 to + 12)
-        hours = hours + settings.utcoffset - 12;
+        hours += (settings.utcoffset - 12);
         if (hours > 24) {
-            hours = hours - 24;
+            hours -= 24;
         } else if (hours < 0) {
-            hours = hours + 24;
+            hours += 24;
         }
     } else {
         // We are displaying local time -
@@ -133,11 +146,12 @@ function shouldShowDisplay() {
 
     // Should we disable the advance? Only if it's set and we've hit the start or end end
     // of the night period
-    // NOTE 'isAdvanceSet' is ONLY set if 'settings.timer.isset' is TRUE
+    // NOTE 'isAdvanceSet' should ONLY be set if 'settings.timer.isset' is TRUE
     if (isAdvanceSet) {
         // 'isAdvanceSet' is unset when the next event time (display goes on or off) is reached
         if (hours == settings.timer.on.hour && minutes >= settings.timer.on.min) isAdvanceSet = false;
         if (hours == settings.timer.off.hour && minutes >= settings.timer.off.min) isAdvanceSet = false;
+        if (!settings.timer.isset) isAdvancedSet = false;
     }
 
     // Have we crossed into the night period? If so, unset 'shouldShow'
@@ -179,56 +193,32 @@ function displayTime() {
     // The main function for updating the display
 
     // Set the digit counters a and b
-    local a = hours;
-    local b = 0;
+    local a = bcd(hours);
 
     // Set the hours
     if (settings.mode) {
         // 24-hour clock
-        if (a < 10) {
-            display[0].displayChar(48, 3);
-            display[1].displayChar(48 + a, 1);
-        } else if (a > 9 && a < 20) {
-            display[0].displayChar(49, 3);
-            display[1].displayChar(38 + a, 1);
-        } else if (a > 19) {
-            display[0].displayChar(50, 3);
-            display[1].displayChar(28 + a, 1);
-        }
+        display[0].displayChar(48 + ((a & 0xF0) >> 4), 3);
+        display[1].displayChar(48 + (a & 0x0F), 1);
     } else {
         // 12-hour clock
-        if (a == 12 || a == 0 ) {
+        a = hours;
+        if (isPM) a -= 12;
+        if (a == 0) a = 12;
+        a = bcd(a);
+        if (a < 10) {
+            display[0].displayGlyph(32, 3);
+        } else {
             display[0].displayChar(49, 3);
-            display[1].displayChar(50, 1);
-        } else if (a < 10) {
-            display[0].displayChar(32, 3);
-            display[1].displayChar(48 + a, 1);
-        } else if (a == 10 || a == 11) {
-            display[0].displayChar(49, 3);
-            display[1].displayChar(38 + a, 1);
-        } else if (a > 12 && a < 22) {
-            display[0].displayChar(32, 3);
-            display[1].displayChar(36 + a, 1);
-        } else if (a == 22 || a == 23) {
-            display[0].displayChar(49, 3);
-            display[1].displayChar(26 + a, 1);
         }
+
+        display[1].displayChar(48 + (a & 0x0F), 1);
     }
 
     // Set the minutes
-    if (minutes > 9) {
-        a = minutes;
-        while (a >= 0) {
-            a = a - 10;
-            b++;
-        }
-
-        display[2].displayChar(47 + b, 2);
-        display[3].displayChar(48 + minutes - (10 * (b - 1)), 0);
-    } else {
-        display[2].displayChar(48, 2);
-        display[3].displayChar(48 + minutes, 0);
-    }
+    a = bcd(minutes);
+    display[2].displayChar(48 + ((a & 0xF0) >> 4), 2);
+    display[3].displayChar(48 + (a & 0x0F), 0);
 
     // Is the clock disconnected? If so, flag the fact
     // with a 2x2 square in the top left corner of the display
@@ -254,7 +244,7 @@ function displayTime() {
     }
 
     // UTC
-    // Plot a 2x2 square in the botton left corner of the display
+    // Plot a 2x2 square in the bottom left corner of the display
     if (settings.utc) display[0].plot(0, 1, 1).plot(0, 0, 1).plot(1, 1, 1).plot(1, 0, 1);
 
     // Check whether the colon should appear
@@ -277,6 +267,17 @@ function displayTime() {
 
     // Draw the display
     updateDisplay();
+}
+
+function bcd(binValue) {
+    for (local i = 0 ; i < 8 ; i++) {
+        binValue = binValue << 1
+        if (i == 7) break;
+        if ((binValue & 0xF00) > 0x4FF) binValue += 0x300
+        if ((binValue & 0xF000) > 0x4FFF) binValue += 0x3000
+    }
+
+    return (binValue >> 8) & 0xFF;
 }
 
 function drawColon() {
@@ -362,7 +363,9 @@ function syncText() {
 }
 
 
-// ********** PREFERENCES FUNCTIONS **********
+/*
+ * PREFERENCES FUNCTIONS
+ */
 function setPrefs(prefsData) {
     // Log receipt of prefs data
     if (debug) server.log("Received preferences from agent");
@@ -494,7 +497,7 @@ function setLight(value) {
     // ADDED IN 2.1.0
     if (settings.timer.isset) {
         // If we're in night mode, we treat this as an advance of the timer
-        // NOTE This will cause settings.on to be set elsewhere (see 'clockTick()')
+        // NOTE This will cause 'settings.on' to be set elsewhere (see 'clockTick()')
         isAdvanceSet = !isAdvanceSet;
     } else {
         // We're not in night mode, so just turn the light off
@@ -504,7 +507,7 @@ function setLight(value) {
 }
 
 function setDebug(state) {
-    // Enable or disble debugging messaging in response to a message from the UI via the agent
+    // Enable or disable debugging messaging in response to a message from the UI via the agent
     if (debug != state) {
         foreach (led in display) led.setDebug(state, true);
         debug = state;
@@ -541,7 +544,9 @@ function setDefaultPrefs() {
     settings.video <- false;
 }
 
-// ********** ALARM FUNCTONS **********
+/*
+ * ALARM FUNCTONS
+ */
 function checkAlarms() {
     // ADDED IN 2.1.0
     // Do we need to display an alarm screen flash?
@@ -718,7 +723,9 @@ function stopAlarm(index) {
 }
 
 
-// ********** NIGHT MODE FUNCTIONS **********
+/*
+ * NIGHT MODE FUNCTIONS
+ */
 function setNight(value) {
     // ADDED IN 2.1.0
     // This function is called when the app enables or disables night mode
@@ -749,7 +756,9 @@ function setNightTime(data) {
 }
 
 
-// ********** OFFLINE OPERATION FUNCTIONS **********
+/*
+ * OFFLINE OPERATION FUNCTIONS
+ */
 function discHandler(event) {
     // Called if the server connection is broken or re-established
     if ("message" in event && debug) server.log("Connection Manager: " + event.message);
@@ -779,7 +788,9 @@ function discHandler(event) {
 }
 
 
-// ********** START OF PROGRAM **********
+/*
+ * START OF PROGRAM
+ */
 
 // Load in generic boot message code
 // If you are NOT using Squinter or a similar tool, replace the following #import statement(s)

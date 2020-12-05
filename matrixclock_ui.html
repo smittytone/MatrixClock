@@ -64,7 +64,7 @@
             </div>
             <!-- Settings and Controls Row -->
             <div class='row'>
-                <div class='col-2'>&nbsp;</div>
+                <div class='col-2'></div>
                 <div class='col-8'>
                     <!-- Main checkboxes -->
                     <h4 align='center'>General Settings</h4>
@@ -171,10 +171,27 @@
                         <h4 align='center'>Alarms</h4>
                         <p class='alarm-list text-center'><span></span></p>
                         <div align='center'>
-                            <div class='form-inline justify-content-center'>
-                                <label for='enter-hour' style='color:white'>Add an Alarm: Hour</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='width:50px;color:black;' placeholder='15' />&nbsp;
-                                <label for='enter-min' style='color:white'>Minute</label>&nbsp;<input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='width:50px;color:black;' placeholder='00' />&nbsp;
-                                <label for='repeat' class='col-form-label' style='color:white'>Repeat?</label>&nbsp;<input type='checkbox' class='form-check-input' name='repeat' id='repeat' value=''>
+                            <div class='form-row'>
+                                <label for='colFormLabel' class='col-3 col-form-label' align='right' style='color:white'>&nbsp;</label>
+                                <label for='colFormLabel' class='col-3 col-form-label' align='center' style='color:white'>Hour</label>
+                                <label for='colFormLabel' class='col-3 col-form-label' align='center' style='color:white'>Min</label>
+                                <label for='colFormLabel' class='col-3 col-form-label' align='left' style='color:white'>&nbsp;</label>
+                            </div>
+                            <div class='form-row'>
+                                <div class='col-3' align='right'>
+                                    <label class='col-form-label' style='color:white'>Add Alarm: </label>
+                                </div>
+                                <div class='col-3' align='center'>
+                                    <input type='text' class='form-control form-control-sm' id='enter-hour' min='0' max='23' style='color:black' placeholder='15'>
+                                </div>
+                                <div class='col-3' align='center'>
+                                    <input type='text' class='form-control form-control-sm' id='enter-min' min='0' max='59' style='color:black' placeholder='00'>
+                                </div>
+                                <div class='col-3' align='left'>
+                                    <label class='checkarea'> Repeat?
+                                        <input type='checkbox' name='repeat' id='repeat' value=''><span class='checkmark'></span>
+                                    </label>
+                                </div>
                             </div>
                             <p style='font-size: 0.8em;line-height: 3em;' align='center'><i>Please set the alarm times in the 24-hour clock format</i></p>
                             <button type='submit' class='btn btn-success' id='setalarm' style='width:200px;font-family:Rubik;'>Set Alarm</button>
@@ -206,7 +223,7 @@
                         </div>
                     </div>
                 </div>
-                <div class='col-2'>&nbsp;</div>
+                <div class='col-2'></div>
             </div>
             <!-- Colophon Row -->
             <div class='row'>
