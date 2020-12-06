@@ -60,7 +60,7 @@ local disTime = 0;
 local isDisconnected = false;
 local isConnecting = false;
 local isPM = false;
-local isAdvanceSet = false;
+local isAdvanced = false;
 local tickFlag = true;
 local debug = false;
 
@@ -124,13 +124,14 @@ function clockTick() {
     if (settings.timer.isset) {
         local should = shouldShowDisplay();
         if (settings.on != should) {
-            // Change the state of the display
+            // Display status has changed so update the state record
             setDisplay(should);
             settings.on = should;
         }
     }
 
     // Present the current time
+    // 'settings.on' is governed by UI control and 'isAdvanced'
     if (settings.on) displayTime();
 }
 
@@ -144,34 +145,30 @@ function shouldShowDisplay() {
     // Assume we will enable the display
     local shouldShow = true;
 
-    // Should we disable the advance? Only if it's set and we've hit the start or end end
-    // of the night period
-    // NOTE 'isAdvanceSet' should ONLY be set if 'settings.timer.isset' is TRUE
-    if (isAdvanceSet) {
-        // 'isAdvanceSet' is unset when the next event time (display goes on or off) is reached
-        if (hours == settings.timer.on.hour && minutes >= settings.timer.on.min) isAdvanceSet = false;
-        if (hours == settings.timer.off.hour && minutes >= settings.timer.off.min) isAdvanceSet = false;
-        if (!settings.timer.isset) isAdvancedSet = false;
+    // Should we disable the advance? Only if it's set and
+    // we've hit the start or end of the night period
+    if (isAdvanced) {
+        // 'isAdvanced' is unset when the next event time (display goes on or off) is reached
+        if (hours == settings.timer.on.hour && minutes >= settings.timer.on.min) isAdvanced = false;
+        if (hours == settings.timer.off.hour && minutes >= settings.timer.off.min) isAdvanced = false;
+        if (debug && !isAdvanced) server.log("Advance ended");
     }
 
     // Have we crossed into the night period? If so, unset 'shouldShow'
     // Check by converting all times to minutes
-    local start = settings.timer.on.hour * 60 + settings.timer.on.min;
-    local end = settings.timer.off.hour * 60 + settings.timer.off.min;
+    local end = settings.timer.on.hour * 60 + settings.timer.on.min;
+    local start = settings.timer.off.hour * 60 + settings.timer.off.min;
     local now = hours * 60 + minutes;
     local delta = end - start;
 
-    // End and start times are identical
-    if (delta == 0) return !isAdvanceSet;
-
     if (delta > 0) {
         if (now >= start && now < end) shouldShow = false;
-    } else {
+    } else if (delta < 0) {
         if (now >= start || now < end) shouldShow = false;
     }
 
-    // 'isAdvancedSet' inverts the expected state
-    return (isAdvanceSet ? !shouldShow : shouldShow);
+    // 'isAdvanced' inverts the expected state
+    return (isAdvanced ? !shouldShow : shouldShow);
 }
 
 function setDisplay(state) {
@@ -179,12 +176,12 @@ function setDisplay(state) {
     // Power up or power down the display according to the supplied state (true or false)
     if (state) {
         powerUp();
-        agent.send("display.state", { "on" : true, "advance" : isAdvanceSet });
+        agent.send("display.state", { "on" : true, "advance" : isAdvanced });
         if (debug) server.log("Brightening display at " + format("%02i", hours) + ":" + format("%02i", minutes));
     } else {
         clearDisplay();
         powerDown();
-        agent.send("display.state", { "on" : false, "advance" : isAdvanceSet });
+        agent.send("display.state", { "on" : false, "advance" : isAdvanced });
         if (debug) server.log("Dimming display at " + format("%02i", hours) + ":" + format("%02i", minutes));
     }
 }
@@ -391,7 +388,7 @@ function setPrefs(prefsData) {
     settings.timer.off.hour = prefsData.timer.off.hour;
     settings.timer.off.min = prefsData.timer.off.min;
     settings.timer.isset = prefsData.timer.isset;
-    //isAdvanceSet = prefsData.timer.isadv;
+    isAdvanced = false;
 
     // ADDED IN 2.2.0
     // Clear and reset the local list of alarms
@@ -401,7 +398,7 @@ function setPrefs(prefsData) {
     }
 
     // ADDED IN 2.1.0: Make use of display disable times
-    // NOTE We change settings.on, so the the local state record, settings.on,
+    // NOTE We change settings.on, so the the local state record, prefsData.on,
     //      is correctly updated in the next stanza
     if (settings.timer.isset) {
         local now = date();
@@ -428,7 +425,11 @@ function setPrefs(prefsData) {
 
     // Set the display state
     // NOTE 'setLight()' updates 'settings.on'
-    if (settings.on != prefsData.on) setLight(prefsData.on);
+    if (settings.on != prefsData.on) {
+        settings.on = prefsData.on;
+        setDisplay(settings.on);
+    }
+    //setLight(prefsData.on);
 
     // Only set the brightness and state now if the display is on
     if (settings.on) {
@@ -492,15 +493,16 @@ function setColon(value) {
 function setLight(value) {
     // This function is called when the app turns the clock display on or off
     // 'value' is passed in from the agent as a bool
-    if (debug) server.log("Setting light " + (value ? "on" : "off"));
 
     // ADDED IN 2.1.0
     if (settings.timer.isset) {
-        // If we're in night mode, we treat this as an advance of the timer
+        // If night mode is set, we treat this as an advance of the timer
         // NOTE This will cause 'settings.on' to be set elsewhere (see 'clockTick()')
-        isAdvanceSet = !isAdvanceSet;
+        isAdvanced = !isAdvanced;
+        if (debug) server.log("Advance " + (isAdvanced ? "set" : "unset"));
     } else {
         // We're not in night mode, so just turn the light off
+        if (debug) server.log("Setting display " + (value ? "on" : "off"));
         settings.on = value;
         setDisplay(value);
     }
@@ -737,7 +739,7 @@ function setNight(value) {
 
     // Disable the timer advance setting as it's only relevant if night mode is
     // on AND it has been triggered since night mode was enabled
-    isAdvanceSet = false;
+    isAdvanced = false;
 
     if (debug) server.log("Setting nightmode " + (value ? "on" : "off"));
 }
