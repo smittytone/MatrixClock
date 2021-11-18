@@ -1,6 +1,6 @@
 /*
  * Matrix Clock
- * Copyright 2020, Tony Smith
+ * Copyright 2021, Tony Smith
  */
 
 
@@ -204,7 +204,7 @@ function displayTime() {
         if (a == 0) a = 12;
         a = bcd(a);
         if (a < 10) {
-            display[0].displayGlyph(32, 3);
+            display[0].displayChar(32, 3);
         } else {
             display[0].displayChar(49, 3);
         }

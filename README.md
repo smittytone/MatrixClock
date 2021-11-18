@@ -66,7 +66,7 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 ## Release Notes ##
 
-- 2.2.11 *Unreleased*
+- 2.2.11 *18 November 2021*
     - Bug fixes.
 - 2.2.10 *06 August 2020*
     - CSS improvements fo web UI.
@@ -134,4 +134,4 @@ You can use the file `clock.svg` to produce a simple laser-cut case/mounting fra
 
 The design and software for Matrix Clock are made available under the [MIT Licence](./LICENSE).
 
-Copyright &copy; 2020, Tony Smith
+Copyright &copy; 2021, Tony Smith
